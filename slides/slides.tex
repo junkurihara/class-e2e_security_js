@@ -248,8 +248,8 @@
 %%%
 %%% 著者など
 %%%
-\title[E2E Security with JS]{JavaScriptによるEnd-to-Endセキュリティの実現}
-\subtitle{セキュリティ入門から実践応用まで}
+\title[E2E Security with JS]{JavaScriptによるEnd-to-Endセキュリティ}
+\subtitle{入門編}
 \author[Jun Kurihara]{栗原 淳}
 \institute[]{}
 \date[\today]{\today}
@@ -269,35 +269,76 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{はじめに}
 \begin{frame}
+ \centering
+ {\Large はじめに}
+\end{frame}
+\begin{frame}
 \frametitle{はじめに}
-この講義の目的:
+この講義では
+\begin{itemize}
+ \item End-to-End (E2E) セキュリティの原則
+ \item WebサイトでのE2Eセキュリティ実践のため、JavaScriptでの実装方法
+\begin{itemize}
+ \item ブラウザ側
+ \item サーバ側 (Node.js)
+\end{itemize}
+\end{itemize}
+のさわりを学ぶ。
 
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{モダンWebサイトとEnd-to-Endセキュリティ}
+\begin{frame}
+ \centering
+ {\Large モダンWebサイトとEnd-to-Endセキュリティ}
+\end{frame}
 
 \begin{frame}
  \frametitle{最近流行りのWebシステム}
 \end{frame}
 
 \begin{frame}
- \frametitle{「暗号化して保存しているから安全です」の嘘}
+ 
 \end{frame}
 
 \begin{frame}
- \frametitle{}
+ \frametitle{「SSL/TLSで暗号化しているから安全です」の嘘}
+\end{frame}
+
+\begin{frame}
+ \frametitle{End-to-Endセキュリティの原則とは}
+\end{frame}
+
+\begin{frame}
+\frametitle{WebシステムにおけるEnd-to-Endセキュリティ}
+導入する意味
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{暗号化}
 \begin{frame}
 \centering
-{\Large JavaScriptで暗号化してみよう [基礎編]}
+{\Large JavaScriptで暗号を使ってみよう [基礎編]}
 \end{frame}
 
-\subsection{共通鍵暗号}
-\subsection{公開鍵暗号}
+\begin{frame}
+ \frametitle{ブラウザでの暗号化: WebCrypto API}
+\end{frame}
+
+\begin{frame}
+ \frametitle{サーバでの暗号化: Node.js Crypto}
+\end{frame}
+
+\begin{frame}
+ \frametitle{ブラウザ・サーバ間での相互接続性の確認}
+\end{frame}
+
+\begin{frame}
+ \frametitle{補足: APIが違うのがめんどくさい…}
+ \textbf{手前味噌だが、統合APIを使って楽をすると良い}
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}

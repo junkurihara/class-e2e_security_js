@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.2-190131-2.6 (utf8.euc) (TeX Live 2019) (preloaded format=platex 2019.7.24)  24 JUL 2019 15:17
+This is e-pTeX, Version 3.14159265-p3.8.2-190131-2.6 (utf8.euc) (TeX Live 2019) (preloaded format=platex 2019.7.24)  24 JUL 2019 16:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -944,22 +944,42 @@ LaTeX Font Info:    Font shape `OT1/txss/m/n' will be
 (Font)              scaled to size 3.79999pt on input line 267.
  [1
 
-] [2
+]
+LaTeX Font Info:    Font shape `OT1/txss/m/n' will be
+(Font)              scaled to size 16.41594pt on input line 274.
+ [2
 
-] [3
+]
+LaTeX Font Info:    Font shape `OT1/txss/m/n' will be
+(Font)              scaled to size 10.40245pt on input line 288.
+ [3
 
 ] [4
 
 ] [5
 
+] [6
+
+] [7
+
+] [8
+
+] [9
+
 ]
-LaTeX Font Info:    Font shape `OT1/txss/m/n' will be
-(Font)              scaled to size 16.41594pt on input line 297.
- [6
+[10
+
+] [11
+
+] [12
+
+] [13
+
+] [14
 
 ]
 LaTeX Font Info:    Font shape `OT1/txss/m/n' will be
-(Font)              scaled to size 6.17497pt on input line 311.
+(Font)              scaled to size 6.17497pt on input line 352.
  (./slides.bbl
 File: beamericonarticle.pdf Graphic file (type pdf)
 <beamericonarticle.pdf>
@@ -967,11 +987,11 @@ File: beamericonarticle.pdf Graphic file (type pdf)
 
 LaTeX Warning: Empty `thebibliography' environment on input line 24.
 
-) [7
+) [15
 
 ]
 \c@framenumberappendix=\count169
- [8
+ [16
 
 ]
 \tf@nav=\write6
@@ -983,21 +1003,21 @@ LaTeX Warning: Empty `thebibliography' environment on input line 24.
 \tf@snm=\write8
 \openout8 = `slides.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 321.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 321.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 362.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 362.
  (./slides.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 321.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 321.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 362.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 362.
 Package rerunfilecheck Info: File `slides.out' has not changed.
-(rerunfilecheck)             Checksum: FA6DD3E5BA47A9C1B70E0E51362ACCB0;347.
+(rerunfilecheck)             Checksum: 09306B271C6C1111856842D3EE340698;219.
  ) 
 Here is how much of TeX's memory you used:
- 17503 strings out of 493216
- 332603 string characters out of 6143982
- 416521 words of memory out of 5000000
- 21078 multiletter control sequences out of 15000+600000
- 16871 words of font info for 54 fonts, out of 8000000 for 9000
+ 17568 strings out of 493216
+ 334310 string characters out of 6143982
+ 417476 words of memory out of 5000000
+ 21143 multiletter control sequences out of 15000+600000
+ 18013 words of font info for 57 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
  56i,15n,55p,794b,544s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on slides.dvi (8 pages, 20968 bytes).
+Output written on slides.dvi (16 pages, 40620 bytes).
