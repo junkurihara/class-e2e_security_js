@@ -304,6 +304,10 @@
 
 \begin{frame}
  \frametitle{「SSL/TLSで暗号化しているから安全です」の嘘}
+ 「ストレージ暗号化しています！」\\
+ $\Rightarrow$ クラウド事業者に丸見えじゃないか…\\
+ $\Rightarrow$ 鍵が漏洩したら一網打尽
+ 
 \end{frame}
 
 \begin{frame}
@@ -320,6 +324,9 @@
 \begin{frame}
 \centering
 {\Large JavaScriptで暗号を使ってみよう [基礎編]}
+今回はAESを使ってみます。
+
+AESとは。
 \end{frame}
 
 \begin{frame}
@@ -332,6 +339,8 @@
 
 \begin{frame}
  \frametitle{ブラウザ・サーバ間での相互接続性の確認}
+
+ しかしサーバで復号しているのであんまり意味がない。
 \end{frame}
 
 \begin{frame}
@@ -339,8 +348,24 @@
  \textbf{手前味噌だが、統合APIを使って楽をすると良い}
 \end{frame}
 
+\begin{frame}
+ \frametitle{ブラウザ同士での相互接続性の確認}
+ APIを通じて暗号化データをやり取りしてみる。
+
+ E2E Security!
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+ \begin{enumerate}
+  \item 今回は共通鍵暗号
+  \item 公開鍵暗号\& Hybrid Encryption
+  \item ハッシュ・署名とHMAC
+　\item 超マニアック講座：RFCとアルゴリズム・フォーマット
+ \end{enumerate}
+\end{frame}
+
 \begin{frame}
 \frametitle{引用文献}
 \bibliographystyle{IEEEtranS}
@@ -366,4 +391,3 @@ This page is not counted.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
