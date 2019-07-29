@@ -295,12 +295,57 @@
 \end{frame}
 
 \begin{frame}
- \frametitle{最近流行りのWebシステム}
+\frametitle{Webサイトにおける昨今の情勢}
+\begin{itemize}
+\item EUにおけるGeneral Data Protection Regulation (GDPR) の施行 (2018年)\\
+\item GDPRに続いて、カリフォルニア、南米、オセアニアで類似の法律の制定の動き\\
+\item 日本においても、2020年に個人情報保護法の改正法案提出の見通し
+\end{itemize}
+\begin{center}
+$\Downarrow$\\
+\alert{企業にとって、「正しく」「強固」に\\
+ユーザデータ、ユーザプライバシを保護することは必須の事項}
+\end{center}
 \end{frame}
 
 \begin{frame}
- 
+\frametitle{最近流行りのWebシステム}
+\begin{itemize}
+ \item クラウドプラットフォーム上で構築
+ \item 「サーバ」のない (\alert{サーバレス}) 構成
+ \item JavaScript (ReactJSなど) を多用した、Single Page Application構成
+\end{itemize}
+\begin{center}
+$\Downarrow$\\
+\alert{ユーザの手元で計算を実行する機会の増加}
+\end{center}
 \end{frame}
+
+\begin{frame}
+AWSを例にした典型的な構成:
+\begin{center}
+\includegraphics[width=0.85\linewidth]{Figs/spa1.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+AWSを例にした典型的な構成:
+\begin{center}
+\includegraphics[width=0.85\linewidth]{Figs/spa3.pdf}
+\end{center}
+\structure{通常、ユーザ・クラウド間のHTTP通信路はSSL/TLSで保護}\\
+$\Rightarrow$ HTTP通信路から外部の盗聴者へのユーザデータ漏洩を防止
+\end{frame}
+
+\begin{frame}
+AWSを例にした典型的な構成:
+\begin{center}
+\includegraphics[width=0.85\linewidth]{Figs/spa2.pdf}
+\end{center}
+\structure{しかし、クラウドPF内・ブラウザ内のデータ保護は……？}
+%$\Rightarrow$ \alert{Google/Amazon/Microsoftを本当に信用できますか？}
+\end{frame}
+
 
 \begin{frame}
  \frametitle{「SSL/TLSで暗号化しているから安全です」の嘘}
