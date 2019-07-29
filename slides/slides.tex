@@ -343,16 +343,67 @@ AWSを例にした典型的な構成:
 \includegraphics[width=0.85\linewidth]{Figs/spa2.pdf}
 \end{center}
 \structure{しかし、クラウドPF内・ブラウザ内のデータ保護は……？}
-%$\Rightarrow$ \alert{Google/Amazon/Microsoftを本当に信用できますか？}
 \end{frame}
 
 
 \begin{frame}
- \frametitle{「SSL/TLSで暗号化しているから安全です」の嘘}
- 「ストレージ暗号化しています！」\\
- $\Rightarrow$ クラウド事業者に丸見えじゃないか…\\
- $\Rightarrow$ 鍵が漏洩したら一網打尽
- 
+\frametitle{「暗号化しているから安全です」という叙述トリック}
+
+\begin{block}{\small (Webとはちょっと違いますが…)某クラウドストレージ事業者の例}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/storage_enc.pdf}
+\end{center} 
+\end{block}
+
+クラウドベースの(Web)サービスでよくある文言：
+\begin{itemize}
+ \item (SSL/TLSで)転送中のデータを暗号化して保護
+ \item ストレージに保存されるデータは暗号化して保護
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{itemize}
+ \item (SSL/TLSで)転送中のデータを暗号化して保護\\
+ $\Rightarrow$ 公開通信路の盗聴からデータを保護
+ \item ストレージに保存されるデータを暗号化して保護\\
+ $\Rightarrow$ ストレージ自体が盗まれた時や、第三者のストレージを使っている場合のデータ漏洩を防止%\footnote[frame]{\scriptsize 自社オンプレのストレージサーバを使っている場合、ディスク暗号化する理由が不明。オンプレストレージが盗まれるのか？}
+\end{itemize}
+\begin{center}
+ \structure{いずれも事業者に対しての秘匿性を担保しているわけではない}\footnote[frame]{事業者はデータを見放題ということ。}\\
+ $\Downarrow$\\
+ \alert{(望む・望まないにしろ)事業者はユーザデータを不必要に取得}
+\end{center}
+\end{frame}
+
+\begin{frame}
+このようなクラウドサービス・Web Appを作ることは：
+
+\begin{itemize}
+\item ユーザにとって：共有不要な相手とデータを共有している
+\item 事業者にとって：昨今のプライバシ・セキュリティ要求の高まりから、\alert{無用なリスクを背負いこむ可能性が大}
+\end{itemize}
+
+\begin{alertblock}{\small 今後、Web Appを作っていくにあたって}
+「必要な相手とだけ」確実に・正しく、データを共有できるように、適切なデータ秘匿が必要
+\end{alertblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{余談: 秘匿性・データプライバシをウリにしたサービス}
+\small 
+\begin{itemize}
+\item Tresorit\footnote[frame]{\scriptsize \url{https://tresorit.com/}}:\\
+事業者・サーバに情報が漏れないことを謳ったクラウドストレージサービス。Dropboxに近い。
+
+\item KeyBase\footnote[frame]{\scriptsize \url{https://keybase.io/}}:\\
+事業者・サーバに情報を漏らさず、メッセージ・ファイル共有（クラウドストレージ）が可能なSNS。
+
+\item Signal\footnote[frame]{\scriptsize \url{https://signal.org}}:\\
+事業者・サーバに情報を漏らさないメッセージング・通話アプリケーション。「最も安全な」チャットサービスと呼ばれており、各類似サービス(WhatsAppなど)にプロトコルを提供。
+\end{itemize}
+
+北米・EU共に、スノーデンの事件以降、事業者にも情報を与えない\alert{End-to-End暗号化}を謳ったサービスが強く注目を浴びている。
 \end{frame}
 
 \begin{frame}
