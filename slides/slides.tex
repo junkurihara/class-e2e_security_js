@@ -390,7 +390,7 @@ AWSを例にした典型的な構成:
 \end{frame}
 
 \begin{frame}
-\frametitle{余談: 秘匿性・データプライバシをウリにしたサービス}
+\frametitle{データの秘匿性・プライバシを謳うサービス}
 \small 
 \begin{itemize}
 \item Tresorit\footnote[frame]{\scriptsize \url{https://tresorit.com/}}:\\
@@ -407,7 +407,37 @@ AWSを例にした典型的な構成:
 \end{frame}
 
 \begin{frame}
- \frametitle{End-to-Endセキュリティの原則とは}
+\frametitle{End-to-Endセキュリティとは}
+\begin{block}{End-to-End (E2E) Principle\footnote[frame]{\scriptsize J.~H.~Saltzer et al.\@, ``End-to-End Arguments in System Design'', in Proc. ICDCS 1981, pp. 509--512, Apr. 1981.}}
+The end-to-end principle is a network design method in which \alert{application-specific features are kept at communication end points}.\\[1ex]
+(アプリケーションの機能はネットワークシステムの\alert{終端}で実装されるべきという原則)
+\end{block}
+\end{frame}
+
+\begin{frame}
+アプリケーションのセキュリティについてのE2E Principle:
+\begin{block}{End-to-End (E2E) セキュリティ}
+情報を共有する主体同士(End-to-End)について、セキュリティ3原則を担保する。
+\begin{itemize}
+ \item 情報の秘匿性 (主体のみで情報を共有可能) $\Rightarrow$ \alert{E2E暗号化}
+ \item 主体・情報の真正性 (主体が生成した情報であることを証明)
+ \item 情報の可用性 (主体同士が正しく情報を利用可能)
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+ポイント：「情報を共有する主体」は一体何か。
+\begin{itemize}
+ \item アプリケーションを利用するユーザ同士？
+ \item サーバ・クライアントアプリ同士？
+ \item 他？
+\end{itemize}
+
+\vspace{2ex}
+
+E2Eセキュリティを実現するには、\structure{構築するアプリケーション毎に「情報を共有する主体」を正しく定義}する必要。
 \end{frame}
 
 \begin{frame}
@@ -420,6 +450,7 @@ AWSを例にした典型的な構成:
 \begin{frame}
 \centering
 {\Large JavaScriptで暗号を使ってみよう [基礎編]}
+
 今回はAESを使ってみます。
 
 AESとは。
