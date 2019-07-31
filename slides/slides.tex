@@ -428,21 +428,42 @@ The end-to-end principle is a network design method in which \alert{application-
 \end{frame}
 
 \begin{frame}
-ポイント：「情報を共有する主体」は一体何か。
+ポイント：アプリケーションにおいて「情報を共有する主体」は一体何か。
 \begin{itemize}
  \item アプリケーションを利用するユーザ同士？
  \item サーバ・クライアントアプリ同士？
  \item 他？
 \end{itemize}
+\end{frame}
 
-\vspace{2ex}
+\begin{frame}
+例: クラウドプラットフォームを介し、\alert{ユーザ同士が情報を共有する主体}の場合
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/e2e1.pdf}
+\end{center}
+\end{frame}
 
+\begin{frame}
+E2Eセキュリティの観点からは、\alert{クラウドプラットフォーム自身ですら情報を取得可能であるべきではない}
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/e2e2.pdf}
+\end{center}
+{\footnotesize ※ユーザがサーバとのみやり取りする場合、一方の主体(End)はサーバとなる。}
+\end{frame}
+
+\begin{frame}
+\begin{alertblock}{}
 E2Eセキュリティを実現するには、\structure{構築するアプリケーション毎に「情報を共有する主体」を正しく定義}する必要。
+\end{alertblock}
+
+E2Eセキュリティを実現しつつ、「事業者にとってリスクとなるような情報はなるべく不用意に取得しない」ことも重要。
 \end{frame}
 
 \begin{frame}
 \frametitle{WebシステムにおけるEnd-to-Endセキュリティ}
 導入する意味
+
+Webシステムのユーザ側Endは？→JS・HTML
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
