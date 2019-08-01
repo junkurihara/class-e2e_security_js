@@ -452,6 +452,14 @@ E2Eセキュリティの観点からは、\alert{クラウドプラットフォ�
 \end{frame}
 
 \begin{frame}
+この例の場合、E2Eセキュリティのためには、
+情報を共有する主体同士のみが復号可能なよう、やり取りするデータを全て暗号化する (\alert{E2E暗号化})
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/e2e3.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
 \begin{alertblock}{}
 E2Eセキュリティを実現するには、\structure{構築するアプリケーション毎に「情報を共有する主体」を正しく定義}する必要。
 \end{alertblock}
@@ -460,10 +468,35 @@ E2Eセキュリティを実現しつつ、「事業者にとってリスクと�
 \end{frame}
 
 \begin{frame}
-\frametitle{WebシステムにおけるEnd-to-Endセキュリティ}
-導入する意味
+\frametitle{Web AppにおけるEnd-to-Endセキュリティ}
+改めて…
+\begin{block}{\small サービスでE2Eセキュリティを考える意味}
+\begin{itemize}
+ \item ユーザプライバシの保護
+ \item 事業者側のリスクの低減
+\end{itemize}
+\end{block}
+\end{frame}
 
-Webシステムのユーザ側Endは？→JS・HTML
+\begin{frame}
+では、Webアプリケーションにおけるエンドポイントとは？
+\begin{itemize}
+\item ユーザ側エンド:\\
+ $\Rightarrow$ \alert{JavaScript/HTML/CSSなど「ブラウザ内で実行・レンダリングされる」Webフロントエンド要素}\footnote[frame]{\scriptsize 実際にユーザが触れる要素がエンドポイントであって、\alert{Webサービスにおいては、端末やブラウザはエンドポイントにならない}}\\
+\item もう一方のエンド:\\
+ $\Rightarrow$ \structure{Webアプリケーション次第で変化}
+\end{itemize}
+
+\vspace{2ex}
+
+\begin{exampleblock}{\small WebアプリケーションにおけるE2Eセキュリティ}
+少なくとも1つのエンドはWebフロントエンド要素\\
+$\Rightarrow$ \alert{Webフロントエンドでセキュリティを担保する方法が必要}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+と、いうわけで、今回は「WebのためのE2Eセキュリティ」としてJavaScriptにおけるデータの暗号化(E2E暗号化)の「さわり」を紹介します。
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -478,12 +511,41 @@ Webシステムのユーザ側Endは？→JS・HTML
 \end{frame}
 
 \begin{frame}
- \frametitle{JavaScriptにおけるセキュリティスイート}
+\frametitle{AES (Advanced Encryption Standard) とは？}
+\begin{block}{AES}
+\end{block}
+
+共通鍵暗号・公開鍵暗号・ハッシュがどうのとか、そういう話は今回はしない。
+
+とにかく「暗号化してみること」から始める。
 \end{frame}
 
 
 \begin{frame}
- \frametitle{AES (Advanced Encryption Standard) とは？}
+\frametitle{JavaScriptにおける暗号の利用環境}
+\small
+一般的な統合ライブラリはCで書かれた\texttt{OpenSSL}だが、
+JavaScriptからは直接利用できない。
+
+\vspace{1ex}
+
+JavaScriptから利用可能な暗号の統合ライブラリ:
+\begin{itemize}
+\item \alert{\texttt{WebCrypto API}} (ブラウザ)\footnote[frame]{\url{https://www.w3.org/TR/WebCryptoAPI/}}:\\
+W3Cにて標準化が進むWeb API (ブラウザのネイティブAPI)。
+\item \alert{\texttt{Crypto}} (Node.js)\footnote[frame]{\url{https://nodejs.org/api/crypto.html}}:\\
+Node.js環境にて利用可能な暗号ライブラリ (Node.jsのネイティブAPI)。OpenSSLのラッパー。
+\item \texttt{sjcl} (Node.js/ブラウザ)\footnote[frame]{\url{http://bitwiseshiftleft.github.io/sjcl/}}:\\
+Stanford大学暗号研究室で開発されたpure JSなライブラリ。共通鍵暗号・ハッシュ等の実装が主。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+今回は、高速動作が期待されるネイティブ実装な統合ライブラリ2つを例にとる。
+\begin{itemize}
+ \item WebCrypto API
+ \item Node Crypto
+\end{itemize}
 \end{frame}
 
 \begin{frame}
