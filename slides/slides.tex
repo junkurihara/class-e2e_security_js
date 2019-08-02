@@ -565,6 +565,23 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 
 \begin{frame}
 \frametitle{今回やってみること}
+ブラウザ・Node.jsをエンドとし、REST APIで暗号化データを登録してみる。
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/mock_flow.pdf}
+\end{center}
+単なるデータのHTTP PUT/GETの前段・後段にAES暗号化・復号部分を組み込んでみる。
+
+※モックサーバはローカルホストで立ち上げ。
+\end{frame}
+
+\begin{frame}
+\frametitle{環境}
+以下の環境が前提:
+\begin{itemize}
+ \item Node.jsがインストール済
+ \item ブラウザとして、Google Chrome (系ブラウザ)、もしくはFirefoxがインストール済み
+ \item Visual Studio Code や WebStorm などの統合開発環境がセットアップ済みだとなお良い。
+\end{itemize}
 \end{frame}
 
 \begin{frame}
