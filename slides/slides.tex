@@ -385,7 +385,7 @@ AWSを例にした典型的な構成:
 \end{itemize}
 
 \begin{alertblock}{\small 今後、Web Appを作っていくにあたって}
-「必要な相手とだけ」確実に・正しく、データを共有できるように、適切なデータ秘匿が必要
+「必要な相手とだけ」確実に・正しく、データを共有できるように、適切なデータ秘匿が必要 (不必要にデータ取得しない)
 \end{alertblock}
 \end{frame}
 
@@ -437,7 +437,19 @@ The end-to-end principle is a network design method in which \alert{application-
 \end{frame}
 
 \begin{frame}
-例: クラウドプラットフォームを介し、\alert{ユーザ同士が情報を共有する主体}の場合
+では、Webアプリケーションにおけるエンドポイントとは？
+\begin{itemize}
+\item ユーザ側エンド:\\
+ $\Rightarrow$ \alert{JavaScript/HTML/CSSなど「ブラウザ内で実行・レンダリングされる」Webフロントエンド要素}\footnote[frame]{\scriptsize 実際にユーザが触れる要素がエンドポイントであって、\alert{Webサービスにおいては、端末やブラウザはエンドポイントにならない}}\\
+\item もう一方のエンド:\\
+ $\Rightarrow$ \structure{Webアプリケーション次第で変化}
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+例: クラウドプラットフォームを介し、\alert{ユーザ同士が情報を共有する主体}の場合 = ユーザのブラウザ同士が両エンド
 \begin{center}
 \includegraphics[width=0.8\linewidth]{Figs/e2e1.pdf}
 \end{center}
@@ -476,23 +488,12 @@ E2Eセキュリティを実現しつつ、「事業者にとってリスクと�
  \item 事業者側のリスクの低減
 \end{itemize}
 \end{block}
-\end{frame}
-
-\begin{frame}
-では、Webアプリケーションにおけるエンドポイントとは？
-\begin{itemize}
-\item ユーザ側エンド:\\
- $\Rightarrow$ \alert{JavaScript/HTML/CSSなど「ブラウザ内で実行・レンダリングされる」Webフロントエンド要素}\footnote[frame]{\scriptsize 実際にユーザが触れる要素がエンドポイントであって、\alert{Webサービスにおいては、端末やブラウザはエンドポイントにならない}}\\
-\item もう一方のエンド:\\
- $\Rightarrow$ \structure{Webアプリケーション次第で変化}
-\end{itemize}
-
-\vspace{2ex}
 
 \begin{exampleblock}{\small WebアプリケーションにおけるE2Eセキュリティ}
-少なくとも1つのエンドはWebフロントエンド要素\\
+少なくとも片方のエンドはWebフロントエンド要素\\
 $\Rightarrow$ \alert{Webフロントエンドでセキュリティを担保する方法が必要}
 \end{exampleblock}
+
 \end{frame}
 
 \begin{frame}
@@ -513,19 +514,33 @@ $\Rightarrow$ \alert{Webフロントエンドでセキュリティを担保す�
 \begin{frame}
 \frametitle{AES (Advanced Encryption Standard) とは？}
 \begin{block}{AES}
+米国NISTの標準暗号アルゴリズム (※共通鍵暗号)\\
+\begin{itemize}
+ \item 鍵長は3種類: 128-bit, 192-bit, 256-bit
+ \item 欧州NESSIE、日本CRYPTRECなどの標準規格としても採択
+ \item 現在まで致命的な欠陥は見つかっていない、安全性の高い\alert{デファクトスタンダード}のアルゴリズム
+\end{itemize}
 \end{block}
+\begin{center}
+\includegraphics[width=0.9\linewidth]{Figs/aes_flow.pdf}
+\end{center}
+\end{frame}
 
-共通鍵暗号・公開鍵暗号・ハッシュがどうのとか、そういう話は今回はしない。
+\begin{frame}
+共通鍵暗号・公開鍵暗号・ハッシュがどうのとか、それらを組み合わせて安全に使うためにはどうするかとか、そういう話は今回はしない。
 
-とにかく「暗号化してみること」から始める。
+\vspace{1ex}
+
+とりあえず「AESという暗号アルゴリズムがあるんだ」くらいで十分。
+今回、まずは「\alert{とにかくJSでAESを使ってデータを暗号化してみること}」から始める。
 \end{frame}
 
 
 \begin{frame}
 \frametitle{JavaScriptにおける暗号の利用環境}
 \small
-一般的な統合ライブラリはCで書かれた\texttt{OpenSSL}だが、
-JavaScriptからは直接利用できない。
+一般的な統合ライブラリはCで書かれたOpenSSLだが、
+JavaScriptから直接呼び出すことができない。
 
 \vspace{1ex}
 
@@ -536,7 +551,7 @@ W3Cにて標準化が進むWeb API (ブラウザのネイティブAPI)。
 \item \alert{\texttt{Crypto}} (Node.js)\footnote[frame]{\url{https://nodejs.org/api/crypto.html}}:\\
 Node.js環境にて利用可能な暗号ライブラリ (Node.jsのネイティブAPI)。OpenSSLのラッパー。
 \item \texttt{sjcl} (Node.js/ブラウザ)\footnote[frame]{\url{http://bitwiseshiftleft.github.io/sjcl/}}:\\
-Stanford大学暗号研究室で開発されたpure JSなライブラリ。共通鍵暗号・ハッシュ等の実装が主。
+Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 \end{itemize}
 \end{frame}
 
@@ -546,6 +561,10 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。共�
  \item WebCrypto API
  \item Node Crypto
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{今回やってみること}
 \end{frame}
 
 \begin{frame}
