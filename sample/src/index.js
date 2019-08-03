@@ -1,7 +1,16 @@
 /**
  * index.js
  */
-import {hello} from './hello.js';
+import {getMyData, postMyData} from './common/post-get';
 
-export default {hello}; // both export and export default needs to be declared for compatibility on node and browser.
-export {hello};
+const data = 'secret';
+const key = 'test key';
+
+postMyData(data, key)
+  .then( (resPost) => {
+    console.log(`Registered id: ${JSON.stringify(resPost)}`);
+    return getMyData(resPost.id, key);
+  })
+  .then( (resGet) => {
+    console.log(`Retrieved data: ${JSON.stringify(resGet)}`);
+  });

@@ -12,7 +12,6 @@ import {getFetch} from './env.js';
 export const makeApiCall = async ({method, requestUrl, payload=null, headers=null, mode='cors'}) => {
   //logger.debug('make API call to AWS API Gateway');
   const fetch = getFetch();
-  console.log(requestUrl);
   const body = (payload)? JSON.stringify(payload) : null;
   const response = await fetch(requestUrl, {
     method,

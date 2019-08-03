@@ -3,7 +3,7 @@
  */
 //////////////////////////////////////////////////////////////////////////
 // Base Config of Your Library
-const libName = 'testlib'; // TODO: This must be edited for your project.
+const libName = 'e2eTest'; // TODO: This must be edited for your project.
 const entry = './src/index.js';
 
 //////////////////////////////////////////////////////////////////////////
