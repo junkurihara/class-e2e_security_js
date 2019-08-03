@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "private": true,
   "scripts": {
-    "start": "./node_modules/.bin/json-server --watch db.json",
+    "start": "cp data/db.template.json data/db.json && ./node_modules/.bin/json-server --watch data/db.json",
     "post": "node -r @babel/register src/nodejs/post.js",
     "get": "node -r @babel/register src/nodejs/get.js",
     "webpack": "./node_modules/.bin/webpack --optimize-minimize --mode development --config webpack.dev.js",
