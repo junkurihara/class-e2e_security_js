@@ -3,7 +3,7 @@
  */
 import {getMyData, postMyData} from './common/post-get';
 
-const data = 'secret';
+const data = 'test secret';
 const key = 'test key';
 
 postMyData(data, key)

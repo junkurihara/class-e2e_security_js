@@ -585,6 +585,27 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 \end{frame}
 
 \begin{frame}
+\frametitle{JavaScriptプロジェクトの準備}
+\begin{itemize}
+\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/junkurihara/e2e-security-class}}をCheck Out\\
+\begin{exampleblock}{}
+\footnotesize
+\$ \texttt{git clone https://github.com/junkurihara/e2e-security-class}\\
+\$ \texttt{cd e2e-security-class/sample}
+\end{exampleblock}
+\item 依存パッケージのインストール
+\begin{exampleblock}{}
+\$ \texttt{yarn install} or \texttt{npm install}
+\end{exampleblock}
+\item モックサーバの立ち上げ
+\begin{exampleblock}{}
+\$ \texttt{yarn start}
+\end{exampleblock}
+起動すると、localhostの3000番ポートでHTTPリクエストを待ち受け開始する。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
  \frametitle{ブラウザでの暗号化: WebCrypto API}
 \end{frame}
 
@@ -608,6 +629,8 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
  APIを通じて暗号化データをやり取りしてみる。
 
  E2E Security!
+
+ JSONの表示を出す
 \end{frame}
 
 

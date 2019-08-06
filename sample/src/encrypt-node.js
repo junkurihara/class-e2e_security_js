@@ -12,7 +12,7 @@ export const encrypt = async (data, key) => {
   const iv = crypto.randomBytes(16); // Initialization vector.
   const cipher = crypto.createCipheriv(algorithm, key, iv);
 
-  let encrypted = cipher.update(jseu.encoder.stringToArrayBuffer(data));
+  let encrypted = cipher.update(jseu.encoder.stringToArrayBuffer(data), 'utf8', 'base64');
   encrypted += cipher.final('base64');
   return {
     data: encrypted,
@@ -36,7 +36,7 @@ export const decrypt = async (data, key, iv) => {
 
   const decipher = crypto.createDecipheriv(algorithm, key, jseu.encoder.decodeBase64(iv));
 
-  let decrypted = decipher.update(data, 'base64');
+  let decrypted = decipher.update(data, 'base64', 'utf8');
   decrypted += decipher.final();
   return decrypted;
 };
