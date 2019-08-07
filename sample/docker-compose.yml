@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  e2etest:
+    build: .
+    image: e2etest
+    container_name: e2etest
+    restart: always
+    ports:
+      - "127.0.0.1:3000:3000"

@@ -60,3 +60,14 @@ export const getMyData = async (dataId, key) => {
   return {data: decrypted};
   ////////////////////////
 };
+
+/**
+ * Get all entries without decryption
+ * @return {Promise<*>}
+ */
+export const getAllEntries = async () => makeApiCall({
+  method: 'GET',
+  requestUrl: `${mockDataUrl}`,
+  headers: {'Content-Type': 'application/json'},
+  mode: 'cors'
+});

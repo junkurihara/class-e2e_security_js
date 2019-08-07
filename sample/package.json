@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "start": "cp data/db.template.json data/db.json && ./node_modules/.bin/json-server --watch data/db.json",
+    "start:global": "cp data/db.template.json data/db.json && ./node_modules/.bin/json-server --watch data/db.json --host 0.0.0.0",
     "get": "node -r @babel/register src/get-node.js",
     "post": "node -r @babel/register src/post-node.js",
     "build": "./node_modules/.bin/webpack --optimize-minimize --mode development --config webpack.dev.js",
