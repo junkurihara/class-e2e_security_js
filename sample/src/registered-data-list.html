@@ -15,7 +15,7 @@
 <dl id="wrap">
   <script type="text/javascript">
     $(async function(){
-      const entries = await e2eTest.getAllEntries();
+      const entries = await e2eTest.getAllEntries(true);
       entries.forEach(x => {
         let h = '<dt>'
           + `id: ${x.id}`

@@ -12,13 +12,13 @@
   const data = 'test secret';
   const key = 'test key';
 
-  e2eTest.postMyData(data, key)
-    .then( (resPost) => {
+  e2eTest.postMyData({data, key, remote: true, encrypt: true})
+    .then( async (resPost) => {
       console.log(`Registered id: ${JSON.stringify(resPost)}`);
-      return e2eTest.getMyData(resPost.id, key);
-    })
-    .then( (resGet) => {
-      console.log(`Retrieved data: ${JSON.stringify(resGet)}`);
+      const simpleFetch = await e2eTest.getMyData({id: resPost.id, key, remote: true});
+      console.log(`Retrieved plaintext string data: ${simpleFetch.data}`);
+      const decryptFetch =  await e2eTest.getMyData({id: resPost.id, key, remote: true, decrypt: true});
+      console.log(`Decrypted string data: ${decryptFetch.data}`);
     });
 </script>
 </body>

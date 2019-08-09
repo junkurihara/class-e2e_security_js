@@ -4,12 +4,12 @@
 //////////////////////////////////////////////////////////////////////////
 // Base Config of Your Library
 const libName = 'e2eTest'; // TODO: This must be edited for your project.
-const entry = './src/index.js';
+const entry = './src/common/index.js';
 
 //////////////////////////////////////////////////////////////////////////
 const path = require('path');
 
-// webpack main configration
+// webpack main configuration
 const webpackConfig = {
   target: 'web',
   entry: {},
