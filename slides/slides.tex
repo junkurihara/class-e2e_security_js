@@ -578,7 +578,7 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 \frametitle{環境}
 以下の環境が前提:
 \begin{itemize}
- \item Node.jsがインストール済 \footnote[frame]{npmに加えてyarnも使えるとなお良い (npm i -g yarn)}
+ \item Node.js ($>$ v10)がインストール済 \footnote[frame]{npmに加えてyarnも使えるとなお良い (インストールコマンド: npm i -g yarn)}
  \item ブラウザとして、Google Chrome (系ブラウザ)、もしくはFirefoxがインストール済み
  \item Visual Studio Code や WebStorm などの統合開発環境がセットアップ済みだとなお良い。
 \end{itemize}
@@ -590,33 +590,195 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 \item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/junkurihara/e2e-security-class}}をCheck Out\\
 \begin{exampleblock}{}
 \footnotesize
-\$ \texttt{git clone https://github.com/junkurihara/e2e-security-class}\\
+\$ \texttt{git clone https://github.com/zettant/e2e-security-class}\\
 \$ \texttt{cd e2e-security-class/sample}
 \end{exampleblock}
 \item 依存パッケージのインストール
 \begin{exampleblock}{}
-\$ \texttt{yarn install} or \texttt{npm install}
+\$ \texttt{yarn install}\quad or\quad \texttt{npm install}
 \end{exampleblock}
-\item モックサーバの立ち上げ
-\begin{exampleblock}{}
-\$ \texttt{yarn start}
-\end{exampleblock}
-起動すると、localhostの3000番ポートでHTTPリクエストを待ち受け開始する。
 \end{itemize}
 \end{frame}
 
 \begin{frame}
- \frametitle{ブラウザでの暗号化: WebCrypto API}
+\frametitle{REST APIモックサーバの準備}
+今回はSSL接続可能な共有サーバを準備済 (\url{https://e2e.zettant.com/})。
+
+\vspace{2ex}
+
+別途、検証用のサーバをローカルで立ち上げ可能。
+\begin{exampleblock}{\small モックサーバの立ち上げ}
+\$ \texttt{yarn start}
+\end{exampleblock}
+起動すると、localhostの3000番ポートでHTTPリクエストを待ち受け開始する。
 \end{frame}
 
 \begin{frame}
- \frametitle{サーバでの暗号化: Node.js Crypto}
+\frametitle{とりあえず試してみる: コマンドライン編}
+JavaScript (Node.js) をコマンドラインから実行してみて、動作イメージを確認してみる。
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/mock_flow.pdf}
+\end{center}
 \end{frame}
 
 \begin{frame}
- \frametitle{ブラウザ・サーバ間での相互接続性の確認}
+まずは生データをPOSTしてサーバに登録してみる。
+\begin{exampleblock}{}\footnotesize
+\$ \texttt{pwd}\\
+\texttt{.../e2e-security-class/sample} ←場所を確認\\[1ex]
+\$ \texttt{yarn execute post -r 'hello my secret world!!!'} ← \alert{登録}\footnote[frame]{\texttt{-r}を抜くとローカルのモックサーバに接続}\\
+\texttt{Register plaintext data to remote server}\\
+\texttt{Data: hello my secret world!!!}\\
+\textbf{\texttt{Registered id: 1}} ←\alert{id=1番として登録したというメッセージ}
+\end{exampleblock}
 
- しかしサーバで復号しているのであんまり意味がない。
+登録したデータを生のまま取得してみる。
+\begin{exampleblock}{}\footnotesize
+\$ \texttt{yarn execute get -r 1} ← \alert{id=1番の登録データを取得}\\
+\texttt{Retrieve plaintext data to remote server}\\
+\texttt{Registered Id: 1}\\
+\textbf{\texttt{Retrieved data: hello my secret world!!!}} ← \alert{取得した1番のデータ}
+\end{exampleblock}
+\end{frame}
+
+
+
+\begin{frame}
+データをAES暗号化したあとPOSTしてサーバに登録してみる。
+\begin{exampleblock}{}\footnotesize
+\$ \texttt{yarn execute post $\backslash$}\\
+~ \textbf{\texttt{-e -k 'my secret key' $\backslash$}} ← \alert{\texttt{my secret key}という鍵で暗号化}\\
+~ \texttt{-r 'hello my super secret world!!!'}\\
+\texttt{Register encrypted data to remote server}\\
+\texttt{Data: hello my super secret world!!!}\\
+\texttt{Key: my secret key}\\
+\texttt{Note: Derived key binary in base64: o12da4tawTjHd4woS+DeexcCR9EOyVKml6gOzZkGzDc=}\footnote[frame]{実際に使うAES鍵のバイナリ表現 (base64)}\\
+\textbf{\texttt{Registered id: 2}} ←\alert{id=2番として登録したというメッセージ}
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}
+暗号化して登録したデータを生のまま取得してみて、暗号化されていることを確認する。
+\begin{exampleblock}{}\footnotesize
+\$ \texttt{yarn execute get -r 2} ← \alert{id=2番の登録データを取得}\\
+\texttt{Retrieve plaintext data to remote server}\\
+\texttt{Registered Id: 2}\\
+\textbf{\texttt{Retrieved data: EoeSsv5BFr6s1jZh3iMM1Pxa+wA4UxQnM30J2027kJU=}} ← \alert{取得した2番のデータ}
+\end{exampleblock}
+Base64エンコードされているが、暗号化されており中身はまったくわからない。\footnote[frame]{Mac/Linuxの場合、ターミナルで``\texttt{echo [base64str] $\mid$ base64 -D -}'' と実行してみると訳のわからないデータにデコードされることが確認できる。}
+\end{frame}
+
+\begin{frame}
+取得した後、復号してみる\footnote[frame]{keyが間違っていると失敗する}
+\begin{exampleblock}{}\footnotesize
+\$ \texttt{yarn execute get $\backslash$}\\
+~ \textbf{\texttt{-d -k 'my secret key' $\backslash$}} ←\alert{my secret keyという鍵で復号}\\
+~ \texttt{-r 2} ← id=2の鍵を取得\\
+\texttt{Retrieve encrypted data to remote server}\\
+\texttt{Id: 2}\\
+\texttt{Key: my secret key}\\
+\texttt{Note: Derived key binary in base64: o12da4tawTjHd4woS+DeexcCR9EOyVKml6gOzZkGzDc=}\\
+\textbf{\texttt{Decrypted data: hello my super secret world!!!}} ←\alert{正しく復号された}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\url{https://e2e.zettant.com/data} にアクセスすると、サーバでの登録状況が一覧できる。\footnote[frame]{ローカルホストに立てた場合は\url{http://localhost:3000/data}}
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/json_list.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{とりあえず試してみる: ブラウザ編}
+\begin{enumerate}
+ \item \texttt{samples/src/post-get-browser.html}をブラウザで開く。
+ \item 真っ白な画面で「開発者ツール」を起動\footnote[frame]{Chrome: Ctrl(Cmd)+Alt(Opt)+i}、Webコンソールを表示する。
+\end{enumerate}
+
+コマンドラインでやった「暗号化して登録→取得して復号」の一連の流れが初期設定のデータ・鍵を使って実行される。
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/browser-img1.pdf}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+以下の2パターンで色々試すことができる。
+\begin{itemize}
+ \item \texttt{samples/src/post-get-browser.html}の中身を編集→リロード
+ \item \texttt{samples/src/post-get-browser.html}を開いたまま、開発者ツールのWebコンソールからPOST関数とGET関数を実行。
+\end{itemize}
+ここでは後者を試してみる。
+\end{frame}
+
+\begin{frame}[fragile]
+Webコンソールから暗号化・登録してみる。
+\begin{center}
+\includegraphics[width=0.9\linewidth]{Figs/browser-img2.pdf}
+\end{center}
+
+\begin{exampleblock}{}\footnotesize
+\begin{verbatim}
+e2eTest.postMyData(
+    {data: 'hello world!', ← 暗号化するデータ
+     key: 'my browser key', ← 鍵
+     remote: true, ← リモートサーバの場合true
+     encrypt: true}) ← 暗号化する場合true
+.then( (result) => console.log(result) );
+\end{verbatim}
+〜中略〜\\[1ex]
+\textbf{\texttt{VM486:6 \{id: 5\}}}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+ コマンドラインと同じく、\url{https://e2e.zettant.com/data}を表示すると暗号化されて登録されていることがわかる。
+\end{frame}
+
+\begin{frame}[fragile]
+今度はWebコンソールから取得・復号してみる。
+\begin{center}
+\includegraphics[width=0.9\linewidth]{Figs/browser-img3.pdf}
+\end{center}
+\begin{exampleblock}{}\footnotesize
+\begin{verbatim}
+e2eTest.getMyData(
+  {id: 5, ← id=5のデータを取得
+   key: 'my browser key', ← 鍵
+   remote: true, ← リモートサーバの場合true
+   decrypt: true}) ← 復号する場合true
+.then( (result) => console.log(result) );
+\end{verbatim}
+〜中略〜\\[1ex]
+\textbf{\texttt{{data: "hello world!"}}}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+もちろん、ブラウザ(WebCrypto)とコマンドラインで相互接続可能。
+\begin{itemize}
+ \item ブラウザで暗号化・登録したデータを、コマンドラインで取得・復号
+ \item コマンドラインで暗号化・登録したデータを、ブラウザで取得・復号
+\end{itemize}
+\begin{center}
+今まで登録したデータで試してみよう！ 
+\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Node.jsでの暗号化・復号の中身}
+Node.js Cryptoライブラリを使ったAES-CBC暗号化
+\end{frame}
+
+
+\begin{frame}
+\frametitle{ブラウザでの暗号化・復号の中身}
+WebCrypto APIw使ったAES-CBC暗号化
 \end{frame}
 
 \begin{frame}
