@@ -272,20 +272,39 @@
  \centering
  {\Large はじめに}
 \end{frame}
+
 \begin{frame}
 \frametitle{はじめに}
 この講義では
 \begin{itemize}
- \item End-to-End (E2E) セキュリティの原則
- \item WebサイトでのE2Eセキュリティ実践のため、JavaScriptでの実装方法
+ \item End-to-End (E2E) セキュリティの原則と必要性
+ \item WebサイトでのE2Eセキュリティ実践のため、JavaScriptでの暗号の利用
 \begin{itemize}
  \item ブラウザ側
  \item サーバ側 (Node.js)
 \end{itemize}
 \end{itemize}
 のさわりを学ぶ。
-
 \end{frame}
+
+\begin{frame}
+\frametitle{この講義の対象と事前準備}
+対象:
+\begin{itemize}
+\item 暗号・セキュリティ技術に興味がある初学者
+\item Webに暗号技術を導入したいWeb系のエンジニア
+\end{itemize}
+
+\vspace{2ex}
+
+必須ではないが触って楽しむのには必要な事前準備:
+\begin{itemize}
+\item Gitが使えるようになっていること
+\item Node.jsが使えるようになっていること
+\item Google Chrome系ブラウザ and/or Firefoxが利用可能なこと
+\end{itemize}
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{モダンWebサイトとEnd-to-Endセキュリティ}
@@ -501,7 +520,9 @@ $\Rightarrow$ \alert{Webフロントエンドでセキュリティを担保す�
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{暗号化}
+\section{JavaScriptで暗号を使ってみよう [基礎編]}
+
+\subsection{導入}
 \begin{frame}
 \centering
 {\Large JavaScriptで暗号を使ってみよう [基礎編]}
@@ -558,8 +579,8 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 \begin{frame}
 今回は、高速動作が期待されるネイティブ実装な統合ライブラリ2つを例にとる。
 \begin{itemize}
- \item WebCrypto API
- \item Node Crypto
+ \item WebCrypto API → ブラウザ向け
+ \item Node Crypto → サーバ/スタンドアロンS/W (Node.js) 向け
 \end{itemize}
 \end{frame}
 
@@ -587,7 +608,7 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 \begin{frame}
 \frametitle{JavaScriptプロジェクトの準備}
 \begin{itemize}
-\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/junkurihara/e2e-security-class}}をCheck Out\\
+\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/zettant/e2e-security-class}}をCheck Out\\
 \begin{exampleblock}{}
 \footnotesize
 \$ \texttt{git clone https://github.com/zettant/e2e-security-class}\\
@@ -596,6 +617,10 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 \item 依存パッケージのインストール
 \begin{exampleblock}{}
 \$ \texttt{yarn install}\quad or\quad \texttt{npm install}
+\end{exampleblock}
+\item ライブラリのビルド
+\begin{exampleblock}{}
+\$ \texttt{yarn build}\quad or\quad \texttt{npm run build}
 \end{exampleblock}
 \end{itemize}
 \end{frame}
@@ -611,6 +636,13 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 \$ \texttt{yarn start}
 \end{exampleblock}
 起動すると、localhostの3000番ポートでHTTPリクエストを待ち受け開始する。
+\end{frame}
+
+
+\subsection{とりあえず試してみる: コマンドライン編}
+\begin{frame}
+\centering
+{\Large とりあえず試してみる: コマンドライン編}
 \end{frame}
 
 \begin{frame}
@@ -691,6 +723,12 @@ Base64エンコードされているが、暗号化されており中身はま�
 \end{center}
 \end{frame}
 
+\subsection{とりあえず試してみる: ブラウザ編}
+\begin{frame}
+\centering
+{\Large とりあえず試してみる: ブラウザ編}
+\end{frame}
+
 \begin{frame}
 \frametitle{とりあえず試してみる: ブラウザ編}
 \begin{enumerate}
@@ -769,34 +807,234 @@ e2eTest.getMyData(
 \end{center}
 \end{frame}
 
+\subsection{暗号化・復号の中身}
+\begin{frame}
+\centering
+{\Large 暗号化・復号の中身}
+\end{frame}
 
 \begin{frame}
-\frametitle{Node.jsでの暗号化・復号の中身}
-Node.js Cryptoライブラリを使ったAES-CBC暗号化
+\frametitle{今回の事例でのモード設定}
+
+\begin{block}{\small AESの「利用モード」}
+AESの処理1回で暗号化できるのはたった16bytesにすぎない。
+
+長いデータを連続で暗号化するために、\alert{暗号化処理を連続して組み合わせる方法}が利用モード。
+\end{block}
+\end{frame}
+
+\begin{frame}
+安全性向上のため、一般的に
+\begin{itemize}
+ \item 「先頭の16バイトはランダムな初期化ベクトルと混ぜる」
+ \item 「前の16バイトのデータを継承して次の16バイトを処理」
+\end{itemize}
+などの工夫を入れた利用モードを用いる。
+
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/cbc_mode.pdf}
+\end{center}
+
+\vspace{2ex}
+今回の事例では、256ビット鍵AESのCBCモード\footnote[frame]{ISO等で標準化されている一般的に安全なモード}を用いた。
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Node.js CryptoライブラリでのAES-CBC暗号化・復号}
+\begin{block}{\small \texttt{sample/src/encrypt-node.js}: encrypt関数}
+\scriptsize
+\begin{verbatim}
+const crypto = require('crypto'); // cryptoモジュールの読み出し
+const algorithm = 'aes-256-cbc'; // AES-256-CBCモード
+
+const iv = crypto.randomBytes(16); // Initial Vectorの生成
+
+const cipher = crypto.createCipheriv(algorithm, key, iv); // 暗号化Object初期化
+let encrypted = cipher.update(uint8data, 'utf8', 'base64'); // 暗号化
+encrypted += cipher.final('base64'); // 暗号化完了
+\end{verbatim}
+\end{block}
+
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/node_aes_e.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\scriptsize
+\begin{block}{\small \texttt{sample/src/encrypt-node.js}: decrypt関数}
+\begin{verbatim}
+const crypto = require('crypto'); // cryptoモジュールの読み出し
+const algorithm = 'aes-256-cbc'; // AES-256-CBCモード
+
+const decipher = crypto.createDecipheriv(algorithm, key, iv); // 復号Object初期化
+let decrypted = decipher.update(encrypted, 'base64', 'utf8'); // 復号
+decrypted += decipher.final(); // 復号完了
+\end{verbatim}
+\end{block}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/node_aes_d.pdf}
+\end{center}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{ブラウザ WebCrypto APIでのAES-CBC暗号化・復号}
+
+\begin{block}{\small \texttt{sample/src/encrypt-browser.js}: encrypt関数}
+\scriptsize
+\begin{verbatim}
+const crypto = window.crypto; // WebCrypto API
+const iv = crypto.getRandomValues(new Uint8Array(16)); // IVの生成
+
+const importedKey = await crypto.subtle.importKey( // keyオブジェクトの生成
+  'raw', // バイナリ鍵のインポート指定
+  key,
+  { name: 'AES-CBC' }, // CBCモードに利用
+  false, // keyオブジェクトからの生鍵エクスポート可否
+  ['encrypt', 'decrypt'] // 暗号化・復号に利用
+);
+
+const encrypted = await crypto.subtle.encrypt( // 暗号化を実行
+  { name: 'AES-CBC', iv: uint8iv }, // CBCモードで暗号化
+  importedKey,
+  data
+);
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{block}{\small \texttt{sample/src/encrypt-browser.js}: decrypt関数}
+\scriptsize
+\begin{verbatim}
+const crypto = window.crypto; // WebCrypto API
+
+const importedKey = await crypto.subtle.importKey( // keyオブジェクトの生成
+  'raw', // バイナリ鍵のインポート指定
+  key,
+  { name: 'AES-CBC' }, // CBCモードに利用
+  false, // keyオブジェクトからの生鍵エクスポート可否
+  ['encrypt', 'decrypt'] // 暗号化・復号に利用
+);
+
+const decrypted = await crypto.subtle.decrypt( // 暗号化を実行
+  { name: 'AES-CBC', iv: uint8iv }, // CBCモードで暗号化
+  importedKey,
+  encrypted
+);
+\end{verbatim}
+\end{block}
+
+{\footnotesize
+そのまま使うのはちょっと大変…
+\begin{itemize}
+ \item Node.jsとは全く違うAPI
+ \item 鍵インポートAPIと暗号化・復号APIでモード指定が重複するなど、不可解な仕様になっている…
+ \item \alert{ブラウザごとの実装差異が大きい} (利用可能オプションなど)
+\end{itemize}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{補足: APIが違うのがめんどくさい…}
+\small 
+\textbf{統合APIを提供するライブラリを使って楽をすると良い (手前味噌)}
+
+\begin{block}{\texttt{js-crypto-utils (jscu)}}
+GitHub: \url{https://github.com/junkurihara/jscu}\\
+NPM: \url{https://www.npmjs.com/package/js-crypto-utils}
+\end{block}
+
+\begin{itemize}
+\item Node.js/ブラウザで全く同じAPIを提供。→ コード再利用性向上
+\item ブラウザごとの実装差異を(ある程度)吸収。
+\item MITライセンス。好きに使って！
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\texttt{jscu}を使うとNode.jsもブラウザも次のような短いコードになる。
+
+\begin{block}{\small \texttt{sample/src/encrypt-universal.js}: encrypt関数}
+\scriptsize
+\begin{verbatim}
+const uint8iv = jscu.random.getRandomBytes(16); // IVの生成
+
+const encrypted = await jscu.aes.encrypt( // AES暗号化
+  uint8data,
+  key, // バイナリ鍵
+  {name: 'AES-CBC', iv: uint8iv} // CBCモードの指定
+);
+\end{verbatim}
+\end{block}
+
+
+\begin{block}{\small \texttt{sample/src/encrypt-universal.js}: decrypt関数}
+\scriptsize
+\begin{verbatim}
+const decrypted = await jscu.aes.decrypt( // AES復号
+  encrypted,
+  key, // バイナリ鍵
+  {name: 'AES-CBC', iv: uint8iv} // CBCモードの指定
+);
+\end{verbatim}
+\end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{まとめ}
+\begin{frame}
+ \centering
+ {\Large まとめ}
+\end{frame}
+
+\begin{frame}
+\frametitle{まとめ}
+お疲れ様でした。
+
+\begin{itemize}
+\item E2Eセキュリティの概念・重要性の紹介
+\item WebにおけるE2Eセキュリティを実現するため、JSでのAES実行方法の紹介
+\end{itemize}
+
+\vspace{2ex}
+
+次回以降…リクエスト次第ですが、
+\begin{itemize}
+\item もう少し詳しく：AESの利用方法について
+\item 公開鍵暗号とHybrid暗号化
+\item ハッシュ・署名とHMAC
+\item RFCとアルゴリズム・フォーマット
+\end{itemize}
+などを予定。
 \end{frame}
 
 
 \begin{frame}
-\frametitle{ブラウザでの暗号化・復号の中身}
-WebCrypto APIw使ったAES-CBC暗号化
+\frametitle{宣伝 1}
+E2E暗号化ファイル転送サービス「iTransfy」を提供しています。
 \end{frame}
+
 
 \begin{frame}
- \frametitle{補足: APIが違うのがめんどくさい…}
- \textbf{手前味噌だが、統合APIを使って楽をすると良い}
+\frametitle{宣伝 2}
+Zettantではイケイケの仲間を募集しています。
 \end{frame}
 
-\begin{frame}
- \frametitle{ブラウザ同士での相互接続性の確認}
- APIを通じて暗号化データをやり取りしてみる。
-
- E2E Security!
-
- JSONの表示を出す
-\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\backupbegin
+\section{Backup}
+
+\begin{frame}
+ 
+\end{frame}
+
 \begin{frame}
  \begin{enumerate}
   \item 今回は共通鍵暗号
@@ -806,19 +1044,6 @@ WebCrypto APIw使ったAES-CBC暗号化
  \end{enumerate}
 \end{frame}
 
-\begin{frame}
-\frametitle{引用文献}
-\bibliographystyle{IEEEtranS}
-{\fontsize{6.5pt}{0pt}\selectfont
-\vspace{0.5ex}
- \bibliography{references.bib}
-}
-
-\end{frame}
-
-
-\backupbegin
-\section{Backup}
 \begin{frame}
 \frametitle{Appendix}
 This page is not counted.

@@ -7,12 +7,13 @@ import jseu from 'js-encoding-utils';
  * @return {Promise<{data: *, iv: *}>}
  */
 export const encrypt = async (data, key) => {
+  const uint8data = jseu.encoder.stringToArrayBuffer(data);
   const crypto = require('crypto');
   const algorithm = 'aes-256-cbc';
   const iv = crypto.randomBytes(16); // Initialization vector.
   const cipher = crypto.createCipheriv(algorithm, key, iv);
 
-  let encrypted = cipher.update(jseu.encoder.stringToArrayBuffer(data), 'utf8', 'base64');
+  let encrypted = cipher.update(uint8data, 'utf8', 'base64');
   encrypted += cipher.final('base64');
   return {
     data: encrypted,
@@ -33,8 +34,9 @@ export const decrypt = async (data, key, iv) => {
 
   const algorithm = 'aes-256-cbc';
   if (!iv) iv = Buffer.alloc(16, 0); // Initialization vector.
+  const uint8iv = jseu.encoder.decodeBase64(iv);
 
-  const decipher = crypto.createDecipheriv(algorithm, key, jseu.encoder.decodeBase64(iv));
+  const decipher = crypto.createDecipheriv(algorithm, key, uint8iv);
 
   let decrypted = decipher.update(data, 'base64', 'utf8');
   decrypted += decipher.final();
