@@ -1,4 +1,0 @@
-\beamer@sectionintoc {1}{はじめに}{2}{0}{1}
-\beamer@sectionintoc {2}{モダンWebサイトとEnd-to-Endセキュリティ}{6}{0}{2}
-\beamer@sectionintoc {3}{まとめ}{6}{0}{3}
-\beamer@sectionintoc {4}{Backup}{10}{0}{4}
