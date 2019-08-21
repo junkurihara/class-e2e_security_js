@@ -1,0 +1,48 @@
+version: '2'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: e2etest-nginx
+    expose:
+      - "30080"
+    restart: always
+    tty: false
+    environment:
+      - "VIRTUAL_HOST=e2e.zettant.com"
+      - "VIRTUAL_PORT=30080"
+      - "VIRTUAL_PROTO=https"
+      - "LETSENCRYPT_HOST=e2e.zettant.com"
+      - "LETSENCRYPT_EMAIL=inquiry@zettant.com"
+      - "LETSENCRYPT_TEST=false"
+    links:
+      - e2etest
+    volumes:
+      - ./setting/nginx/conf.d:/etc/nginx/conf.d
+    volumes_from:
+      - container:nginx-proxy
+    networks:
+      common_link:
+      back-e2e:
+        ipv4_address: 192.168.114.10
+
+  e2etest:
+    build: .
+    image: e2etest
+    container_name: e2etest
+    restart: always
+    expose:
+      - "3000"
+    networks:
+      back-e2e:
+        ipv4_address: 192.168.114.11
+
+networks:
+  common_link:
+    external: true
+  back-e2e:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.114.0/24
