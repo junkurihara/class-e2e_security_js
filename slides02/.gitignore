@@ -1,0 +1,14 @@
+.DS_Store
+thumbs.db
+.idea/
+.vscode/
+*.bbl
+*.blg
+*.log
+*.nav
+*.out
+*.toc
+*.snm
+*.dvi
+*.aux
+*.vrb
