@@ -283,7 +283,7 @@ E2Eセキュリティの重要性はわかったし、AESを使ってみるこ�
 \begin{block}{\small この講義で最終的に理解できること}
 \begin{itemize}
 \item パスワードを使ってAESを暗号化するのってどうすればいいか？
-\item ランダムな鍵を使ってAESを暗号化するにはどうすればいいか？
+\item バイナリ鍵を使ってAESを暗号化するにはどうすればいいか？
 \end{itemize}
  
 \end{block}
@@ -314,7 +314,70 @@ E2Eセキュリティの重要性はわかったし、AESを使ってみるこ�
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{モダンWebサイトとEnd-to-Endセキュリティ}
+\section{AESの使い方 事始め}
+\begin{frame}
+\centering
+{\Large AESの使い方 事始め}
+\end{frame}
+
+\begin{frame}
+AESを使う際に気をつけることは、ざっと3点。
+\begin{itemize}
+ \item AESに入れる「鍵」のランダム具合
+ \item AESに入れる「鍵」を総当りする際の大変さ
+ \item AESの「暗号化モード」の安全性
+\end{itemize}
+
+pbkdf2, hkdf, cbc/ctr/cfb...
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{AESの使い方: とりあえず暗号化してみよう}
+\begin{frame}
+\centering
+{\Large AESの使い方: とりあえず暗号化してみよう}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{パスワードで暗号化してみる}
+pbkdf使え
+\end{frame}
+
+\begin{frame}
+\frametitle{バイナリ鍵で暗号化してみる}
+hkdf使え
+\end{frame}
+
+\begin{frame}
+\frametitle{危ない暗号化モードで暗号化してみる}
+ecbとか論外だからctrとか使え
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{AESの使い方: 細かめの解説}
+\begin{frame}
+\centering
+{\Large AESの使い方: 細かめの解説}
+\end{frame}
+
+\begin{frame}
+\frametitle{PBKDF2ってなに？}
+jscuなら動くよ
+\end{frame}
+
+\begin{frame}
+\frametitle{HKDFってなに？}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{暗号化モードの種類}
+ctr云々。
+
+jsでのサポート具合を列挙
+\end{frame}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -336,9 +399,8 @@ E2Eセキュリティの重要性はわかったし、AESを使ってみるこ�
 
 次回以降…リクエスト次第ですが、
 \begin{itemize}
-\item もう少し詳しく：AESの利用方法について
-\item 公開鍵暗号とHybrid暗号化
-\item ハッシュ・署名とHMAC
+\item 公開鍵暗号とその使い方
+\item 「情報が改ざんされてない」ことを保証するために（電子署名とMAC）
 \item RFCとアルゴリズム・フォーマット
 \end{itemize}
 などを予定。
