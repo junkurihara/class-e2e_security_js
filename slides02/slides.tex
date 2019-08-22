@@ -266,11 +266,13 @@
  \item End-to-End (E2E) セキュリティの原則と必要性
  \item WebサイトでのE2Eセキュリティ実践のため、JavaScriptでの暗号(AES)の利用のさわり
 \end{itemize}
-を話した。
+を勉強した。
 
 \vspace{2ex}
 
-E2Eセキュリティの重要性はわかったし、AESを使ってみることもできた。
+E2Eセキュリティの重要性はわかった。
+
+AESを使ってみることもできた。
 
 \vspace{2ex}
 
@@ -278,20 +280,21 @@ E2Eセキュリティの重要性はわかったし、AESを使ってみるこ�
 \end{frame}
 
 \begin{frame}
-今回は正しく・安全にAESを使ってみる方法、についてのお話。
+今回は\underline{正しく・安全に}AESを使ってみる方法、についてのお話。
 
-\begin{block}{\small この講義で最終的に理解できること}
+\begin{block}{\small この講義で最終的に学びたいこと}
 \begin{itemize}
-\item パスワードを使ってAESを暗号化するのってどうすればいいか？
-\item バイナリ鍵を使ってAESを暗号化するにはどうすればいいか？
+\item パスワードを使ってAESを暗号化するのってどうすればいいか？\footnote[frame]{\scriptsize RFC8018 PBES2 \url{https://tools.ietf.org/html/rfc8018}によるAES暗号化}
+\item バイナリ鍵を使ってAESを暗号化するにはどうすればいいか？\footnote[frame]{\scriptsize RFC5869 HKDF \url{https://tools.ietf.org/html/rfc5869}による鍵導出とAES暗号化}
 \end{itemize}
- 
 \end{block}
 
 「たったこれだけ」のことでも、気をつけなければならない\alert{「重要なお作法」}がある。
 
-\alert{この作法を守る・守らないで安全性は大違い}なので本当に注意\footnote[frame]{世の中のソフトウェアのコード見ると、全くセオリー守ってないのがあって…本当危険…}。
+\end{frame}
 
+\begin{frame}
+\alert{お作法を守る・守らないで安全性は大違い}なので、注意しなければならない。\footnote[frame]{世の中のソフトウェアのコード見ると、全くお作法を守ってないのがあって…本当危険…}
 \end{frame}
 
 \begin{frame}
@@ -321,14 +324,75 @@ E2Eセキュリティの重要性はわかったし、AESを使ってみるこ�
 \end{frame}
 
 \begin{frame}
-AESを使う際に気をつけることは、ざっと3点。
-\begin{itemize}
- \item AESに入れる「鍵」のランダム具合
- \item AESに入れる「鍵」を総当りする際の大変さ
- \item AESの「暗号化モード」の安全性
-\end{itemize}
+AESを使う際に気をつけるお作法は、ざっと3点。
+\begin{enumerate}
+ \item AESで使う鍵の\alert{ランダム具合}
+ \item AESで使う鍵を\alert{総当りする際の大変さ}\footnote[frame]{1点目と2点目は似ているようで異なる。}
+ \item AESの\alert{利用モードの安全性}
+\end{enumerate}
 
-pbkdf2, hkdf, cbc/ctr/cfb...
+\vspace{2ex}
+つまりどういうこと？
+
+\end{frame}
+
+\begin{frame}
+\frametitle{1: AESで使う鍵のランダム具合？}
+$\Rightarrow$ \alert{過去の利用履歴も含めたランダムさ}のこと
+
+\vspace{1ex}
+
+\begin{block}{}
+つまり…
+\begin{itemize}
+\item 過去に使った鍵は\alert{二度と使わない}
+\item 暗号化の鍵は\alert{毎回ランダム変更}し、可能ならば\alert{使い捨て}
+\end{itemize}
+ということ。
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+…なぜか？
+\begin{block}{}
+\begin{itemize}
+ \item 鍵が1つ漏れてしまうと、過去の暗号化データまで一網打尽…。
+ \item なので、万一暗号鍵1つ漏れちゃったとしても、他の暗号化データにまで影響が出ないことを保証しなきゃならない。\footnote[frame]{これを保証することを (Perfect) Forward Secrecyとか呼ぶ。}
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+\begin{frame}
+ただ、現実的には\underline{パスワードなどを毎回変更することは難しい}。
+
+\begin{center}
+ $\Downarrow$
+\end{center}
+
+\alert{固定のパスワードなどから毎回ランダムな鍵を生成する方法}を使う\footnote[frame]{PBKDF2 (RFC8018), HKDF (RFC5869)}。
+\end{frame}
+
+\begin{frame}
+\frametitle{2: AESで使う鍵を総当りする際の大変さ？}
+$\Rightarrow$ 総当たり攻撃やるには膨大な計算が必要になるようにすること
+\end{frame}
+
+\begin{frame}
+\frametitle{3: AESの利用モードの安全性？}
+
+$\Rightarrow$ AESのAPIで設定できる利用モード('AES256-CBC'とか)と、そのパラメタ設定の適切な設定が必要。
+
+\vspace{2ex}
+
+\begin{block}{\small AESの「利用モード」}
+AESの処理1回で暗号化できるのはたった16bytesにすぎない。
+
+長いデータを連続で暗号化するために、\alert{暗号化処理を連続して組み合わせる方法}が利用モード。
+\end{block}
+
+
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -362,17 +426,17 @@ ecbとか論外だからctrとか使え
 \end{frame}
 
 \begin{frame}
-\frametitle{PBKDF2ってなに？}
+\frametitle{PBKDF2の使い方 in JavaScript}
 jscuなら動くよ
 \end{frame}
 
 \begin{frame}
-\frametitle{HKDFってなに？}
+\frametitle{HKDFの使い方 in JavaScript}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{暗号化モードの種類}
+\frametitle{暗号化モードの設定}
 ctr云々。
 
 jsでのサポート具合を列挙
