@@ -344,6 +344,16 @@ AESを使う際に気をつけるお作法は、ざっと3点。
 \end{frame}
 
 \begin{frame}
+\frametitle{準備: パスワードとかを使ったAES暗号化のポイント}
+\begin{block}{\small パスワード $\neq$ AES暗号化の鍵}
+パスワードやバイナリ値を元にしてAES暗号化するためには、「パスワード等を変換し、AES暗号化の鍵を導出」することが必要
+\end{block}
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/kdf_definition.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
 \frametitle{1: AESで使う鍵のランダム具合？}
 $\Rightarrow$ \alert{過去の利用履歴も含めたランダムさ}のこと
 
@@ -386,12 +396,84 @@ $\Rightarrow$ \alert{固定パスワード等からランダムに鍵を導出�
 \includegraphics[width=0.9\linewidth]{Figs/pfs_kdf_case.pdf}
 \end{center}
 
+※ただし、固定パスワード等そのものが漏洩した場合はこの場合でもアウトなことに注意
 \end{frame}
 
 \begin{frame}
 \frametitle{2: AESで使う鍵を総当りする際の大変さ？}
-$\Rightarrow$ 総当たり攻撃やるには膨大な計算が必要になるようにすること
+
+$\Rightarrow$ 総当たり攻撃のためのコストのこと。
+
+\alert{※特にパスワードを使って暗号化する場合に重要}
+
+\vspace{1ex}
+
+\begin{block}{\small 暗号化データに対する総当たり攻撃}
+鍵の候補を全通りを一覧で用意して、「当たり」を見つけるまでとにかく復号を繰り返すこと。
+\end{block}
+
+\vspace{2ex}
+
+つまり総当たり攻撃のコストは、「ストレージ量」と「計算量」。
+
+\alert{このコストを払うことが非現実的に高くなければヤバい。}
 \end{frame}
+
+\begin{frame}
+\begin{block}{\small 8桁パスワードを単純にバイナリ化して鍵としてしまうと…}
+大小英数字$8$桁パスワードは $62^8 < 2^{48}$ 通り。
+
+\begin{itemize}
+\item[$\Rightarrow$] $48$bitsの全通りの準備は、高々$1.5$PB。
+\item[$\Rightarrow$] ストレージなしでも、パスワード候補を都度バイナリ化するだけで復号を試行可能。
+\end{itemize}
+\alert{割と簡単に「当たり＝バイナリ鍵」が見つかってしまう}。\footnote[frame]{\scriptsize 2009年当時でもスパコンを使って60時間とか。今だとGPUで並列化すればもっと高速になる。\url{https://web.archive.org/web/20180412051235/http://www.lockdown.co.uk/?pg=combi&s=articles}}
+\end{block}
+\vspace{1ex}
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{Figs/kdf_weak.pdf}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+
+なので、短いパスワード等から鍵を作るときは、コストが膨大になるような変換をする。
+
+\vspace{2ex}
+\begin{block}{}
+パスワード等から暗号化の鍵を作るとき、
+\begin{itemize}
+\item 毎回使い捨てのランダム値(Saltと呼ぶ)と混合して、\alert{AES暗号化の鍵のランダム性を上げる}。
+\item \alert{計算コストの高い演算}を使う。
+\end{itemize}
+という処理を行う。\footnote[frame]{PBKDF2}
+\end{block}
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/kdf_strong.pdf}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/kdf_strong.pdf}
+\end{center}
+
+\begin{itemize}
+ \item ランダムなSaltと混合することで、\alert{鍵候補全通りの事前準備のストレージが膨大になる}
+ \item ストレージなしで試行しても、計算コストの高い演算のせいで、\alert{鍵候補を都度生成→復号の計算コストが莫大になる}
+\end{itemize}
+
+\vspace{2ex}
+
+「お作法1」と合わせて1つの関数で実行することが多いが、AES暗号化の鍵を作る際に意識する重要なポイント。
+
+\end{frame}
+
 
 \begin{frame}
 \frametitle{3: AESの利用モードの安全性？}
@@ -406,7 +488,47 @@ AESの処理1回で暗号化できるのはたった16bytesにすぎない。
 長いデータを連続で暗号化するために、\alert{暗号化処理を連続して組み合わせる方法}が利用モード。
 \end{block}
 
+\end{frame}
 
+\begin{frame}
+\begin{block}{「とりあえずAESを使う」ためのポイントは2つ}
+\begin{itemize}
+\item 初期ベクトル(IV)というパラメタは\alert{都度ランダム値にする}\footnote[frame]{APIによって、ナンス(Nonce)というパラメタもあればそれも。}。
+\item CTRモード・CBCモードあたりを使う。\alert{ECBモードは絶対に使わない。}
+\end{itemize} 
+\end{block}
+
+前者、「過去に暗号化したデータとの相関をなくす」ために必要なパラメタ設定。
+
+後者、\alert{ECBモードは論外} (これが言いたいこと)。
+\end{frame}
+
+\begin{frame}
+どうしてECBモードは論外なのか？
+\begin{itemize}
+ \item[$\Rightarrow$] 元のデータの中で「同じ値のブロック\footnote[frame]{1ブロックは16Bytes単位}」は、暗号化データにおいても必ず「同じ値のブロック」になる。
+ \item[$\Rightarrow$] \alert{暗号化されてても中のデータが何かというのが予測可能…}
+\end{itemize}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/ecb_mode.pdf}
+\end{center}
+
+というわけで、JavaScript以外でも、たとえ選べたとしても絶対にECBモードは利用してはいけない。
+\end{frame}
+
+\begin{frame}
+ECBモードと違って、CBCモードではそういうことが起きない。
+\begin{itemize}
+ \item 先頭の16Bytesはランダムな初期化ベクトルと混ぜる
+ \item 前の16Bytesのデータを継承して次の16Bytesを処理
+\end{itemize}
+
+\vspace{2ex}
+
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/cbc_mode.pdf}\\
+CBCモードの16Bytes毎の処理
+\end{center}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -429,7 +551,7 @@ hkdf使え
 
 \begin{frame}
 \frametitle{危ない暗号化モードで暗号化してみる}
-ecbとか論外だからctrとか使え
+ecbとか論外だからcbcとか使え
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -451,7 +573,7 @@ jscuなら動くよ
 
 \begin{frame}
 \frametitle{暗号化モードの設定}
-ctr云々。
+cbc云々。
 
 jsでのサポート具合を列挙
 \end{frame}
