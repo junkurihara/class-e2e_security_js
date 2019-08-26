@@ -285,7 +285,7 @@ AESを使ってみることもできた。
 \begin{block}{\small この講義で最終的に学びたいこと}
 \begin{itemize}
 \item パスワードを使ってAES暗号化はどうすればいいか？\footnote[frame]{\scriptsize RFC8018 PBES2 \url{https://tools.ietf.org/html/rfc8018}によるAES暗号化}
-\item 固定バイナリ値を使ってAES暗号化はどうすればいいか？\footnote[frame]{\scriptsize RFC5869 HKDF \url{https://tools.ietf.org/html/rfc5869}による鍵導出とAES暗号化}
+\item 固定のマスターシークレット(バイナリ値)を使ってAES暗号化はどうすればいいか？\footnote[frame]{\scriptsize RFC5869 HKDF \url{https://tools.ietf.org/html/rfc5869}による鍵導出とAES暗号化}
 \end{itemize}
 \end{block}
 
@@ -331,9 +331,9 @@ AESを使ってみることもできた。
 \end{frame}
 
 \begin{frame}
-\frametitle{復習: AES (Advanced Encryption Standard) とは？}
+\frametitle{AES (Advanced Encryption Standard) とは？}
 \begin{block}{AES}
-米国NISTの標準暗号アルゴリズム (※共通鍵暗号)\\
+米国NISTの標準暗号アルゴリズム\\
 \begin{itemize}
  \item 鍵長は3種類: 128-bit, 192-bit, 256-bit
  \item 欧州NESSIE、日本CRYPTRECなどの標準規格としても採択
@@ -347,6 +347,7 @@ AESを使ってみることもできた。
 
 
 \begin{frame}
+\frametitle{AESを使うために}
 AESを使う際に気をつけるお作法は、ざっと3点。
 \begin{enumerate}
  \item AESで使う鍵の\alert{ランダム具合}
@@ -362,7 +363,7 @@ AESを使う際に気をつけるお作法は、ざっと3点。
 \begin{frame}
 \frametitle{準備: パスワードとかを使ったAES暗号化のポイント}
 \begin{block}{\small パスワード $\neq$ AES暗号化の鍵}
-パスワードやバイナリ値を元にしてAES暗号化するためには、「パスワード等を変換し、AES暗号化の鍵を導出」することが必要
+パスワードやマスターシークレットを元にしてAES暗号化するためには、「パスワード等を変換し、AES暗号化の鍵を導出」することが必要
 \end{block}
 \begin{center}
 \includegraphics[width=\linewidth]{Figs/kdf_definition.pdf}
@@ -443,7 +444,7 @@ $\Rightarrow$ 総当たり攻撃のためのコストのこと。
 \item[$\Rightarrow$] $48$bitsの全通りの準備は、高々$1.5$PB。
 \item[$\Rightarrow$] ストレージなしでも、パスワード候補を都度バイナリ化するだけで復号を試行可能。
 \end{itemize}
-\alert{割と簡単に「当たり＝バイナリ鍵」が見つかってしまう}。\footnote[frame]{\scriptsize 2009年当時でもスパコンを使って60時間とか。今だとGPUで並列化すればもっと高速になる。\url{https://web.archive.org/web/20180412051235/http://www.lockdown.co.uk/?pg=combi&s=articles}}
+\alert{割と簡単に「当たり＝48bits」が見つかってしまう}。\footnote[frame]{\scriptsize 2009年当時でもスパコンを使って60時間とか。今だとGPUで並列化すればもっと高速になる。\url{https://web.archive.org/web/20180412051235/http://www.lockdown.co.uk/?pg=combi&s=articles}}
 \end{block}
 \vspace{1ex}
 
@@ -565,7 +566,7 @@ CBCモードの16Bytes毎の処理
 \begin{frame}
 ブラウザ・Node.jsをエンドとし、
 \begin{enumerate}
- \item 「パスワード」「バイナリデータ」から鍵を導出し\footnote[frame]{お作法1,2}
+ \item 「パスワード」「マスターシークレット」から鍵を導出し\footnote[frame]{お作法1,2}
  \item それを使ってAES-CBCモードで暗号化して\footnote[frame]{お作法3}
 \end{enumerate}
 REST APIで暗号化データを登録してみる。
@@ -625,7 +626,7 @@ pbkdf使え
 \end{frame}
 
 \begin{frame}
-\frametitle{バイナリ鍵で暗号化してみる}
+\frametitle{マスターシークレット(バイナリ)で暗号化してみる}
 hkdf使え
 \end{frame}
 
@@ -643,12 +644,17 @@ ecbとか論外だからcbcとか使え
 
 \begin{frame}
 \frametitle{PBKDF2の使い方 in JavaScript}
-jscuなら動くよ
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/kdf_pbkdf2_flow.pdf}
+\end{center}
 \end{frame}
 
 \begin{frame}
 \frametitle{HKDFの使い方 in JavaScript}
-
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/kdf_pbkdf2_flow.pdf}
+\end{center}
 \end{frame}
 
 \begin{frame}
@@ -672,11 +678,17 @@ jsでのサポート具合を列挙
 お疲れ様でした。
 
 \begin{itemize}
-\item 
+\item AES暗号化する際のお作法を学んだ。
+\begin{itemize}
+ \item 鍵のランダムさを上げる、鍵への攻撃を困難にするためにKey Derivation Functionを適切に使う。
+ \item 利用モードはCBCモードやCTRモードを使う。
 \end{itemize}
+\item お作法をを守ったJavaScriptでの実装例を触ってみた。
+\end{itemize}
+\end{frame}
 
-\vspace{2ex}
 
+\begin{frame}
 次回以降…リクエスト次第ですが、
 \begin{itemize}
 \item 公開鍵暗号とその使い方

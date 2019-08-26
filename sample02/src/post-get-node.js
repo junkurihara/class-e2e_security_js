@@ -3,6 +3,9 @@
 import {postMyData, getMyData} from './post-get';
 import pgm from 'commander';
 import {generateBase64MasterSecret} from './derive-key';
+import {encryptECB, encrypt} from './encrypt';
+import {getJscu} from './util/env';
+import jseu from 'js-encoding-utils';
 
 
 pgm.version('0.0.1');
@@ -74,6 +77,23 @@ pgm
     }
     const res = generateBase64MasterSecret(parseInt(len));
     console.log(`> Generated master secret in Base64: ${res}`);
+  });
+
+/// weak ecb mode simulation
+pgm
+  .command('aes-mode-compare', '')
+  .description('AES-ECB/CBC simulation, check the encrypted binary occurrence.')
+  .action(async () => {
+    const jscu = getJscu();
+
+    const ecbKey = jscu.random.getRandomBytes(32);
+    const ecbData = '0000000000000000000000000000000000000000000000';
+    console.log(`AES-ECB/CBC simulation key (Base64): ${jseu.encoder.encodeBase64(ecbKey)}`);
+    console.log(`AES-ECB/CBC simulation data (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.stringToArrayBuffer(ecbData))}`);
+    const ecb = await encryptECB(ecbData, ecbKey);
+    console.log(`AES-ECB encrypted data (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.decodeBase64(ecb.data))}`);
+    const cbc = await encrypt(ecbData, ecbKey);
+    console.log(`AES-CBC encrypted data (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.decodeBase64(cbc.data))}`);
   });
 
 

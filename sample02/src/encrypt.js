@@ -43,3 +43,61 @@ export const decrypt = async (data, key, iv) => {
 
   return jseu.encoder.arrayBufferToString(decrypted);
 };
+
+
+
+/////////////////////////////
+// pseudo simulation of aes ecb mode
+const AESBLOCK = 16;
+const SLICEBLOCK = AESBLOCK - 1; // work around...
+//// DO NOT USE ECB MODE IN PRODUCTION
+export const encryptECB = async (data, key) => {
+  const jscu = getJscu();
+
+  const iv = new Uint8Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+  const uint8data = jseu.encoder.stringToArrayBuffer(data);
+
+  const blockNum = Math.ceil(uint8data.length/SLICEBLOCK);
+  const plaintext = new Uint8Array( blockNum * SLICEBLOCK );
+  uint8data.map( (u,i) => {plaintext[i]=u;});
+  const encrypted = new Uint8Array( blockNum * AESBLOCK );
+
+  for(let i = 0; i < blockNum; i++){
+    const block = plaintext.slice(i * SLICEBLOCK, (i+1) * SLICEBLOCK);
+    const x = await jscu.aes.encrypt(
+      block,
+      key,
+      {name: 'AES-CBC', iv}
+    );
+    encrypted.set(x, i*AESBLOCK);
+  }
+
+  return {
+    data: jseu.encoder.encodeBase64(encrypted)
+  };
+};
+
+//// DO NOT USE ECB MODE IN PRODUCTION
+export const decryptECB = async (data, key) => {
+  const jscu = getJscu();
+
+  const iv = new Uint8Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+  const encrypted = jseu.encoder.decodeBase64(data);
+
+  const blockNum = encrypted.length/AESBLOCK;
+  const decrypted = new Uint8Array( blockNum * SLICEBLOCK );
+
+  for(let i = 0; i < blockNum; i++){
+    const block = encrypted.slice(i*AESBLOCK, (i+1)*AESBLOCK);
+    const x = await jscu.aes.decrypt(
+      block,
+      key,
+      {name: 'AES-CBC', iv}
+    );
+    decrypted.set(x, i*SLICEBLOCK);
+  }
+
+  return {
+    data: jseu.encoder.arrayBufferToString(decrypted)
+  };
+};
