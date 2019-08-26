@@ -331,6 +331,22 @@ AESを使ってみることもできた。
 \end{frame}
 
 \begin{frame}
+\frametitle{復習: AES (Advanced Encryption Standard) とは？}
+\begin{block}{AES}
+米国NISTの標準暗号アルゴリズム (※共通鍵暗号)\\
+\begin{itemize}
+ \item 鍵長は3種類: 128-bit, 192-bit, 256-bit
+ \item 欧州NESSIE、日本CRYPTRECなどの標準規格としても採択
+ \item 現在まで致命的な欠陥は見つかっていない、安全性の高い\alert{デファクトスタンダード}のアルゴリズム
+\end{itemize}
+\end{block}
+\begin{center}
+\includegraphics[width=0.9\linewidth]{Figs/aes_flow.pdf}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
 AESを使う際に気をつけるお作法は、ざっと3点。
 \begin{enumerate}
  \item AESで使う鍵の\alert{ランダム具合}
@@ -520,7 +536,7 @@ AESの処理1回で暗号化できるのはたった16bytesにすぎない。
 ECBモードと違って、CBCモードではそういうことが起きない。
 \begin{itemize}
  \item 先頭の16Bytesはランダムな初期化ベクトルと混ぜる
- \item 前の16Bytesのデータを継承して次の16Bytesを処理
+ \item 前の16Bytesの暗号化データを混ぜて次の16Bytesを処理
 \end{itemize}
 
 \vspace{2ex}
@@ -537,6 +553,70 @@ CBCモードの16Bytes毎の処理
 \centering
 {\Large AESの使い方: とりあえず暗号化してみよう}
 \end{frame}
+
+\begin{frame}
+\frametitle{今回のセッティング}
+前回同様のREST APIサーバを介したE2E暗号化。
+\begin{center}
+\includegraphics[width=0.9\linewidth]{Figs/e2e.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+ブラウザ・Node.jsをエンドとし、
+\begin{enumerate}
+ \item 「パスワード」「バイナリデータ」から鍵を導出し\footnote[frame]{お作法1,2}
+ \item それを使ってAES-CBCモードで暗号化して\footnote[frame]{お作法3}
+\end{enumerate}
+REST APIで暗号化データを登録してみる。
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/mock_flow.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{環境}
+以下の環境が前提:
+\begin{itemize}
+ \item Node.js ($>$ v10)がインストール済 \footnote[frame]{npmに加えてyarnも使えるとなお良い (インストールコマンド: npm i -g yarn)}
+ \item ブラウザとして、Google Chrome (系ブラウザ)、もしくはFirefoxがインストール済み
+ \item Visual Studio Code や WebStorm などの統合開発環境がセットアップ済みだとなお良い。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{JavaScriptプロジェクトの準備}
+\begin{itemize}
+\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/zettant/e2e-security-02}}をClone\\
+\begin{exampleblock}{}
+\footnotesize
+\$ \texttt{git clone https://github.com/zettant/e2e-security-02}\\
+\$ \texttt{cd e2e-security-class/sample}
+\end{exampleblock}
+\item 依存パッケージのインストール
+\begin{exampleblock}{}
+\$ \texttt{yarn install}\quad or\quad \texttt{npm install}
+\end{exampleblock}
+\item ライブラリのビルド
+\begin{exampleblock}{}
+\$ \texttt{yarn build}\quad or\quad \texttt{npm run build}
+\end{exampleblock}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{REST APIモックサーバの準備}
+今回はSSL接続可能な共有サーバを準備済 (\url{https://e2e.zettant.com/})。
+
+\vspace{2ex}
+
+別途、検証用のサーバをローカルで立ち上げ可能。
+\begin{exampleblock}{\small モックサーバの立ち上げ}
+\$ \texttt{yarn start}
+\end{exampleblock}
+起動すると、localhostの3000番ポートでHTTPリクエストを待ち受け開始する。
+\end{frame}
+
 
 
 \begin{frame}
