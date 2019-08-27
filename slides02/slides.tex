@@ -285,7 +285,7 @@ AESを使ってみることもできた。
 \begin{block}{\small この講義で最終的に学びたいこと}
 \begin{itemize}
 \item パスワードを使ってAES暗号化はどうすればいいか？\footnote[frame]{\scriptsize RFC8018 PBES2 \url{https://tools.ietf.org/html/rfc8018}によるAES暗号化}
-\item 固定のマスターシークレット(バイナリ値)を使ってAES暗号化はどうすればいいか？\footnote[frame]{\scriptsize RFC5869 HKDF \url{https://tools.ietf.org/html/rfc5869}による鍵導出とAES暗号化}
+\item 固定のマスターシークレット(バイナリ値)\footnote[frame]{\scriptsize よくサーバの.envファイルとかにBase64で書くアレ。}を使ってAES暗号化はどうすればいいか？\footnote[frame]{\scriptsize RFC5869 HKDF \url{https://tools.ietf.org/html/rfc5869}による鍵導出とAES暗号化}
 \end{itemize}
 \end{block}
 
@@ -301,7 +301,7 @@ AESを使ってみることもできた。
 
 \vspace{2ex}
 
-\alert{お作法を守る・守らないで安全性は大違い}なので、注意しなければならない。\footnote[frame]{世の中のソフトウェア、全くお作法を守ってないのがあって…危険…最近だとphpの\texttt{hash\_hkdf()}がお作法守ってなかった (2018年)。}
+\alert{お作法を守る・守らないで安全性は大違い}なので、注意しなければならない。\footnote[frame]{世の中のソフトウェア、全くお作法を守ってないのが散見されてとても危険。最近だとphpの\texttt{hash\_hkdf()}がお作法守ってなかった (2018年)。}
 \end{frame}
 
 \begin{frame}
@@ -495,7 +495,7 @@ $\Rightarrow$ 総当たり攻撃のためのコストのこと。
 \begin{frame}
 \frametitle{3: AESの利用モードの安全性？}
 
-$\Rightarrow$ AESのAPIで設定できる利用モード('AES256-CBC'とか)と、そのパラメタ設定の適切な設定が必要。
+$\Rightarrow$ AESのAPIで設定できる利用モード('AES256-CBC'とか)と、そのパラメタの適切な設定をしないと\underline{致命的な事態に陥る}。
 
 \vspace{2ex}
 
@@ -508,7 +508,7 @@ AESの処理1回で暗号化できるのはたった16bytesにすぎない。
 \end{frame}
 
 \begin{frame}
-\begin{block}{「とりあえずAESを使う」ためのポイントは2つ}
+\begin{block}{\small「とりあえずAESを使う」ための利用モード設定のポイントは2つ}
 \begin{itemize}
 \item 初期ベクトル(IV)というパラメタは\alert{都度ランダム値にする}\footnote[frame]{APIによって、ナンス(Nonce)というパラメタもあればそれも。}。
 \item CTRモード・CBCモードあたりを使う。\alert{ECBモードは絶対に使わない。}
@@ -689,17 +689,41 @@ ECBモードについては、WebCryptoAPIなどではその危険性のため�
 
 \begin{frame}
 \frametitle{PBKDF2の使い方 in JavaScript}
+パスワードからAESの鍵を導出するのに使った。
+\begin{block}{\small PBKDF2: Password-based Key Derivation Function}
+PKCS \#5 v2.1 (RFC8081\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc8018}}) にて規定。
+非推奨のPBKDF1の置き換え。PBKDF2 を利用した(AES)暗号化は、Password-based Encryption Scheme 2 (PBES2) と規定される。
+\end{block}
 
 \begin{center}
 \includegraphics[width=\linewidth]{Figs/kdf_pbkdf2_flow.pdf}
 \end{center}
+他にも、BCryptoなど目的が同じ類似のアルゴリズムがある。
+\end{frame}
+
+\begin{frame}
+PBKDF2は、WebCrypto API, Node.js Crypto共にネイティブ実装。
+
+今回は、手前味噌だがAPI差をなくすのに\texttt{jscu}を利用。
 \end{frame}
 
 \begin{frame}
 \frametitle{HKDFの使い方 in JavaScript}
+マスターシークレットからAESの鍵を導出するのに使った。
+\begin{block}{\small HKDF: HMAC-based Key Derivation Function}
+RFC8081\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc5869}} にて規定。
+PBKDF2と違って、\structure{鍵の導出計算量を莫大にする効果は薄い}ので、長めのマスターシークレットを元にする場合に使う。
+\end{block}
+
 \begin{center}
-\includegraphics[width=\linewidth]{Figs/kdf_pbkdf2_flow.pdf}
+\includegraphics[width=\linewidth]{Figs/kdf_hkdf_flow.pdf}
 \end{center}
+\end{frame}
+
+\begin{frame}
+HKDFは、WebCrypto APIでのみネイティブ実装。
+
+今回は、手前味噌だが環境差をなくすのに\texttt{jscu}を利用。
 \end{frame}
 
 \begin{frame}
