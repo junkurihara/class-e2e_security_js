@@ -81,19 +81,18 @@ pgm
 
 /// weak ecb mode simulation
 pgm
-  .command('aes-mode-compare', '')
+  .command('aes-mode-compare <data>', '')
   .description('AES-ECB/CBC simulation, check the encrypted binary occurrence.')
-  .action(async () => {
+  .action(async (data) => {
     const jscu = getJscu();
 
     const ecbKey = jscu.random.getRandomBytes(32);
-    const ecbData = '0000000000000000';
-    console.log(`AES-ECB/CBC simulation key (Base64): ${jseu.encoder.encodeBase64(ecbKey)}`);
-    console.log(`AES-ECB/CBC simulation data (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.stringToArrayBuffer(ecbData))}`);
-    const ecb = await encryptECB(ecbData, ecbKey);
-    console.log(`AES-ECB encrypted data (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.decodeBase64(ecb.data))}`);
-    const cbc = await encrypt(ecbData, ecbKey);
-    console.log(`AES-CBC encrypted data (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.decodeBase64(cbc.data))}`);
+    console.log(`random key (Base64): ${jseu.encoder.encodeBase64(ecbKey)}`);
+    console.log(`data (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.stringToArrayBuffer(data))}`);
+    const ecb = await encryptECB(data, ecbKey);
+    console.log(`AES-ECB (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.decodeBase64(ecb.data))}`);
+    const cbc = await encrypt(data, ecbKey);
+    console.log(`AES-CBC (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.decodeBase64(cbc.data))}`);
   });
 
 

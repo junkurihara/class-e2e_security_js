@@ -618,7 +618,19 @@ REST APIで暗号化データを登録してみる。
 起動すると、localhostの3000番ポートでHTTPリクエストを待ち受け開始する。
 \end{frame}
 
+\begin{frame}
+まずはコマンドラインを叩き、Node.jsで
+\begin{itemize}
+ \item パスワードでAES暗号化
+ \item マスターシークレットでAES暗号化
+ \item ヤバい利用モードでのヤバさを実感
+\end{itemize}
+してみる。
 
+\vspace{2ex}
+
+※ユニバーサル暗号ユーティリティ「jscu」\footnote[frame]{\url{https://github.com/junkurihara/jscu}}を使ってサンプルを制作しているので、\alert{ブラウザでも全く同じAPI・Code snippetを試用可能。}
+\end{frame}
 
 \begin{frame}
 \frametitle{パスワードで暗号化してみる}
@@ -631,9 +643,42 @@ hkdf使え
 \end{frame}
 
 \begin{frame}
-\frametitle{危ない暗号化モードで暗号化してみる}
-ecbとか論外だからcbcとか使え
+ブラウザでもパスワード暗号化・マスターシークレットでの暗号化が試せる。
+
+\vspace{1ex}
+
+\texttt{sample02/src/post-get-browser.html} を開いて開発者コンソールから試してみよう。
+
+\vspace{1ex}
+
+(サンプルコードはhtmlファイルに記載)
 \end{frame}
+
+\begin{frame}
+\frametitle{危ない暗号化モードで暗号化してみる}
+ECBモードで暗号化できるAPIを用意してみたので、それで暗号化してみるとヤバさが目に見えてわかる。
+
+\begin{exampleblock}{}
+\scriptsize
+\$ \texttt{yarn execute aes-mode-compare '\alert{0123456789ABCDEF}\structure{0123456789ABCDEF}'} ←16bytes毎\\
+\texttt{random key (Base64): 4gfrl+/OMyFt2ALLEp24sIXyHsyjvlYZZxRj4lkJe9M=}\\
+\texttt{data (Hex): 3031323334353637383941424344454630313233343536373839414243444546}\\
+\texttt{AES-ECB (Hex): \underline{\alert{c871e345b92951236059676b0866c7af}} \underline{\structure{c871e345b92951236059676b0866c7af}} ...}\\
+\texttt{AES-CBC (Hex): \alert{d34ad4cc8816edcf3ad1a56c355c9067} \structure{69c4f525903b607960e377649abef648} ...}
+\end{exampleblock}
+
+16bytes単位で同じ値が出てくるデータを、ECBモードで暗号化してみると\alert{ECBモードだと暗号文も同じ値の繰り返しになる}。\\
+$\Rightarrow$ \underline{元のデータが推測しやすくなる。}
+
+\end{frame}
+
+\begin{frame}
+CBCモードだと暗号化データが繰り返されるようなことはない。\footnote[frame]{というか、繰り返しが発生してしまうようなものはECBだけ。}
+
+\vspace{3ex}
+ECBモードについては、WebCryptoAPIなどではその危険性のためにサポートされていない\footnote[frame]{サンプルコードでは、CBCモードを弄ってECBモードを再現している。}が、\alert{どんな場合であってもECBモードの利用は避けて}、CBCモードやCTRモードなどを利用しよう。
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{AESの使い方: 細かめの解説}
