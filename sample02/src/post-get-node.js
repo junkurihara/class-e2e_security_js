@@ -87,7 +87,7 @@ pgm
     const jscu = getJscu();
 
     const ecbKey = jscu.random.getRandomBytes(32);
-    const ecbData = '0000000000000000000000000000000000000000000000';
+    const ecbData = '0000000000000000';
     console.log(`AES-ECB/CBC simulation key (Base64): ${jseu.encoder.encodeBase64(ecbKey)}`);
     console.log(`AES-ECB/CBC simulation data (Hex): ${jseu.encoder.arrayBufferToHexString(jseu.encoder.stringToArrayBuffer(ecbData))}`);
     const ecb = await encryptECB(ecbData, ecbKey);
