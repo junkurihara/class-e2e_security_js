@@ -634,13 +634,136 @@ REST APIで暗号化データを登録してみる。
 
 \begin{frame}
 \frametitle{パスワードで暗号化してみる}
-pbkdf使え
+\small
+
+「yarn execute post -r -p `パスワード' `データ'」で暗号化。
+
+\begin{block}{\small sampleディレクトリ以下で実行}
+\scriptsize
+\$ \texttt{yarn execute post -r -p 'my password' 'my private data'} // -r を抜くとローカル\\
+\texttt{Register encrypted data to remote server}\\
+\texttt{Data: my private data}\\
+\texttt{Password: my password}\\
+{\color{red}
+\texttt{Derived key and its related params:} // パスワードから生成された鍵とパラメタ\\
+\texttt{\quad Derived key in Base64: fiP4flrlhd3Iwg5MOyln7zNNk4Au9If429n2uvfi43s=}\\
+\texttt{\quad PBKDF2 Param - Salt in Base64: zyD7/TGDq3dig3l4zJ5SRzFKVnIjw2KG26XUrMZFkkw=}\\
+\texttt{\quad PBKDF2 Param - Hash: SHA-256}\\
+\texttt{\quad PBKDF2 Param - Iteration: 2048}
+}\\
+\texttt{Registered id: 1} // id=1で暗号化データと鍵導出のパラメタを登録
+\end{block}
+
+長い鍵「S4lFVWrvLj4OjPfFRTgVJFfRUI+6LIlw1VooFzG2J5E=」を短い「my password」から生成。
+
+また、同じパスワード・データでも毎回異なる鍵になることを確認する。
 \end{frame}
 
 \begin{frame}
-\frametitle{マスターシークレット(バイナリ)で暗号化してみる}
-hkdf使え
+登録データは\url{https://e2e.zettant.com/data}で一覧。
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/data_pbes.pdf}
+\end{center} 
+
+暗号化データ以外、復号側と共有する公開パラメタ：
+\begin{itemize}
+ \item AESのCBCモード → IV
+ \item パスワードから鍵の導出 → Salt, iteration回数、Hash関数
+\end{itemize}
 \end{frame}
+
+\begin{frame}
+ 「yarn execute get -r -p `パスワード' `id番号'」で復号。
+\begin{block}{}
+\scriptsize
+\$ \texttt{yarn execute get -r -p 'my password' 1} // -r を抜くとローカル\\
+\texttt{Retrieve encrypted data to remote server}\\
+\texttt{Id: 1}\\
+\texttt{Password: my password}\\
+{\color{blue}
+\texttt{Derived key and its related params:} // 取得した公開パラメタと、生成した鍵\\
+\texttt{\quad Derived key in Base64: fiP4flrlhd3Iwg5MOyln7zNNk4Au9If429n2uvfi43s=}\\
+\texttt{\quad PBKDF2 Param - Salt in Base64: zyD7/TGDq3dig3l4zJ5SRzFKVnIjw2KG26XUrMZFkkw=}\\
+\texttt{\quad PBKDF2 Param - Hash: SHA-256}\\
+\texttt{\quad PBKDF2 Param - Iteration: 2048}\\
+}
+\texttt{Decrypted data: my private data} // 正しく復号された
+\end{block}
+
+暗号化の時と同一の鍵が生成されたことに注目。
+
+\vspace{2ex}
+
+中のコードがどうなっているかは後述。
+\end{frame}
+
+
+\begin{frame}
+\frametitle{マスターシークレット(バイナリ)で暗号化してみる}
+\small
+「yarn execute post -r -m `マスターシークレット\footnote[frame]{Base64}' `データ'」で暗号化。
+
+\begin{block}{\small sampleディレクトリ以下で実行}
+\scriptsize
+\$ \texttt{yarn execute gen-secret 32} // まずはマスターシークレットを生成する。\\
+\texttt{Generated master secret in Base64: \alert{mP95WFEv3G/iWsjQKC4mEuEmCkiS8dRK80Q6CpC1bc0=}}\\[2ex]
+\$ \texttt{yarn execute post -r -m 'mP95WFEv3G/iWsjQKC4mEuEmCkiS8dRK80Q6CpC1bc0=' 'my private data'}\\
+\texttt{Register encrypted data to remote server}\\
+\texttt{Data: my private data}\\
+\texttt{Master secret: mP95WFEv3G/iWsjQKC4mEuEmCkiS8dRK80Q6CpC1bc0=}\\
+{\color{red}
+\texttt{Derived key and its related params:} // マスターシークレットから生成された鍵とパラメタ\\
+\texttt{\quad Derived key in Base64: 1vgTfxp3FEi3kpJiQ6h0vxtDCkdz+u5XQUF1tPm1VMY=}\\
+\texttt{\quad HKDF Param - Salt in Base64: 8SM9tyXJUX+JGwLswIUnnGyHPL+7hzkSHXaKY7z0AF0=}\\
+\texttt{\quad HKDF Param - Hash: SHA-256}
+}\\
+\texttt{Registered id: 2}
+\end{block}
+
+同じマスターシークレット・データでも毎回異なる鍵になることを確認する。
+
+\end{frame}
+
+
+\begin{frame}
+ブラウザで確認してみる。
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/data_hkdf.pdf}
+\end{center} 
+
+暗号化データ以外、復号側と共有する公開パラメタ：
+\begin{itemize}
+ \item AESのCBCモード → IV
+ \item マスターシークレットから鍵の導出 → Salt, Hash関数
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+ 「yarn execute get -r -m `マスターシークレット' `id番号'」で復号。
+\begin{block}{}
+\scriptsize
+\$ \texttt{yarn execute get -r -m 'mP95WFEv3G/iWsjQKC4mEuEmCkiS8dRK80Q6CpC1bc0=' 2} // -r を抜くとローカル\\
+\texttt{Retrieve encrypted data to remote server}\\
+\texttt{Id: 2}\\
+\texttt{Master secret: mP95WFEv3G/iWsjQKC4mEuEmCkiS8dRK80Q6CpC1bc0=}\\
+{\color{blue}
+\texttt{Derived key and its related params:} // 取得した公開パラメタと、生成した鍵\\
+\texttt{\quad Derived key in Base64: 1vgTfxp3FEi3kpJiQ6h0vxtDCkdz+u5XQUF1tPm1VMY=}\\
+\texttt{\quad HKDF Param - Salt in Base64: 8SM9tyXJUX+JGwLswIUnnGyHPL+7hzkSHXaKY7z0AF0=}\\
+\texttt{\quad HKDF Param - Hash: SHA-256}}
+\\
+\texttt{Decrypted data: my private data} // 正しく復号された
+\end{block}
+
+暗号化の時と同一の鍵が生成されたことに注目。
+
+\vspace{2ex}
+
+中のコードがどうなっているかは後述。
+\end{frame}
+
 
 \begin{frame}
 ブラウザでもパスワード暗号化・マスターシークレットでの暗号化が試せる。
