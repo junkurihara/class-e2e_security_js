@@ -702,11 +702,11 @@ REST APIで暗号化データを登録してみる。
 \begin{frame}
 \frametitle{マスターシークレット(バイナリ)で暗号化してみる}
 \small
-「yarn execute post -r -m `マスターシークレット\footnote[frame]{Base64}' `データ'」で暗号化。
+「yarn execute post -r -m `マスターシークレット' `データ'」で暗号化。\footnote[frame]{マスターシークレットはBase64}
 
 \begin{block}{\small sampleディレクトリ以下で実行}
 \scriptsize
-\$ \texttt{yarn execute gen-secret 32} // まずはマスターシークレットを生成する。\\
+\$ \texttt{yarn execute gen-secret 32} // まずはBase64でマスターシークレットを生成する。\\
 \texttt{Generated master secret in Base64: \alert{mP95WFEv3G/iWsjQKC4mEuEmCkiS8dRK80Q6CpC1bc0=}}\\[2ex]
 \$ \texttt{yarn execute post -r -m 'mP95WFEv3G/iWsjQKC4mEuEmCkiS8dRK80Q6CpC1bc0=' 'my private data'}\\
 \texttt{Register encrypted data to remote server}\\
@@ -821,13 +821,35 @@ PKCS \#5 v2.1 (RFC8081\footnote[frame]{\scriptsize \url{https://tools.ietf.org/h
 \begin{center}
 \includegraphics[width=\linewidth]{Figs/kdf_pbkdf2_flow.pdf}
 \end{center}
-他にも、BCryptoなど目的が同じ類似のアルゴリズムがある。
+他にも、BCryptなど類似のアルゴリズムがある。\footnote[frame]{\scriptsize 「パスワードハッシュ化」と「パスワードから鍵導出」で目的は異なれど、必要な機能は一緒。}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 PBKDF2は、WebCrypto API, Node.js Crypto共にネイティブ実装。
 
 今回は、手前味噌だがAPI差をなくすのに\texttt{jscu}を利用。
+
+\begin{exampleblock}{\small \texttt{sample/src/derive-key.js: deriveKeyFromPassword}}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu(); // 環境に応じてjscuをscriptタグで読み込んだり、requireしたり。
+
+if(!salt){ // saltが入力されなかったらランダム値を生成。Saltは任意長。
+  salt = jscu.random.getRandomBytes(32); // Uint8Array
+}
+else {
+  salt = jseu.encoder.decodeBase64(salt); // Base64からUint8Arrayにデコード
+}
+
+const key = await jscu.pbkdf.pbkdf2( // PBKDF2により鍵導出
+  password,       // パスワード。
+  salt,           // 復号側と共有(公開)。
+  iterationCount, // 内部処理の反復回数。通常1000回以上。復号側と共有(公開)。
+  len,            // 出力する鍵の長さ。復号側と共有(公開)。
+  hash            // 内部のHMAC関数用のHash関数名。'SHA-256'。復号側と共有(公開)。
+);
+\end{verbatim}
+\end{exampleblock}
 \end{frame}
 
 \begin{frame}
@@ -843,17 +865,73 @@ PBKDF2と違って、\structure{鍵の導出計算量を莫大にする効果は
 \end{center}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 HKDFは、WebCrypto APIでのみネイティブ実装。
 
 今回は、手前味噌だが環境差をなくすのに\texttt{jscu}を利用。
+
+\begin{exampleblock}{\small \texttt{sample/src/derive-key.js: deriveKeyFromMasterSecret}}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu(); // 環境に応じてjscuをscriptタグで読み込んだり、requireしたり。
+
+if(!salt){ // saltが入力されなかったらランダム値を生成。Saltは任意長。
+  salt = jscu.random.getRandomBytes(32); // Uint8Array
+}
+else {
+  salt = jseu.encoder.decodeBase64(salt); // Base64からUint8Arrayにデコード。
+}
+
+const keyObj = await jscu.hkdf.compute(
+  masterSecret, // マスターシークレット。
+  hash          // 内部のHMAC関数用のHash関数名。'SHA-256'。復号側と共有(公開)。
+  len,          // 出力する鍵の長さ。復号側と共有(公開)。
+  '',           // 'info' field for RFC5869. This could be always blank.
+  salt          // 復号側と共有(公開)。
+);
+\end{verbatim}
+
+\end{exampleblock}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{暗号化モードの設定}
-cbc云々。
+\texttt{jscu}では、CBCに加えて、CTRモードを拡張したGCM\footnote[frame]{GCM(Galois/Counter Mode)は、CTRモードで暗号化したデータに\structure{認証タグ}を付与したもの。暗号化データの改ざんを検知できる。}をサポートしている。
 
-jsでのサポート具合を列挙
+\begin{exampleblock}{\small \texttt{sample/src/encrypt.js: encrypt}}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu(); // 環境に応じてjscuをscriptタグで読み込んだり、requireする。
+
+const uint8iv = jscu.random.getRandomBytes(16); // ランダムIVの生成。CBCは16Bytes。
+const encrypted = await jscu.aes.encrypt( // AES暗号化
+  jseu.encoder.stringToArrayBuffer(data), // string dataのUint8Array化
+  key,                                    // HKDF/PBKDFで導出した鍵
+  { // CBC暗号化モードを設定
+    name: 'AES-CBC',
+    iv: uint8iv
+  }
+);
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{exampleblock}{\small \texttt{sample/src/encrypt.js: decrypt}}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu(); // 環境に応じてjscuをscriptタグで読み込んだり、requireする。
+
+const decrypted = await jscu.aes.decrypt( // AES復号
+  jseu.encoder.decodeBase64(data), // Base64の暗号化データをデコード。
+  key,                             // HKDF/PBKDFで導出した鍵
+  { // CBC暗号化モードを設定
+    name: 'AES-CBC',
+    iv: jseu.encoder.decodeBase64(iv) // Base64で与えられたIVをデコード。
+  }
+);
+\end{verbatim}
+\end{exampleblock}
 \end{frame}
 
 
