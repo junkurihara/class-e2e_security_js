@@ -275,22 +275,42 @@
 \end{frame}
 
 \begin{frame}
-今回は\underline{正しく・安全に}公開鍵暗号を使ってみる方法、についてのお話。
+今回は\underline{正しく・安全に}公開鍵暗号を使っていくためのお話。
 
 \begin{block}{\small この講義で最終的に学びたいこと}
 \begin{itemize}
-\item 公開鍵暗号ってどういうもの？AESとのメリデメは？
-\item RSAと楕円曲線の違い。
+\item 公開鍵暗号はどういうものか。AESと比べたpros/cons。
+\item RSA暗号と楕円曲線暗号\footnote[frame]{楕円曲線Diffie-Hellman}の違い。
 \item AESと公開鍵暗号を組み合わせてデータを暗号化するために。
 \end{itemize}
-
-細かい所の話もしますが、なるべく数式とか使わないで「イメージ」でわかるようにしていきます。
 \end{block}
 
+細かい所の話もしますが、なるべく数式を使わないで「イメージ」をつかめるようにする。
 \end{frame}
 
 \begin{frame}
+\frametitle{公開鍵暗号って？}
 
+既知だと思うが、まずざっと定義しておく。
+
+\begin{block}{\small 定義: 公開鍵暗号}
+\footnotesize
+以下のステップで暗号化・復号が行われる暗号方式のこと
+\begin{enumerate}
+ \item \underline{特殊な数学的条件}を満たす鍵ペア「公開鍵 $\mathit{PK}$ と 秘密鍵 $\mathit{SK}$」を生成
+ \item \alert{$\mathit{PK}$は公開、$\mathit{SK}$は秘匿}
+ \item データ$D$を$\mathit{PK}$によって暗号化して、暗号化データ$X$を生成
+ \item $X$は$\mathit{SK}$によってデータ$D$に復号される。
+\end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+公開鍵暗号の絵
+\end{center}
+
+暗号化・復号の鍵を分けて、暗号化の鍵を公開してしまうことで\alert{パスワードなどの共有が不要}になる。
 \end{frame}
 
 \begin{frame}
@@ -319,6 +339,112 @@
 {\Large 公開鍵暗号の使い方 事始め}
 \end{frame}
 
+\begin{frame}
+\frametitle{公開鍵暗号の種類}
+\begin{exampleblock}{}
+\begin{center}
+公開鍵暗号の定義「\underline{特殊な数学的条件}を満たす鍵ペアを生成」\\[0.5ex]
+ $\Downarrow$\\[0.5ex]
+この「数学的条件」に複数の種類が存在。
+\end{center}
+\end{exampleblock}
+
+\vspace{2ex}
+
+JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗号：
+\begin{itemize}
+ \item 素因数分解に関する条件\\ → \alert{RSA暗号}
+ \item 楕円曲線上の離散対数に関する条件\\ → \alert{楕円曲線暗号(Elliptic Curve Diffie-Hellman; ECDH)}
+\end{itemize}
+この2つの使い方、注意ポイントを今回は取り上げる。
+\end{frame}
+
+\begin{frame}
+\frametitle{RSA暗号のさわり}
+\end{frame}
+
+\begin{frame}
+\frametitle{楕円曲線暗号(ECDH)のさわり}
+\end{frame}
+
+\begin{frame}
+\frametitle{AESと比べた公開鍵暗号のPros/Cons}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{RSA暗号を使ってみよう}
+\begin{frame}
+\centering
+{\Large RSA暗号を使ってみよう}
+\end{frame}
+
+\begin{frametitle}
+\frametitle{RSA暗号って何？}
+\end{frametitle}
+
+\begin{frame}
+\frametitle{RSA暗号を使うためのお作法}
+Padding:
+
+RSA OAEP
+https://tools.ietf.org/html/rfc8017
+
+PKCS1-v1.5 paddingはやばい。Cryptrecからも落ちた。
+https://www.cryptrec.go.jp/method.html
+
+https://tools.ietf.org/html/rfc8017
+既知の攻撃が知られており、RSASSA, RSAES共にPKCF1-v1.5は非推奨@RFC
+
+でもNode.jsではOAEP非サポートなので作った
+\end{frame}
+
+\begin{frame}
+\frametitle{RSA-OAEPによるデータ暗号化をしてみよう}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{楕円曲線暗号(ECDH)を使ってみよう}
+\begin{frame}
+\centering
+{\Large 楕円曲線暗号(ECDH)を使ってみよう}
+\end{frame}
+
+\begin{frame}
+\frametitle{ECDHって何？}
+TLS https://tools.ietf.org/html/rfc8422
+
+JOSEだとConcat KDFを使うだけ。
+https://tools.ietf.org/html/rfc8037
+
+直接Concat KDFを暗号化の鍵にするか、
+あるいはConcat KDFの結果をAESKWの鍵としてContent Encryption Keyを暗号化するのに使う。
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{ECDHによるデータ暗号化をしてみよう}
+今回はHKDFで暗号化してみる。
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{AESと公開鍵暗号のいいとこ取り}
+\begin{frame}
+\centering
+{\Large AESと公開鍵暗号のいいとこ取り}
+\end{frame}
+
+\begin{frame}
+\frametitle{公開鍵暗号とAESの比較}
+\end{frame}
+
+\begin{frame}
+\frametitle{ハイブリッド暗号化}
+AESの暗号化データをガンガン使い回せる！
+
+msgpack-lightを使ったコードを提供
+\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

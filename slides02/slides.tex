@@ -950,7 +950,8 @@ const decrypted = await jscu.aes.decrypt( // AES復号
 \begin{itemize}
 \item AES暗号化する際のお作法を学んだ。
 \begin{itemize}
- \item 鍵のランダムさを上げる、鍵への攻撃を困難にするためにKey Derivation Functionを適切に使う。
+ \item 鍵のランダムさを上げる、鍵への攻撃を困難にするためにKey Derivation Functionを適切に使う。\\
+(※今回紹介したPBKDF2/HKDF以外の方法もある。\footnote[frame]{\scriptsize e.g., JOSE向けのConcat KDF with AESKW \url{https://tools.ietf.org/html/rfc8037}})
  \item 利用モードはCBCモードやCTRモードを使う。
 \end{itemize}
 \item お作法をを守ったJavaScriptでの実装例を触ってみた。
