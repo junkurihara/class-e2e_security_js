@@ -896,7 +896,7 @@ const keyObj = await jscu.hkdf.compute(
 
 \begin{frame}[fragile]
 \frametitle{暗号化モードの設定}
-\texttt{jscu}では、CBCに加えて、CTRモードを拡張したGCM\footnote[frame]{GCM(Galois/Counter Mode)は、CTRモードで暗号化したデータに\structure{認証タグ}を付与したもの。暗号化データの改ざんを検知できる。}をサポートしている。
+\texttt{jscu}では、CBCモードとCTRモードに加えて、CTRモードを拡張したGCM\footnote[frame]{\scriptsize GCM(Galois/Counter Mode)は、CTRモードで暗号化したデータに\structure{認証タグ}を付与したもの。暗号化したデータの改ざんを検知できる。}をサポートしている。
 
 \begin{exampleblock}{\small \texttt{sample/src/encrypt.js: encrypt}}
 \scriptsize
