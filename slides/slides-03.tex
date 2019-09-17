@@ -261,10 +261,10 @@
 
 \begin{frame}
 \frametitle{はじめに}
-前回・前々回 (第1,2回) では
+第1回と第2回では
 \begin{itemize}
  \item End-to-End (E2E) セキュリティの原則と必要性
- \item WebサイトでのE2Eセキュリティ実践のため、JavaScriptでの暗号(AES)の正しく・安全に利用するする方法
+ \item WebサイトでのE2Eセキュリティ実践のため、JavaScriptで暗号(AES)を正しく・安全に利用する方法
 \end{itemize}
 を勉強した。
 
@@ -272,20 +272,6 @@
 \vspace{2ex}
 
 ところで、AES(共通鍵暗号)とは別に、「公開鍵暗号」というのが存在する。
-\end{frame}
-
-\begin{frame}
-今回は\underline{正しく・安全に}公開鍵暗号を使っていくためのお話。
-
-\begin{block}{\small この講義で最終的に学びたいこと}
-\begin{itemize}
-\item 公開鍵暗号はどういうものか。AESと比べたpros/cons。
-\item RSA暗号と楕円曲線暗号\footnote[frame]{今回は楕円曲線Diffie-Hellmanを取り上げる}の違い。
-\item AESと公開鍵暗号を組み合わせてデータを暗号化するために。
-\end{itemize}
-\end{block}
-
-細かい所の話もしますが、なるべく数式を使わないで「イメージ」をつかめるようにする。
 \end{frame}
 
 \begin{frame}
@@ -311,7 +297,26 @@
 \end{center}
 
 暗号化・復号の鍵を分けて、暗号化の鍵を公開してしまうことで\alert{パスワードなどの共有が不要}になる。
+
+\vspace{1ex}
+
+$\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。
 \end{frame}
+
+\begin{frame}
+今回は\underline{正しく・安全に}公開鍵暗号を使っていくためのお話。
+
+\begin{block}{\small この講義で最終的に学びたいこと}
+\begin{itemize}
+\item 公開鍵暗号はどういうものか。AESと比べたpros/cons。
+\item RSA暗号と楕円曲線暗号\footnote[frame]{楕円曲線Diffie-Hellmanを取り上げる}の違い。
+\item AESと公開鍵暗号を組み合わせてデータを暗号化するために。
+\end{itemize}
+\end{block}
+
+細かい話もするが、なるべく数式を使わないで「イメージ」をつかめるようにする。
+\end{frame}
+
 
 \begin{frame}
 \frametitle{この講義の対象と事前準備}
@@ -361,14 +366,89 @@ JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗�
 
 \begin{frame}
 \frametitle{RSA暗号のさわり}
+\begin{block}{RSA Cryptography}
+言わずもがな、公開鍵暗号の代表的な手法
+\begin{itemize}
+ \item 1977年、Rivest-Shamir-Edelmanの3名により発明。2000年に特許期間満了(現在特許フリー)。暗号化以外に「署名」の手法への応用も有名。
+ \item RFC 8017 (PKCS\#1 v2.2)、ANSI X9.31、IEEE 1363、CRYPTREC等、各所で標準に採用。
+ \item 鍵長は1024--4096bitsが標準的に使われている。\footnote[frame]{原理的には無限に伸ばせる。}
+ \item 暗号化・署名の際には、元のデータにパディングが必要。\alert{パディング方法によりセキュリティが大きく左右される。}\footnote[frame]{RSA-OAEP(暗号化)、RSA-PSS(署名)が現状ベターな方法。これを話す。}
+\end{itemize}
+\end{block}
+
 \end{frame}
 
 \begin{frame}
 \frametitle{楕円曲線暗号(ECDH)のさわり}
+\begin{block}{Elliptic-Curve Cryptography}
+\end{block}
+
 \end{frame}
 
 \begin{frame}
 \frametitle{AESと比べた公開鍵暗号のPros/Cons}
+\begin{table}
+\centering
+\begin{tabular}{|p{0.1\linewidth}||p{0.39\linewidth}|p{0.39\linewidth}|}
+\hline
+ & \textbf{Pros} & \textbf{Cons}\\
+\hline
+\hline
+\textbf{AES}
+& ・安全性を担保する鍵長が短い (128bits〜) & ・パスワードなどの\structure{事前共有が必要} \\
+& ・一般的に\alert{高速}・SoCでの最適化も望める\footnote[frame]{Intel AES-NI} & \\
+\hline
+\textbf{公開鍵暗号}
+& ・パスワードなどの秘密情報の\alert{事前共有が不要} & ・安全性を担保する鍵長が長い (RSA: 2048bits〜)\\
+& & ・一般的に\structure{非常に遅い・重い}\\
+\hline
+\end{tabular}
+\end{table}
+
+$\Rightarrow$ 使い所を考えて組み合わせて使うことがオススメ(後述)
+
+\end{frame}
+
+\begin{frame}
+\frametitle{安全性を担保する鍵長が大きく違うのはどういうこと？}
+
+AESと比べたRSA・楕円曲線暗号の鍵のビット長比較\footnote[frame]{\scriptsize Recommendation for Key Management, Special Publication 800-57 Part 1 Rev. 4, NIST, 01/2016. \url{https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-4/final}}。\alert{横1行がだいたい同じくらいの安全性}と言われる。
+\begin{table}
+\centering
+\begin{tabular}{|c||c|c|}
+\hline
+\textbf{AES} & \textbf{RSA} & \textbf{楕円曲線}\\
+\hline
+\hline
+128 & 3072 & 256--383\\
+\hline
+192 & 7680 & 384--511\\
+\hline
+256 & 15360 & 512--\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{block}{}
+AESに比べて、\alert{楕円曲線で倍、RSAに至っては24倍以上}の鍵長を使わないと、同じくらいの安全性を担保できない。
+\end{block}
+
+※ \structure{鍵長は長ければ長いほど処理がどんどん重く・遅くなっていく…}
+
+\end{frame}
+\begin{frame}
+ 
+「AES-128が、RSA-3072と同じくらい」というイメージは、以下のように説明できる。
+\begin{itemize}
+ \item AES: 数値$=0,1,\dots,2^{128}-1$のうち、どれか1つが鍵。
+ \item RSA: \alert{特殊な条件を満たす数 = 素数の組}を選んで、公開・秘密鍵を求める。
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/key-length-image.pdf}
+\end{center}
+
+総当たりした時に\alert{「当たる」確率を揃えるには、RSAはその分巨大な素数まで候補にしないとならない}。
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
