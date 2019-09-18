@@ -314,7 +314,9 @@ $\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。
 \end{itemize}
 \end{block}
 
-細かい話もするが、なるべく数式を使わないで「イメージ」をつかめるようにする。
+細かい話もするが、数式は使わない。
+
+「イメージ」と「コードの流れ＆その流れの必要性」をつかめるようにする。
 \end{frame}
 
 
@@ -379,10 +381,17 @@ JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗�
 \end{frame}
 
 \begin{frame}
-\frametitle{楕円曲線暗号(ECDH)のさわり}
+\frametitle{楕円曲線暗号のさわり}
 \begin{block}{Elliptic-Curve Cryptography}
+楕円曲線という数の世界での「離散対数」を使った方式の総称\footnote[frame]{普通に離散対数問題を使うより、楕円曲線上でやることで安全性を担保する鍵長が短くなる。}
+\begin{itemize}
+\item 1985年頃、Victor Miller、Neal Koblitzにより独立に考案。
+\item TLS (RFC8442) 等で標準化。Bitcoinなど多方面で利用。
+\item Diffie-Hellman(DH)を楕円曲線上で実行するのがECDH、DSAを楕円曲線上で実行するのがECDSA。
+\item 鍵長は、256--521bitsが標準的に使われている。
+\item ECDHは「ECDH-Ephemeral」という方法で実行することで、普通に使うより\alert{安全性が大きく向上}する。\footnote[frame]{Forward Secrecy(第1回のスライド参照)を担保する。}
+\end{itemize}
 \end{block}
-
 \end{frame}
 
 \begin{frame}
@@ -441,14 +450,14 @@ AESに比べて、\alert{楕円曲線で倍、RSAに至っては24倍以上}の�
 「AES-128が、RSA-3072と同じくらい」というイメージは、以下のように説明できる。
 \begin{itemize}
  \item AES: 数値$=0,1,\dots,2^{128}-1$のうち、どれか1つが鍵。
- \item RSA: \alert{特殊な条件を満たす数 = 素数の組}を選んで、公開・秘密鍵を求める。
+ \item RSA: \alert{特殊な条件を満たす数 = 素数2個の積(合成数)}を選んで、公開・秘密鍵を求める。
 \end{itemize}
 
 \begin{center}
 \includegraphics[width=\linewidth]{Figs/key-length-image.pdf}
 \end{center}
 
-総当たりした時に\alert{「当たる」確率を揃えるには、RSAはその分巨大な素数まで候補にしないとならない}。
+総当たりした時に\alert{「当たる」確率を揃えるには、RSAはその分巨大な数まで候補にしないとならない}。
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -488,6 +497,7 @@ https://tools.ietf.org/html/rfc8017
 \begin{frame}
 \centering
 {\Large 楕円曲線暗号(ECDH)を使ってみよう}
+ECDH(楕円曲線DH)は、\structure{公開鍵暗号というより「匿名での鍵共有方法」というイメージ}。
 \end{frame}
 
 \begin{frame}
