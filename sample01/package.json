@@ -13,27 +13,27 @@
   "author": "Jun Kurihara",
   "license": "MIT",
   "devDependencies": {
-    "@babel/cli": "7.5.5",
-    "@babel/core": "7.5.5",
+    "@babel/cli": "7.6.0",
+    "@babel/core": "7.6.0",
     "@babel/plugin-transform-regenerator": "7.4.5",
-    "@babel/plugin-transform-runtime": "7.5.5",
-    "@babel/polyfill": "7.4.4",
-    "@babel/preset-env": "7.5.5",
-    "@babel/register": "7.5.5",
-    "babel-eslint": "^10.0.2",
+    "@babel/plugin-transform-runtime": "7.6.0",
+    "@babel/polyfill": "7.6.0",
+    "@babel/preset-env": "7.6.0",
+    "@babel/register": "7.6.0",
+    "babel-eslint": "10.0.3",
     "babel-loader": "8.0.6",
-    "cross-env": "5.2.0",
-    "eslint": "^6.1.0",
-    "webpack": "4.39.0",
-    "webpack-cli": "3.3.6",
-    "webpack-merge": "4.2.1"
+    "cross-env": "5.2.1",
+    "eslint": "6.4.0",
+    "webpack": "4.40.2",
+    "webpack-cli": "3.3.9",
+    "webpack-merge": "4.2.2"
   },
   "dependencies": {
-    "@babel/runtime": "~7.5.0",
-    "commander": "^3.0.0",
-    "js-crypto-utils": "0.16.2",
-    "js-encoding-utils": "^0.5.2",
-    "json-server": "~0.15.0",
-    "node-fetch": "^2.6.0"
+    "@babel/runtime": "~7.6.0",
+    "commander": "~3.0.1",
+    "js-crypto-utils": "0.17.1",
+    "js-encoding-utils": "0.5.4",
+    "json-server": "~0.15.1",
+    "node-fetch": "~2.6.0"
   }
 }

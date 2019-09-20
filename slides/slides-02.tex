@@ -318,8 +318,8 @@ AESを使ってみることもできた。
 
 必須ではないが触って楽しむのには必要な事前準備:
 \begin{itemize}
-\item Gitが使えるようになっていること
-\item Node.jsが使えるようになっていること
+\item Bash, Gitが使えるようになっていること
+\item Node.js, npm, yarnが使えるようになっていること
 \item Google Chrome系ブラウザ and/or Firefoxが利用可能なこと
 \end{itemize}
 \end{frame}
@@ -593,7 +593,7 @@ REST APIで暗号化データを登録してみる。
 \frametitle{環境}
 以下の環境が前提:
 \begin{itemize}
- \item Node.js ($>$ v10)がインストール済 \footnote[frame]{npmに加えてyarnも使えるとなお良い (インストールコマンド: npm i -g yarn)}
+ \item Node.js ($>$ v10)がインストール済。yarnが使えること。 \footnote[frame]{インストールコマンド: \texttt{npm i -g yarn}}
  \item ブラウザとして、Google Chrome (系ブラウザ)、もしくはFirefoxがインストール済み
  \item Visual Studio Code や WebStorm などの統合開発環境がセットアップ済みだとなお良い。
 \end{itemize}
@@ -610,11 +610,11 @@ REST APIで暗号化データを登録してみる。
 \end{exampleblock}
 \item 依存パッケージのインストール
 \begin{exampleblock}{}
-\$ \texttt{yarn install}\quad or\quad \texttt{npm install}
+\$ \texttt{yarn install}
 \end{exampleblock}
 \item ライブラリのビルド
 \begin{exampleblock}{}
-\$ \texttt{yarn build}\quad or\quad \texttt{npm run build}
+\$ \texttt{yarn build}
 \end{exampleblock}
 \end{itemize}
 \end{frame}
