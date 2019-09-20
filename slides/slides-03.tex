@@ -383,13 +383,13 @@ JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗�
 \begin{frame}
 \frametitle{楕円曲線暗号のさわり}
 \begin{block}{Elliptic-Curve Cryptography}
-楕円曲線という数の世界での「離散対数」を使った方式の総称\footnote[frame]{普通に離散対数問題を使うより、楕円曲線上でやることで安全性を担保する鍵長が短くなる。}
+楕円曲線という数の世界での「離散対数」を使った方式の総称\footnote[frame]{\scriptsize 普通に離散対数問題を使うより、楕円曲線上でやることで安全性を担保する鍵長が短くなる。}
 \begin{itemize}
 \item 1985年頃、Victor Miller、Neal Koblitzにより独立に考案。
-\item TLS (RFC8442) 等で標準化。Bitcoinなど多方面で利用。
-\item Diffie-Hellman(DH)を楕円曲線上で実行するのがECDH、DSAを楕円曲線上で実行するのがECDSA。
-\item 鍵長は、256--521bitsが標準的に使われている。
-\item ECDHは「ECDH-Ephemeral」という方法で実行することで、普通に使うより\alert{安全性が大きく向上}する。\footnote[frame]{Forward Secrecy(第1回のスライド参照)を担保する。}
+\item Diffie-Hellman(DH)\footnote[frame]{\scriptsize RFC2631 \url{https://tools.ietf.org/html/rfc2631}}を楕円曲線上で実行するのがECDH、DSA\footnote[frame]{\scriptsize NIST FIPS 186-4 \url{https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf}}を楕円曲線上で実行するのがECDSA。
+\item RFC8442、CRYPTREC、IEEE P1363等で標準化。TLSやBitcoinなど多方面で利用。
+\item 鍵長は256--512bitsが標準的に使われている。
+\item ECDHは「ECDH-Ephemeral」という方法で実行することで、普通に使うより\alert{安全性が大きく向上}する。\footnote[frame]{\scriptsize Forward Secrecy(第1回のスライド参照)を担保する。}
 \end{itemize}
 \end{block}
 \end{frame}
