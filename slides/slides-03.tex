@@ -235,7 +235,7 @@
 %%% 著者など
 %%%
 \title[E2E Security with JS 03]{JavaScriptによるEnd-to-Endセキュリティ}
-\subtitle{第3回 公開鍵暗号はどうやって使えばいいのか？ 編}
+\subtitle{第3回 公開鍵暗号はどうやって使えばいいのか？ 編\\ \alert{PNGになってんのはPDFに修正しとくこと}}
 \author[Jun Kurihara]{栗原 淳}
 \institute[]{}
 \date[Oct. 17, 2019]{2019年10月17日}
@@ -292,15 +292,16 @@
 \end{frame}
 
 \begin{frame}
+
+暗号化・復号の鍵を分けて、暗号化の鍵を公開してしまうことで\alert{パスワードなどの共有が不要}になる。
+
 \begin{center}
 \includegraphics[width=\linewidth]{Figs/pk_cryptosystem.pdf}
 \end{center}
 
-暗号化・復号の鍵を分けて、暗号化の鍵を公開してしまうことで\alert{パスワードなどの共有が不要}になる。
-
 \vspace{1ex}
 
-$\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。
+$\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。現代のセキュリティインフラはこれで成り立っていると言っても過言ではない。
 \end{frame}
 
 \begin{frame}
@@ -396,6 +397,10 @@ JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗�
 
 \begin{frame}
 \frametitle{AESと比べた公開鍵暗号のPros/Cons}
+\small
+
+何でもかんでも公開鍵暗号、で良さそうな気もしてくるが…
+
 \begin{table}
 \centering
 \begin{tabular}{|p{0.1\linewidth}||p{0.39\linewidth}|p{0.39\linewidth}|}
@@ -414,7 +419,8 @@ JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗�
 \end{tabular}
 \end{table}
 
-$\Rightarrow$ 使い所を考えて組み合わせて使うことがオススメ(後述)
+$\Rightarrow$ 使い所を考えて組み合わせて使う、もしくは場合に応じて使い分けないと\structure{実用に耐えないシステム・サービスが出来上がる}。
+
 
 \end{frame}
 
@@ -454,10 +460,60 @@ AESに比べて、\alert{楕円曲線で倍、RSAに至っては24倍以上}の�
 \end{itemize}
 
 \begin{center}
-\includegraphics[width=\linewidth]{Figs/key-length-image.pdf}
+\includegraphics[width=\linewidth]{Figs/key-length-image.png} % todo
 \end{center}
 
 総当たりした時に\alert{「当たる」確率を揃えるには、RSAはその分巨大な数まで候補にしないとならない}。
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{今回のサンプル}
+\begin{frame}
+{\Large サンプルコードの準備}
+\end{frame}
+
+\begin{frame}
+\frametitle{準備}
+\small
+細かく暗号化の説明を聞きつつ、手を動かすため、まず環境準備。
+
+\alert{今回は、JavaScript (Node.js) を使って手元で公開鍵暗号化・復号。}
+
+\begin{center}
+ \includegraphics[width=0.8\linewidth]{Figs/pk-flow.png}%todo
+\end{center}
+
+前回・前々回使った「リモートサーバに登録する」というところは、簡略化のため端折ってる。興味があれば、前回のコードを公開鍵暗号に拡張して、E2Eセキュリティしてみよう！
+\end{frame}
+
+\begin{frame}
+\frametitle{環境}
+以下の環境が前提:
+\begin{itemize}
+ \item Node.js ($>$ v10)がインストール済。yarnが使えること。 \footnote[frame]{インストールコマンド: \texttt{npm i -g yarn}}
+ \item ブラウザとして、Google Chrome (系ブラウザ)、もしくはFirefoxがインストール済み
+ \item Visual Studio Code や WebStorm などの統合開発環境がセットアップ済みだとなお良い。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{JavaScriptプロジェクトの準備}
+\begin{itemize}
+\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/zettant/e2e-security-03}}をClone\\
+\begin{exampleblock}{}
+\footnotesize
+\$ \texttt{git clone https://github.com/zettant/e2e-security-03}\\
+\$ \texttt{cd e2e-security-03/sample}
+\end{exampleblock}
+\item 依存パッケージのインストール
+\begin{exampleblock}{}
+\$ \texttt{yarn install}
+\end{exampleblock}
+\item ライブラリのビルド
+\begin{exampleblock}{}
+\$ \texttt{yarn build}
+\end{exampleblock}
+\end{itemize}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -467,28 +523,88 @@ AESに比べて、\alert{楕円曲線で倍、RSAに至っては24倍以上}の�
 {\Large RSA暗号を使ってみよう}
 \end{frame}
 
-\begin{frametitle}
-\frametitle{RSA暗号って何？}
-\end{frametitle}
-
 \begin{frame}
 \frametitle{RSA暗号を使うためのお作法}
-Padding:
+\begin{block}{\small RSA暗号化の制限}
+\alert{データ$D$と、公開鍵$PK$とが、同じビット長でなければならない}
+\end{block}
+$\Rightarrow$ RSA暗号化の前には、まず\underline{元データへのパディング}\footnote[frame]{\scriptsize 長いデータの場合は切断…}が必要。
 
-RSA OAEP
-https://tools.ietf.org/html/rfc8017
+\begin{center}
+\includegraphics[width=0.9\linewidth]{Figs/rsa-padding.png}\\%todo
+\end{center}
+\vspace{2ex}
 
-PKCS1-v1.5 paddingはやばい。Cryptrecからも落ちた。
-https://www.cryptrec.go.jp/method.html
-
-https://tools.ietf.org/html/rfc8017
-既知の攻撃が知られており、RSASSA, RSAES共にPKCF1-v1.5は非推奨@RFC
-
-でもNode.jsではOAEP非サポートなので作った
+\alert{RSA暗号化には、前処理としてのパディングの選択が最重要のお作法。}
 \end{frame}
 
 \begin{frame}
-\frametitle{RSA-OAEPによるデータ暗号化をしてみよう}
+
+RSA向けに主として2種類のパディング方法が知られている。\footnote[frame]{\scriptsize 共にPKCS\#1 (RFC8017) で標準化。\url{https://tools.ietf.org/html/rfc8017}}
+
+\begin{itemize}
+ \item PKCS\#1-v1.5 Padding
+ \item Optimal Asymmetric Encryption Padding (OAEP)
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+
+\begin{block}{\small PKCS\#1-v1.5 Padding}
+\small
+\begin{itemize}
+ \item RSA暗号化と組み合わせると、RSAES-PKCS1-v1\_5。
+ \item 元データ$M$に、公開鍵長まで以下のようなパディングを付与。
+\begin{align*}
+ D = \mathtt{0x00}\ ||\ \mathtt{0x02}\ ||\ \texttt{RandomSequence}\ ||\ \mathtt{0x00}\ ||\ M
+\end{align*}
+ \item 暗号化データを任意に改変でき、復号者に復号成功・失敗を確認させられる時、\alert{元データを復号される脆弱性}が知られている。\footnote[frame]{\scriptsize Bleinchenbacher Attack \url{http://archiv.infsec.ethz.ch/education/fs08/secsem/Bleichenbacher98.pdf}。}
+ \item PKCS\#1 （RFC8017) で「後方互換性のため以外では使用するな」と明示的に記載。CRYPTRECにおいても推奨暗号方式リストからドロップ。\footnote[frame]{\scriptsize \url{https://www.cryptrec.go.jp/method.html}}
+\end{itemize}
+\end{block}
+
+\begin{center}
+ {\Large \alert{基本的に使うな}}
+\end{center}
+\end{frame}
+
+\begin{frame}
+
+\begin{block}{\small Optimal Asymmetric Encryption Padding (OAEP) \footnote[frame]{\scriptsize M. Bellare and P. Rogaway, ``Optimal Asymmetric Encryption,'' in Proc. EUROCRYPTO 1994, pp.~92--111, LNCS 950, 1994.}}
+\small
+\begin{itemize}
+ \item RSA暗号化と組み合わせて、RSA-OAEP、もしくはRSAES (RSA Encryption Scheme) - OAEPと呼ぶ。
+ \item 元データ$M$とランダムシードに対して、All or Nothing Transform (AONT)を実行し、$D$を公開鍵ビット長まで膨らませる。
+\begin{align*}
+ D = \textsf{AONT}(M, \texttt{RandomSeed})
+\end{align*}
+ \item PKCS\#1-v1.5 Paddingの脆弱性は潰されている。実用の上ですぐに致命的な脆弱性は知られていない。PKCS\#1 (RFC8017) では、\alert{新規アプリはOAEPを利用すること}と明記。
+\end{itemize}
+\end{block}
+
+\begin{center}
+ {\Large \alert{今はRSAならOAEP使っとけば間違いない}}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{参考: OAEPのイメージ図}
+\begin{center}
+ \includegraphics[width=\linewidth]{Figs/oaep.png}
+\end{center}
+逆変換はMasked Seed, Masked Data Blockが両方揃えば可能。
+\end{frame}
+
+
+\begin{frame}
+\frametitle{JavaScriptでRSA-OAEP暗号化をしてみよう}
+RSAES-OAEPは、WebCrypto API(ブラウザ)でも、Node.js Cryptoでもネイティブサポートされている。\footnote[frame]{\scriptsize RSAES-PKCS1-v1\_5もサポートされている。}
+
+\end{frame}
+
+\begin{frame}
 \end{frame}
 
 
