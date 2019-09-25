@@ -560,8 +560,8 @@ RSA向けに主として2種類のパディング方法が知られている。\
 \begin{align*}
  D = \mathtt{0x00}\ ||\ \mathtt{0x02}\ ||\ \texttt{RandomSequence}\ ||\ \mathtt{0x00}\ ||\ M
 \end{align*}
- \item 暗号化データを任意に改変でき、復号者に復号成功・失敗を確認させられる時、\alert{元データを復号される脆弱性}が知られている。\footnote[frame]{\scriptsize Bleinchenbacher Attack \url{http://archiv.infsec.ethz.ch/education/fs08/secsem/Bleichenbacher98.pdf}。}
- \item PKCS\#1 （RFC8017) で「後方互換性のため以外では使用するな」と明示的に記載。CRYPTRECにおいても推奨暗号方式リストからドロップ。\footnote[frame]{\scriptsize \url{https://www.cryptrec.go.jp/method.html}}
+ \item 暗号化データを任意に改変でき、復号者に復号成功・失敗を確認させられる時、\alert{元データを復号される脆弱性}が知られている。\footnote[frame]{\scriptsize 1998年のBleinchenbacher's Attack。 2018年、現代のInternetでも未対策ホスト・サービスが大量なことが発表されている(ROBOT Attack)。}
+ \item PKCS\#1 v2.2 （RFC8017) で「後方互換性のため以外では使用するな」と明示的に記載。CRYPTRECにおいても推奨暗号方式リストからドロップ。\footnote[frame]{\scriptsize \url{https://www.cryptrec.go.jp/method.html}}
 \end{itemize}
 \end{block}
 
@@ -580,7 +580,7 @@ RSA向けに主として2種類のパディング方法が知られている。\
 \begin{align*}
  D = \textsf{AONT}(M, \texttt{RandomSeed})
 \end{align*}
- \item PKCS\#1-v1.5 Paddingの脆弱性は潰されている。実用の上ですぐに致命的な脆弱性は知られていない。PKCS\#1 (RFC8017) では、\alert{新規アプリはOAEPを利用すること}と明記。
+ \item PKCS\#1-v1.5 Paddingの脆弱性は潰されている。実用の上ですぐに致命的な脆弱性は知られていない。PKCS\#1 v2.2 (RFC8017) では、\alert{新規アプリはOAEPを利用すること}と明記。
 \end{itemize}
 \end{block}
 
@@ -613,7 +613,26 @@ RSAES-OAEPは、WebCrypto API(ブラウザ)でも、Node.js Cryptoでもネイ�
 \begin{frame}
 \centering
 {\Large 楕円曲線暗号(ECDH)を使ってみよう}
-ECDH(楕円曲線DH)は、\structure{公開鍵暗号というより「匿名での鍵共有方法」というイメージ}。
+\end{frame}
+
+\begin{frame}
+\frametitle{楕円曲線暗号を使うためのお作法}
+
+今までECDHを公開鍵暗号って呼んでいてすみませんでした…
+
+\begin{block}{\small Elliptic-Curve Diffie-Hellman (ECDH)}
+ECDH自身は、データの暗号化ではなく、公開鍵・秘密鍵を使って\alert{送受信者間で秘密裏にランダムビット列を共有するための方法}。
+\end{block}
+
+$\Rightarrow$ 共有したランダムビット列を鍵(の種)として用いて、AESとかでデータを暗号化。
+
+\begin{center}
+絵
+
+
+この流れ全体で「公開鍵暗号」の体を為す。
+\end{center}
+
 \end{frame}
 
 \begin{frame}
