@@ -617,7 +617,7 @@ RSAES-OAEPは、WebCrypto API(ブラウザ)でも、Node.js Cryptoでもネイ�
 \end{frame}
 
 \begin{frame}
-\frametitle{楕円曲線暗号を使うためのお作法}
+\frametitle{楕円曲線暗号を使うためのお作法 その1}
 
 今までECDHを公開鍵暗号って呼んでいてすみませんでした…
 
@@ -661,7 +661,25 @@ $\Rightarrow$ 共有したランダムビット列を鍵(の種)として用い�
 \end{frame}
 
 \begin{frame}
-\frametitle{ECDH + AESで公開鍵暗号化してみよう}
+\frametitle{楕円曲線暗号を使うためのお作法 その2}
+前回の「AESを使うために」で学んだことの復習。
+
+$\Rightarrow$ 共有ビット列から\alert{正しく・安全に鍵を導出する}こと。\\
+
+\vspace{2ex}
+
+鍵導出関数の利用:
+\begin{itemize}
+ \item HKDF (RFC5869)
+ \item Concat KDF (RFC8039)\footnote[frame]{\scriptsize JOSE向けに標準化された鍵導出関数 \url{https://tools.ietf.org/html/rfc8037}}
+ \item etc....
+\end{itemize}
+$\Rightarrow$ 鍵のランダム具合の向上、鍵の総当たりの困難化。
+
+\end{frame}
+
+\begin{frame}
+鍵導出関数を使ってHKDF $\rightarrow$ AES暗号化をしてみよう。
 \end{frame}
 
 
@@ -672,43 +690,36 @@ $\Rightarrow$ 共有したランダムビット列を鍵(の種)として用い�
 \end{frame}
 
 \begin{frame}
+\frametitle{公開鍵暗号による、AES暗号鍵のカプセル化}
+\begin{block}{\small Hybrid Encryption (ハイブリッド暗号化)}
+\end{block}
+
+$\Rightarrow$ 鍵だけを公開鍵暗号、データ自体はAESで暗号化することで、\alert{暗号化データ部分の使い回し}を促進。
+
+\end{frame}
+
+\begin{frame}
+Msgpackを使って「複数人宛のデータ暗号化」を試してみよう。 
+\end{frame}
+
+\begin{frame}
 \frametitle{Perfect Forward Secrecy}
+より安全な暗号化のために。
 
 \begin{block}{\small (Perfect) Forward Secrecy}
 長期的に保存されているマスター秘密鍵の漏洩や、一部の暗号化データがクラックされたとしても、\alert{それ以外の過去に暗号化されたデータは復号されてしまうことはない}という概念。
 \end{block}
 
+\begin{center}
+$\Downarrow$
+
+使い捨ての公開鍵・秘密鍵を生成する\alert{Ephemeral Scheme}の利用
+\end{center}
+
 \end{frame}
 
 \begin{frame}
-送信元・受信先で共有ビット列を導出する際の2種類の方法:
-\begin{itemize}
- \item 送信元の公開鍵・秘密鍵を直接使う\structure{ECDH-Static}
- \item 使い捨ての公開鍵・秘密鍵を生成する\structure{ECDH-Ephemeral}
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}
-\small 
-\begin{block}{\small ECDH-Static}
-\end{block}
-
-\begin{itemize}
- \item 送信先の相手が一緒なら常に同じ共有ビット列が生成される。
-
-$\Rightarrow$ 万一共有ビット列が盗まれると、今まで作った暗号化データが丸ごとクラックされる恐れ。
-
-$\Rightarrow$ \alert{Forward secrecyが担保不能}。基本的に使わない方が良い。
- \item 一方、何もしなくても共有ビット列が作れるので通信コストは低い。
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}
-\small
-\begin{block}{\small ECDH-Ephemeral (ECDHE)}
-\end{block}
+\textbf{ECDH-Ephemeral} (ECDHE)\footnote[frame]{TLSで利用されるスキームだと思って良い \url{https://tools.ietf.org/html/rfc8422}}:
 
 \begin{itemize}
  \item 送信先の相手が一緒でも、毎回違う共有ビット列が生成される。
@@ -723,12 +734,10 @@ $\Rightarrow$ \alert{Forward secrecyが担保可能}。
 
 
 \begin{frame}
-\frametitle{ECDHって何？}
-TLS https://tools.ietf.org/html/rfc8422
+ 
+\end{frame}
 
-JOSEだとConcat KDFを使うだけ。
-https://tools.ietf.org/html/rfc8037
-
+\begin{frame}
 直接Concat KDFを暗号化の鍵にするか、
 あるいはConcat KDFの結果をAESKWの鍵としてContent Encryption Keyを暗号化するのに使う。
 
