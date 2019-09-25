@@ -374,7 +374,7 @@ JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗�
 \begin{itemize}
  \item 1977年、Rivest-Shamir-Edelmanの3名により発明。2000年に特許期間満了(現在特許フリー)。暗号化以外に「署名」の手法への応用も有名。
  \item RFC 8017 (PKCS\#1 v2.2)、ANSI X9.31、IEEE 1363、CRYPTREC等、各所で標準に採用。
- \item 鍵長は1024--4096bitsが標準的に使われている。\footnote[frame]{原理的には無限に伸ばせる。}
+ \item 公開鍵長は1024--4096bitsが標準的に使われている。\footnote[frame]{原理的には無限に伸ばせる。}
  \item 暗号化・署名の際には、元のデータにパディングが必要。\alert{パディング方法によりセキュリティが大きく左右される。}\footnote[frame]{RSA-OAEP(暗号化)、RSA-PSS(署名)が現状ベターな方法。これを話す。}
 \end{itemize}
 \end{block}
@@ -389,7 +389,7 @@ JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗�
 \item 1985年頃、Victor Miller、Neal Koblitzにより独立に考案。
 \item Diffie-Hellman(DH)\footnote[frame]{\scriptsize RFC2631 \url{https://tools.ietf.org/html/rfc2631}}を楕円曲線上で実行するのがECDH、DSA\footnote[frame]{\scriptsize NIST FIPS 186-4 \url{https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf}}を楕円曲線上で実行するのがECDSA。
 \item RFC8442、CRYPTREC、IEEE P1363等で標準化。TLSやBitcoinなど多方面で利用。
-\item 鍵長は256--512bitsが標準的に使われている。
+\item 公開鍵長は256--521bits (Compact form) が標準的に使われている。
 \item ECDHは「ECDH-Ephemeral」という方法で実行することで、普通に使うより\alert{安全性が大きく向上}する。\footnote[frame]{\scriptsize Forward Secrecy(第1回のスライド参照)を担保する。}
 \end{itemize}
 \end{block}
@@ -469,6 +469,7 @@ AESに比べて、\alert{楕円曲線で倍、RSAに至っては24倍以上}の�
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{今回のサンプル}
 \begin{frame}
+\centering
 {\Large サンプルコードの準備}
 \end{frame}
 
@@ -627,13 +628,99 @@ ECDH自身は、データの暗号化ではなく、公開鍵・秘密鍵を使�
 $\Rightarrow$ 共有したランダムビット列を鍵(の種)として用いて、AESとかでデータを暗号化。
 
 \begin{center}
-絵
-
+\includegraphics[width=\linewidth]{Figs/ecdh-flow01.pdf}
 
 この流れ全体で「公開鍵暗号」の体を為す。
 \end{center}
 
 \end{frame}
+
+
+\begin{frame}
+というわけで、まずはこの「共有ランダムビット列」の導出の話。
+\begin{block}{\small ECDHの特徴}
+2つの公開鍵・秘密鍵ペア: \alert{$(\mathit{PK_1}, \mathit{SK}_1)$}と\textcolor{blue}{$(\mathit{PK_2}, \mathit{SK}_2)$}で、
+\begin{align*}
+\mathtt{SharedRandomBits} &= \mathsf{ECDH}(
+\text{\textcolor{red}{$\mathit{PK}_1$}},
+\text{\textcolor{blue}{$\mathit{SK}_2$}}
+)\\
+& = \mathsf{ECDH}(
+\text{\textcolor{blue}{$\mathit{PK}_2$}},
+\text{\textcolor{red}{$\mathit{SK}_1$}}
+).
+\end{align*}
+すなわちECDHでは、\alert{鍵ペアを持っているもの同士なら、相手の公開鍵から共有ビット列が導出可能}。
+\end{block}
+
+共有ビット列の長さは、公開鍵長 (Compact form) と一緒。
+\end{frame}
+
+\begin{frame}
+確認してみよう。
+\end{frame}
+
+\begin{frame}
+\frametitle{ECDH + AESで公開鍵暗号化してみよう}
+\end{frame}
+
+
+\section{より実用的な公開鍵暗号の運用}
+\begin{frame}
+\centering
+{\Large より実用的な公開鍵暗号の運用}
+\end{frame}
+
+\begin{frame}
+\frametitle{Perfect Forward Secrecy}
+
+\begin{block}{\small (Perfect) Forward Secrecy}
+長期的に保存されているマスター秘密鍵の漏洩や、一部の暗号化データがクラックされたとしても、\alert{それ以外の過去に暗号化されたデータは復号されてしまうことはない}という概念。
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+送信元・受信先で共有ビット列を導出する際の2種類の方法:
+\begin{itemize}
+ \item 送信元の公開鍵・秘密鍵を直接使う\structure{ECDH-Static}
+ \item 使い捨ての公開鍵・秘密鍵を生成する\structure{ECDH-Ephemeral}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\small 
+\begin{block}{\small ECDH-Static}
+\end{block}
+
+\begin{itemize}
+ \item 送信先の相手が一緒なら常に同じ共有ビット列が生成される。
+
+$\Rightarrow$ 万一共有ビット列が盗まれると、今まで作った暗号化データが丸ごとクラックされる恐れ。
+
+$\Rightarrow$ \alert{Forward secrecyが担保不能}。基本的に使わない方が良い。
+ \item 一方、何もしなくても共有ビット列が作れるので通信コストは低い。
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\small
+\begin{block}{\small ECDH-Ephemeral (ECDHE)}
+\end{block}
+
+\begin{itemize}
+ \item 送信先の相手が一緒でも、毎回違う共有ビット列が生成される。
+
+$\Rightarrow$ 「今使った」共有ビット列が盗まれても過去のデータは解読不能。
+
+$\Rightarrow$ \alert{Forward secrecyが担保可能}。
+ \item 毎度毎度、自分の一時公開鍵をまず送らなければならないので、通信コストが高い。
+\end{itemize}
+
+\end{frame}
+
 
 \begin{frame}
 \frametitle{ECDHって何？}
