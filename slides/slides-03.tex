@@ -814,13 +814,18 @@ RSA-OAEP+AESのコードの中身はこんな感じ。
 \begin{center}
 $\Downarrow$\\[1ex]
 
-ハイブリッド暗号化の際、公開鍵・秘密鍵を使い捨てる\alert{Ephemeral Scheme}の利用
+公開鍵・秘密鍵を1回限りで使い捨てる\alert{Ephemeral Scheme}の利用
 \end{center}
 
 \end{frame}
 
 \begin{frame}
  Ephemeral Schemeのイメージ
+
+\begin{center}
+ \includegraphics[width=0.8\linewidth]{Figs/ephemeral-scheme-flow01.pdf}
+\end{center}
+ハイブリッド暗号化の場合、\alert{AESの鍵自身もランダム\&使い捨て}
 \end{frame}
 
 \begin{frame}
@@ -831,21 +836,21 @@ ECDHを使った暗号化では、Ephemeral Schemeを使うのが推奨される
 \begin{itemize}
  \item 送信先の相手を問わず、毎回違う共有ビット列が生成される。
 
-$\Rightarrow$ 「今使った」共有ビット列や秘密鍵が盗まれても過去のデータは解読不能。
-
-$\Rightarrow$ \alert{Forward secrecyが担保可能}。
- \item 毎度毎度、まずEphemeral公開鍵を送らなければならず、通信コストは高い。
+$\Rightarrow$ 「今使った」共有ビット列や秘密鍵が盗まれても過去のデータは解読不能。i.e., \alert{Forward secrecy}。
+ \item 毎度毎度、まずEphemeralな公開鍵を送らなければならず、\alert{通信コストは高い}。
+ \item \structure{「送られてきたEphemeralな公開鍵は、本当に自分がやりとりしたい相手の公開鍵か?」を確認する手間}もかかる。\footnote[frame]{\scriptsize 署名を使う。次回の勉強会で話す予定。}
 \end{itemize}
 \end{block}
 
 \end{frame}
-
+ECDHのEphemeral Schemeを試してみよう。
 
 \begin{frame}
  
 \end{frame}
 
 \begin{frame}
+コードの中身はこんな感じ。
  
 \end{frame}
 
