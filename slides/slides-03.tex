@@ -320,6 +320,7 @@ $\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。現
 「イメージ」と「コードの流れ＆その流れの必要性」をつかめるようにする。
 \end{frame}
 
+\input{./frame-kurihara.tex}
 
 \begin{frame}
 \frametitle{この講義の対象と事前準備}
@@ -337,6 +338,22 @@ $\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。現
 \item Node.js, npm, yarnが使えるようになっていること
 \item Google Chrome系ブラウザ and/or Firefoxが利用可能なこと
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+今後の予定(暫定)
+\begin{enumerate}
+ \item \textcolor{gray}{導入\&JSの暗号化コードを触ってみる}
+ \item \textcolor{gray}{AESを正しく・安全に暗号化するには？}
+ \item \alert{公開鍵暗号はどうやって使う？その使い方のコツは？} ← 今日はココ
+ \item ハッシュ・MAC・署名、それぞれの使い所と使い方は？
+ \item \textcolor{gray}{RFCにまつわるあれこれ（証明書・鍵フォーマット・etc...)}
+\end{enumerate}
+「こういうのを知りたい」というリクエストがあれば是非。
+
+\vspace{2ex}
+
+\underline{セカンドシーズンも検討中。}\footnote[frame]{場所等変えてもっと来やすい場所へ。。。}
 \end{frame}
 
 
@@ -881,6 +898,36 @@ ECDHのEphemeral Schemeを試してみよう。
 \end{itemize}
 \end{frame}
 
+
+\begin{frame}
+\frametitle{次回は}
+\begin{itemize}
+ \item 内容: 
+\begin{itemize}
+ \item 暗号化に加えて、MAC・署名を使ってみよう（数学的なことはやらない）
+ \item まずはハッシュ: SHA2, SHA3
+ \item 共通鍵ベース: HMAC/CMAC
+ \item 公開鍵ベース: RSA Signature/ECDSA
+\end{itemize}
+ \item 日時: 2019年10月31(?)日(木曜日) 19:00- (2週間後)
+ \item 場所: ブロックチェーンハブ (ここ)
+ \item 発表者: (また) 栗原
+\end{itemize}
+\end{frame}
+
+
+\input{./frame-itransfy.tex}
+\input{./frame-zettant.tex}
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\backupbegin
+
 \begin{frame}
  以下バックアップ
 \end{frame}
@@ -910,19 +957,9 @@ ECDHのEphemeral Schemeを試してみよう。
 \end{center}
 \end{frame}
 
-% \begin{frame}
-% 次回以降…リクエスト次第ですが、
-% \begin{itemize}
-% \item 「情報が改ざんされてない」ことを保証するために（電子署名とMAC）
-% \item RFCとアルゴリズム・フォーマット
-% \end{itemize}
-% などを予定。
-% \end{frame}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% \backupbegin
 % \section{Backup}
 
 % \begin{frame}
@@ -930,19 +967,10 @@ ECDHのEphemeral Schemeを試してみよう。
 % \end{frame}
 
 % \begin{frame}
-%  \begin{enumerate}
-%   \item 今回は共通鍵暗号
-%   \item 公開鍵暗号\& Hybrid Encryption
-%   \item ハッシュ・署名とHMAC
-% 　\item 超マニアック講座：RFCとアルゴリズム・フォーマット
-%  \end{enumerate}
-% \end{frame}
-
-% \begin{frame}
 % \frametitle{Appendix}
 % This page is not counted.
 % \end{frame}
-% \backupend
+\backupend
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
