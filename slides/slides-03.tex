@@ -362,7 +362,7 @@ $\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。現
 JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗号：
 \begin{itemize}
  \item 素因数分解に関する条件\\ → \alert{RSA暗号}
- \item 楕円曲線上の離散対数に関する条件\\ → \alert{楕円曲線暗号(Elliptic Curve Diffie-Hellman; ECDH)}
+ \item 楕円曲線上の離散対数に関する条件\\ → \alert{楕円曲線暗号(Elliptic Curve Cryptography)}\footnote[frame]{\scriptsize 今回は便宜上Elliptic Curve Diffie-Hellman; ECDHを楕円曲線暗号と呼んでいく。}
 \end{itemize}
 この2つの使い方、注意ポイントを今回は取り上げる。
 \end{frame}
@@ -427,7 +427,9 @@ $\Rightarrow$ 使い所を考えて組み合わせて使う、もしくは場合
 \begin{frame}
 \frametitle{安全性を担保する鍵長が大きく違うのはどういうこと？}
 
-AESと比べたRSA・楕円曲線暗号の鍵のビット長比較\footnote[frame]{\scriptsize Recommendation for Key Management, Special Publication 800-57 Part 1 Rev. 4, NIST, 01/2016. \url{https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-4/final}}。\alert{横1行がだいたい同じくらいの安全性}と言われる。
+AESと比べたRSA・楕円曲線暗号の公開鍵のビット長比較\footnote[frame]{\scriptsize Recommendation for Key Management, Special Publication 800-57 Part 1 Rev. 4, NIST, 01/2016. \url{https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-4/final}}。
+
+\alert{横1行がだいたい同じくらいの安全性}と言われる。
 \begin{table}
 \centering
 \begin{tabular}{|c||c|c|}
@@ -448,7 +450,7 @@ AESと比べたRSA・楕円曲線暗号の鍵のビット長比較\footnote[fram
 AESに比べて、\alert{楕円曲線で倍、RSAに至っては24倍以上}の鍵長を使わないと、同じくらいの安全性を担保できない。
 \end{block}
 
-※ \structure{鍵長は長ければ長いほど処理がどんどん重く・遅くなっていく…}
+\structure{鍵長が長いほど、暗号化・復号がどんどん重く・遅くなっていく…}
 
 \end{frame}
 \begin{frame}
@@ -606,6 +608,7 @@ RSAES-OAEPは、WebCrypto API(ブラウザ)でも、Node.js Cryptoでもネイ�
 \end{frame}
 
 \begin{frame}
+RSA-OAEPによる公開鍵暗号化のコードはこんな感じ。
 \end{frame}
 
 
@@ -633,12 +636,22 @@ $\Rightarrow$ 共有したランダムビット列を鍵(の種)として用い�
 この流れ全体で「公開鍵暗号」の体を為す。
 \end{center}
 
+というわけで、まずはこの「共有ランダムビット列」の導出の話。
 \end{frame}
 
 
 \begin{frame}
-というわけで、まずはこの「共有ランダムビット列」の導出の話。
-\begin{block}{\small ECDHの特徴}
+(EC)DHにおける共有ランダムビット列の導出の流れ:
+\begin{center}
+ \includegraphics[width=\linewidth]{Figs/ecdh-flow02.pdf}
+\end{center}
+\vspace{-1ex}
+送信者(A)と受信者(B)が、\alert{互いに公開鍵を交換するだけで同じビット列を秘密裏\footnote[frame]{\scriptsize 秘密鍵は一切表に出てこないことに注目}に共有}できる。
+\end{frame}
+
+\begin{frame}
+ちょっとフォーマルに書くと:
+\begin{block}{\small ECDHの特徴\footnote[frame]{\scriptsize ECでないDHも同様。}}
 2つの公開鍵・秘密鍵ペア: \alert{$(\mathit{PK_1}, \mathit{SK}_1)$}と\textcolor{blue}{$(\mathit{PK_2}, \mathit{SK}_2)$}で、
 \begin{align*}
 \mathtt{SharedRandomBits} &= \mathsf{ECDH}(
@@ -657,29 +670,57 @@ $\Rightarrow$ 共有したランダムビット列を鍵(の種)として用い�
 \end{frame}
 
 \begin{frame}
-確認してみよう。
+\frametitle{JavaScriptでECDH共有ビット列導出をしてみよう}
+ECDHの共有ビット列導出は、WebCrypto API(ブラウザ)でも、Node.js Cryptoでもネイティブサポートされている。\footnote[frame]{\scriptsize [ブラウザ] encryptなどというわかりやすいAPIではなく、deriveBits(ビット導出)。[Node.js] ECDHオブジェクト生成。}
+
+\end{frame}
+
+\begin{frame}
+ECDH共有ビット列導出のコードの中身はこんな感じ。
 \end{frame}
 
 \begin{frame}
 \frametitle{楕円曲線暗号を使うためのお作法 その2}
 前回の「AESを使うために」で学んだことの復習。
 
-$\Rightarrow$ 共有ビット列から\alert{正しく・安全に鍵を導出する}こと。\\
+\begin{block}{\small 前回の復習}
+マスターシークレット(=ECDH共有ビット列)を元にAES暗号化を行うためには、
+\alert{マスターシークレットから作る鍵のランダム具合の向上、鍵の総当たりの困難化}を施すと良い。
+\end{block}
 
-\vspace{2ex}
 
-鍵導出関数の利用:
+$\Rightarrow$ 共有ビット列に対して鍵導出関数を利用することで担保する。
 \begin{itemize}
  \item HKDF (RFC5869)
  \item Concat KDF (RFC8039)\footnote[frame]{\scriptsize JOSE向けに標準化された鍵導出関数 \url{https://tools.ietf.org/html/rfc8037}}
  \item etc....
 \end{itemize}
-$\Rightarrow$ 鍵のランダム具合の向上、鍵の総当たりの困難化。
-
+今回はHKDFを使う。
 \end{frame}
 
 \begin{frame}
-鍵導出関数を使ってHKDF $\rightarrow$ AES暗号化をしてみよう。
+\frametitle{JavaScriptでECDHからAES暗号化してみよう}
+ECDH, HDKF, AESを組み合わせて、「公開鍵暗号化」してみる。
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/ecdh-flow03.pdf}
+\end{center}
+
+このフローでは、\alert{実際のデータの暗号化はAESに任せている}。
+\begin{center}
+ $\Downarrow$
+\end{center}
+RSA暗号化と違い、一度に暗号化できるデータサイズが公開鍵のサイズ以下などと制限されることはない。\footnote[frame]{\scriptsize ただし、通常この場合も共有ビット列を使って暗号化するデータは、「別のAES暗号化用の鍵(すなわち256bits以下)」とすることが多い。後述する。}
+\end{frame}
+
+\begin{frame}
+実行してみる。
+ 
+\end{frame}
+
+
+\begin{frame}
+ECDH, HKDF, AESを組み合わせた暗号化のコードはこんな感じ。
 \end{frame}
 
 
@@ -690,16 +731,76 @@ $\Rightarrow$ 鍵のランダム具合の向上、鍵の総当たりの困難化
 \end{frame}
 
 \begin{frame}
+\frametitle{ここまでの振り返り}
+ここ迄、以下の2つの「単純な」公開鍵暗号のやり方を学んだ。
+\begin{itemize}
+ \item RSA-OAEPによる暗号化
+ \item ECDH, KDF, AESの組み合わせによる暗号化
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+ただ、この単純なやり方だと、次のような制限がある。
+
+\begin{itemize}
+ \item 複数宛先向けの暗号化で\alert{めちゃくちゃ効率が悪い}。\\
+ ※あるデータを、$n$人の宛先向けに暗号化すると、トータルの暗号化データは元のデータの$n$倍(以上)。
+ \item \alert{秘密鍵$\mathit{SK}$が漏洩すると、何もかも終わり}。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+これを踏まえて、ここでそれらの実用的な対策を学ぶ。
+\begin{enumerate}
+\item \structure{公開鍵暗号によるAES暗号鍵のカプセル化}\\
+$\Rightarrow$ 複数宛先向けに効率のいい公開鍵暗号化。
+\item \structure{Perfect Forward Secrecy}\\
+$\Rightarrow$ 秘密鍵が漏洩しても、過去の暗号化データはクラック不能。
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
 \frametitle{公開鍵暗号による、AES暗号鍵のカプセル化}
-\begin{block}{\small Hybrid Encryption (ハイブリッド暗号化)}
+\begin{block}{\small Hybrid Encryption, Key Encapsulation}
+\begin{itemize}
+ \item データの暗号化はランダム鍵$K$を使ったAES暗号化\footnote[frame]{\scriptsize 共通鍵暗号化}
+ \item $K$のみを宛先ごとに公開鍵暗号化
+\end{itemize}
 \end{block}
 
-$\Rightarrow$ 鍵だけを公開鍵暗号、データ自体はAESで暗号化することで、\alert{暗号化データ部分の使い回し}を促進。
+\vspace{2ex}
+
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/hybrid-encryption-flow01.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{itemize}
+ \item 比較的小さいAESの鍵$K$のみ、宛先毎の公開鍵で暗号化。
+ \item 鍵に比べて非常に大きい(であろう)\alert{データ部分の暗号化は、宛先に依らず共通化}してしまう。
+\end{itemize}
+
+\begin{block}{}
+誰宛でもまず同じAES暗号化データを送りつけといて、そのAESの鍵だけを復号を許可したい人の公開鍵で暗号化するようなデータへのアクセス制御への応用。
+\end{block}
+
+\begin{block}{}
+AES暗号化データ自体は誰宛でも共通なので、CDNに載せて公開配信とかしちゃうとめちゃくちゃ再利用性が高まってよい。\footnote[frame]{\scriptsize インターネット配信向けのDRMなんかでもこういう考え方がよく使われている。}
+\end{block}
 
 \end{frame}
 
 \begin{frame}
-Msgpackを使って「複数人宛のデータ暗号化」を試してみよう。 
+RSA-OAEPとAESを使って「複数人宛のデータ暗号化」を試してみよう。 
+\end{frame}
+
+\begin{frame}
+RSA-OAEP+AESのコードの中身はこんな感じ。
+\end{frame}
+
+\begin{frame}
+ 
 \end{frame}
 
 \begin{frame}
