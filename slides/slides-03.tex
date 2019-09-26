@@ -711,24 +711,31 @@ Msgpackを使って「複数人宛のデータ暗号化」を試してみよう�
 \end{block}
 
 \begin{center}
-$\Downarrow$
+$\Downarrow$\\[1ex]
 
-使い捨ての公開鍵・秘密鍵を生成する\alert{Ephemeral Scheme}の利用
+ハイブリッド暗号化の際、公開鍵・秘密鍵を使い捨てる\alert{Ephemeral Scheme}の利用
 \end{center}
 
 \end{frame}
 
 \begin{frame}
-\textbf{ECDH-Ephemeral} (ECDHE)\footnote[frame]{TLSで利用されるスキームだと思って良い \url{https://tools.ietf.org/html/rfc8422}}:
+ Ephemeral Schemeのイメージ
+\end{frame}
 
+\begin{frame}
+ECDHを使った暗号化では、Ephemeral Schemeを使うのが推奨される\footnote[frame]{\scriptsize  RSA暗号を使った場合のEphemeral Schemeを標準の手法は知る限りない…単純に巨大な公開鍵を送るコストが高いことと、RSA-4096でAES-256の鍵を暗号化するなど、無駄の多さが理由か？}。
+
+
+\begin{block}{\small ECDH-Ephemeral (ECDHE)\footnote[frame]{\scriptsize TLSで利用されるスキームだと思って良い \url{https://tools.ietf.org/html/rfc8422}}}
 \begin{itemize}
- \item 送信先の相手が一緒でも、毎回違う共有ビット列が生成される。
+ \item 送信先の相手を問わず、毎回違う共有ビット列が生成される。
 
-$\Rightarrow$ 「今使った」共有ビット列が盗まれても過去のデータは解読不能。
+$\Rightarrow$ 「今使った」共有ビット列や秘密鍵が盗まれても過去のデータは解読不能。
 
 $\Rightarrow$ \alert{Forward secrecyが担保可能}。
- \item 毎度毎度、自分の一時公開鍵をまず送らなければならないので、通信コストが高い。
+ \item 毎度毎度、まずEphemeral公開鍵を送らなければならず、通信コストは高い。
 \end{itemize}
+\end{block}
 
 \end{frame}
 
@@ -737,6 +744,40 @@ $\Rightarrow$ \alert{Forward secrecyが担保可能}。
  
 \end{frame}
 
+\begin{frame}
+ 
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{まとめ}
+\begin{frame}
+ \centering
+ {\Large まとめ}
+\end{frame}
+
+\begin{frame}
+\frametitle{まとめ}
+お疲れ様でした。
+
+\begin{itemize}
+\item 公開鍵暗号化の際のお作法を学んだ。
+\begin{itemize}
+ \item RSA: パディングには\alert{OAEPを使う(RSAES-OAEP)}。
+ \item ECDH: 導出した共有ビット列は\alert{鍵導出関数を通してから}AESの鍵として利用する。
+\end{itemize}
+\item より実用的な公開鍵暗号化の運用について触れた。
+\begin{itemize}
+ \item \structure{ハイブリッド暗号化}: 複数人向け、量的に効率的な暗号化。
+ \item \structure{Ephemeral Scheme}: Perfect Forward Secrecyを担保して万一の鍵漏洩に備える。
+\end{itemize}
+\item 上記について、JavaScriptのコードを実行/中身を覗いてみた。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+ 以下バックアップ
+\end{frame}
 \begin{frame}
 直接Concat KDFを暗号化の鍵にするか、
 あるいはConcat KDFの結果をAESKWの鍵としてContent Encryption Keyを暗号化するのに使う。
@@ -762,50 +803,6 @@ $\Rightarrow$ \alert{Forward secrecyが担保可能}。
 \includegraphics[width=\linewidth]{Figs/aeskw.pdf}
 \end{center}
 \end{frame}
-
-\begin{frame}
-\frametitle{ECDHによるデータ暗号化をしてみよう}
-今回はHKDFで暗号化してみる。
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{AESと公開鍵暗号のいいとこ取り}
-\begin{frame}
-\centering
-{\Large AESと公開鍵暗号のいいとこ取り}
-\end{frame}
-
-\begin{frame}
-\frametitle{公開鍵暗号とAESの比較}
-\end{frame}
-
-\begin{frame}
-\frametitle{ハイブリッド暗号化}
-AESの暗号化データをガンガン使い回せる！
-
-msgpack-lightを使ったコードを提供
-\end{frame}
-
-\begin{frame}
-\end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{まとめ}
-\begin{frame}
- \centering
- {\Large まとめ}
-\end{frame}
-
-\begin{frame}
-\frametitle{まとめ}
-お疲れ様でした。
-
-\begin{itemize}
-\item 公開鍵暗号を利用する際のお作法を学んだ。
-\end{itemize}
-\end{frame}
-
 
 % \begin{frame}
 % 次回以降…リクエスト次第ですが、
