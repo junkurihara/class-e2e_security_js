@@ -63,7 +63,7 @@ export const deriveKeyFromMasterSecret = async (masterSecret, len, salt=null, ha
   }
 
   const keyObj = await jscu.hkdf.compute(
-    masterSecret,
+    jseu.encoder.decodeBase64(masterSecret),
     hash,
     len,
     '', // 'info' field for RFC5869. This could be always blank.

@@ -16,19 +16,18 @@ export const getJscu = () => {
 };
 
 /**
- * Get fetch
+ * Get ec
  */
-export const getFetch = () => {
-  // node-fetch in aws sdk
-  let fetch;
+export const getJscec = () => {
+  let jscec;
   const global = Function('return this;')();
-  if (typeof window === 'undefined'){
-    fetch = require('node-fetch');
-    global.fetch = fetch;
+  if (typeof window !== 'undefined'){
+    jscec = window.jscec;
   }
-  else {
-    fetch = window.fetch;
+  else{
+    jscec = require('js-crypto-ec');
+    global.jscec = jscec;
   }
-  return fetch;
-};
 
+  return jscec;
+};

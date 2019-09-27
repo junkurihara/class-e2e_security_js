@@ -1,9 +1,9 @@
 /**
  * index.js
  */
-import {getMyData, postMyData} from './post-get';
-import {generateBase64MasterSecret} from './derive-key';
-import {encryptECB, encrypt} from './encrypt';
+import {ecKeyGen, rsaKeyGen, rsaOaepDecrypt, rsaOaepEncrypt} from './test-apis';
+import {deriveKeyFromMasterSecret} from './derive-key';
+import {encryptAES, decryptAES} from './encryptAES';
 
-export {getMyData, postMyData, generateBase64MasterSecret, encryptECB, encrypt};
-export default {getMyData, postMyData, generateBase64MasterSecret, encryptECB, encrypt};
+export {encryptAES, decryptAES, ecKeyGen, rsaKeyGen, rsaOaepDecrypt, rsaOaepEncrypt, deriveKeyFromMasterSecret};
+export default {encryptAES, decryptAES, ecKeyGen, rsaKeyGen, rsaOaepDecrypt, rsaOaepEncrypt, deriveKeyFromMasterSecret};
