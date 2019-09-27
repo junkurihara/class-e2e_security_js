@@ -855,22 +855,25 @@ ECDHを使った暗号化では、Ephemeral Schemeを使うのが推奨される
 
 $\Rightarrow$ 「今使った」共有ビット列や秘密鍵が盗まれても過去のデータは解読不能。i.e., \alert{Forward secrecy}。
  \item 毎度毎度、まずEphemeralな公開鍵を送らなければならず、\alert{通信コストは高い}。
- \item \structure{「送られてきたEphemeralな公開鍵は、本当に自分がやりとりしたい相手の公開鍵か?」を確認する手間}もかかる。\footnote[frame]{\scriptsize 署名を使う。次回の勉強会で話す予定。}
+ \item \structure{「送られてきたEphemeralな公開鍵は、本当に自分がやりとりしたい相手の公開鍵か?」を確認する手間}もかかる。
 \end{itemize}
 \end{block}
 
 \end{frame}
-ECDHのEphemeral Schemeを試してみよう。
+
 
 \begin{frame}
- 
-\end{frame}
+\begin{block}{}
+「送られてきたEphemeralな公開鍵は、本当に自分がやりとりしたい相手の公開鍵か?」を確認する手間もかかる。
+\end{block}
+\begin{center}
+ $\Downarrow$\\
+ここでようやく\\
+\alert{本人確認・改ざん防止を担保をする「署名」を使う}。\\
+次回の勉強会で話す予定。
+\end{center}
 
-\begin{frame}
-コードの中身はこんな感じ。
- 
 \end{frame}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{まとめ}
