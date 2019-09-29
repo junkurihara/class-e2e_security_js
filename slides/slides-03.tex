@@ -235,7 +235,7 @@
 %%% 著者など
 %%%
 \title[E2E Security with JS 03]{JavaScriptによるEnd-to-Endセキュリティ}
-\subtitle{第3回 公開鍵暗号はどうやって使えばいいのか？ 編\\ \alert{PNGになってんのはPDFに修正しとくこと}}
+\subtitle{第3回 公開鍵暗号はどうやって使えばいいのか？ 編}
 \author[Jun Kurihara]{栗原 淳}
 \institute[]{}
 \date[Oct. 17, 2019]{2019年10月17日}
@@ -503,7 +503,12 @@ AESに比べて、\alert{楕円曲線で倍、RSAに至っては24倍以上}の�
  \includegraphics[width=0.8\linewidth]{Figs/pk-flow.png}%todo
 \end{center}
 
-前回・前々回使った「リモートサーバに登録する」というところは、簡略化のため端折ってる。興味があれば、前回のコードを公開鍵暗号に拡張して、E2Eセキュリティしてみよう！
+\alert{サンプルコードはブラウザでも動く}。src/commands-browser.htmlを開くとこれからNode.JSで試すデモが開発者コンソールで実行される。適宜試したり比較すると良い。
+\end{frame}
+
+\begin{frame}
+ 
+前回・前々回使った「リモートサーバに登録する」というところは、簡略化のため省略した。興味があれば、前回のコードを公開鍵暗号に拡張して、ネットワークを介してE2Eセキュリティしてみよう！
 \end{frame}
 
 \begin{frame}
@@ -618,15 +623,128 @@ RSA向けに主として2種類のパディング方法が知られている。\
 \end{frame}
 
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{JavaScriptでRSA-OAEP暗号化をしてみよう}
-RSAES-OAEPは、WebCrypto API(ブラウザ)でも、Node.js Cryptoでもネイティブサポートされている。\footnote[frame]{\scriptsize RSAES-PKCS1-v1\_5もサポートされている。}
+sampleディレクトリで以下を実行すると、公開鍵・秘密鍵ペアを生成して、引数のstringの暗号化→復号を一連で実行する。
+\begin{exampleblock}{}
+\scriptsize
+\begin{verbatim}
+$ yarn execute rsa-oaep-demo 'hello world'
+<Input Data>
+hello world
+<Generated RSA Key Pair (PEM Form)>
+Public Key:
+30820122300d06092a864....... // 生成した公開鍵の(DER)
+Private Key:
+308204bc020100300d060....... // 生成した秘密鍵(DER)
+=======
 
+<Encrypted Data (in Base64)>
+9f28a2acbd7cd5bc748f3....... // 'hello world'のRSA-OAEP暗号化データ
+=======
+
+<Decrypted Data>
+hello world // 復号したデータ
+=======
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]
+\small
+一連の動作をオートでやらずに自力でやる方法 (コピペで頑張る):
+\begin{exampleblock}{\small RSA鍵ペアを生成}
+\scriptsize
+\begin{verbatim}
+$ yarn execute rsa-keygen
+<Generated RSA Key Pair (DER Form)>
+Public Key:
+30820122300d06092a864886f70d010......
+Private Key:
+308204be020100300d06092a864886f......
+\end{verbatim}
+\end{exampleblock}
+\begin{exampleblock}{\small RSA-OAEP暗号化 (-pで公開鍵を指定)}
+\scriptsize
+\begin{verbatim}
+$ yarn execute rsa-oaep-encrypt 'hello world'\
+ -p '308201223......'
+<Encrypted Data (in HexString)>
+8da122191b1ec6da72afe88c96cfbb3...... // 暗号化データ
+\end{verbatim}
+\end{exampleblock}
+\begin{exampleblock}{\small RSA-OAEP復号 (-sで秘密鍵を指定)}
+\scriptsize
+\begin{verbatim}
+$ yarn execute rsa-oaep-decrypt '8da122191b1ec6da72afe88c96cfbb3......'\
+ -s '308204be020100300d06092a864886f......'
+<Decrypted Data>
+hello world
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+
+\begin{frame}[fragile]
+RSA-OAEPによる公開鍵暗号化のコードはこんな感じ。
+\begin{block}{\small RSA鍵ペア生成 (src/test-api.js)}
+\scriptsize
+\begin{verbatim}
+// bits = 2048
+const jscu = getJscu(); // jscuオブジェクト取得。Node.js Crypto, WebCryptoのラッパー
+const keyPair = await jscu.pkc.generateKey(
+  'RSA', 
+  {modulusLength: bits} // 2048bitsのRSA鍵ペアを生成
+); 
+\end{verbatim}
+\end{block}
+\begin{block}{\small RSA-OAEP暗号化 (src/test-api.js)}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu(); // jscuオブジェクト取得。Node.js Crypto, WebCryptoのラッパー
+
+// DERエンコード(Uint8Array)の公開鍵をjscuの鍵オブジェクトに変換。
+const publicKey = new jscu.Key('der', publicDer);
+
+const encrypted = await jscu.pkc.encrypt(
+  uint8ArrayData, // 暗号化されるデータ
+  publicKey,
+  {hash: 'SHA-256'} // OAEPで利用されるハッシュ。今なら'SHA-256'使っとけばいい。
+);
+\end{verbatim}
+\end{block}
+\end{frame}
+\begin{frame}[fragile]
+\begin{block}{\small RSA-OAEP復号 (src/test-api.js)}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu(); // jscuオブジェクト取得。Node.js Crypto, WebCryptoのラッパー
+
+// DERエンコード(Uint8Array)の秘密鍵をjscuの鍵オブジェクトに変換。
+const privateKey = new jscu.Key('der', privateDer);
+
+const decrypted = await jscu.pkc.decrypt(
+  uint8ArrayEncryptedData,
+  privateKey,
+  {hash: 'SHA-256'} // 暗号化で使われているものと一緒。
+);
+\end{verbatim}
+\end{block}
+これらのコードはjscuを使う限りはNode.jsでもブラウザでも一緒。
 \end{frame}
 
 \begin{frame}
-RSA-OAEPによる公開鍵暗号化のコードはこんな感じ。
+RSAES-OAEPは、WebCrypto API(ブラウザ)でも、Node.js Cryptoでもネイティブサポートされている。\footnote[frame]{\scriptsize WebCryptoでは、「サポートされているブラウザだといいですね」。jscuだとその辺はpurejsで実装し直しているので動かないことはない。(IEはダメかも)}
+
+\vspace{1ex}
+
+なお、RSAES-PKCS1-v1\_5も規格上サポートされている。JSに限らず、\underline{どちらかというとOAEPの方がまだ実装されていない。}
+
+\vspace{1ex}
+
+$\Rightarrow $そのせいで、SSL/TLSではROBOT攻撃に対する脆弱性とかを引き起こしている……
 \end{frame}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -686,14 +804,61 @@ $\Rightarrow$ 共有したランダムビット列を鍵(の種)として用い�
 共有ビット列の長さは、公開鍵長 (Compact form) と一緒。
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{JavaScriptでECDH共有ビット列導出をしてみよう}
-ECDHの共有ビット列導出は、WebCrypto API(ブラウザ)でも、Node.js Cryptoでもネイティブサポートされている。\footnote[frame]{\scriptsize [ブラウザ] encryptなどというわかりやすいAPIではなく、deriveBits(ビット導出)。[Node.js] ECDHオブジェクト生成。}
+sampleディレクトリで以下を実行。鍵ペアを2つ生成→互いの公開鍵から共有ビット列を生成する。
 
+\begin{exampleblock}{}
+\scriptsize
+\begin{verbatim}
+$ yarn execute check-ecdh
+<ECC Key Pair A (DER Form)>
+Public Key:
+3059301306072a8648ce3d020106082... // 公開鍵A
+Private Key:
+308193020100301306072a8648ce3d0... // 秘密鍵A
+=======
+<ECC Key Pair B (DER Form)>
+Public Key:
+3059301306072a8648ce3d020106082... // 公開鍵B
+Private Key:
+308193020100301306072a8648ce3d0... // 秘密鍵B
+=======
+
+// 公開鍵Aと秘密鍵Bから生成
+Shared Bits from Public Key A and Private Key B: c55393fc681811141...
+// 公開鍵Bと秘密鍵Aから生成
+Shared Bits from Public Key B and Private Key A: c55393fc681811141...
+\end{verbatim}
+\end{exampleblock}
+共有ビット列は全く同じものになっていることに注目
+\end{frame}
+
+\begin{frame}[fragile]
+\small
+ECDH共有ビット列導出のコードの中身はこんな感じ。
+\begin{block}{\small src/test-api.js}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu();
+const jscec = getJscec(); //js-crypto-ecオブジェクト。jscuのサブモジュール。
+
+// DERエンコードからjscu鍵オブジェクトを生成、そのあとJWKエンコードの鍵として出力
+const publicKey = new jscu.Key('der', publicDer);
+const privateKey = new jscu.Key('der', privateDer);
+const publicJwk = await publicKey.export('jwk');
+const privateJwk = await privateKey.export('jwk');
+
+// 共有ビット列の出力
+const derived = await jscec.deriveSecret(publicJwk, privateJwk);
+\end{verbatim}
+\end{block}
+※jscuではECDH+AESという形式でAPIを提供しているため、ECDH自身は隠蔽している。
+そのため、ECDHの仕組みをわかりやすくするためにサブモジュールを呼んでいる。
 \end{frame}
 
 \begin{frame}
-ECDH共有ビット列導出のコードの中身はこんな感じ。
+ECDHの共有ビット列導出は、WebCrypto API(ブラウザ)でも、Node.js Cryptoでもネイティブサポートされている。\footnote[frame]{\scriptsize [ブラウザ] encryptなどというわかりやすいAPIではなく、deriveBits(ビット導出)。[Node.js] ECDHオブジェクト生成。}
 \end{frame}
 
 \begin{frame}
@@ -730,14 +895,120 @@ ECDH, HDKF, AESを組み合わせて、「公開鍵暗号化」してみる。
 RSA暗号化と違い、一度に暗号化できるデータサイズが公開鍵のサイズ以下などと制限されることはない。\footnote[frame]{\scriptsize ただし、通常この場合も共有ビット列を使って暗号化するデータは、「別のAES暗号化用の鍵(すなわち256bits以下)」とすることが多い。後述する。}
 \end{frame}
 
-\begin{frame}
-実行してみる。
+\begin{frame}[fragile]
+実行してみる。(コピペ頑張って！)
+
+\begin{exampleblock}{\small EC鍵生成 (2回やって2ペア作る)}
+\scriptsize
+\begin{verbatim}
+$ yarn execute ecc-keygen
+<Generated ECC Key Pair (DER Form)>
+Public Key:
+3059301306072a8648ce3d020......
+Private Key:
+308193020100301306072a864.....
+
+$ yarn execute ecc-keygen
+<Generated ECC Key Pair (DER Form)>
+Public Key:
+3059301306072a8648ce3d020.....
+Private Key:
+308193020100301306072a864.....
+\end{verbatim}
+\end{exampleblock}
  
 \end{frame}
 
+\begin{frame}[fragile]
+\begin{exampleblock}{\small ECDH+HKDF+AES-CBC暗号化}
+\scriptsize
+\begin{verbatim}
+$ yarn execute ecdh-aes-encrypt 'hello world'\
+-p '3059301306072a8648ce3d020106082a8648c......' // 送り先の公開鍵
+-s '308193020100301306072a8648ce3d0201060......' // 送り元の秘密鍵
 
-\begin{frame}
+<Shared Bits> // ECDHの共有ビット列
+51a1a502d01917e6ae0c7cd69cc7078d4a07d0172d271555d001485621551eef
+
+<Derived AES Key> // HDKFで導出した鍵とパラメタ
+Key: f52372329867b83ee4e2cada7452a909e85b1ffc2401c5e3b7e7aa7bf9363f7b
+HKDF-Salt: 1dffbb6a9a0b91929b690116e3abd75b4a984e4d8686fcd9e35b4bd0220ebfe7
+HKDF-Hash: SHA-256
+
+<Encrypted data> // AES-CBC暗号化したデータ
+Data: e36ded44e0e27a8f01d160feb54b1c30
+Initial Vector: e9799bff5bdbd3400b1c753e5d5506ff
+
+// Key, Salt, IV, Encrypted DataをMsgpackしたやつ
+<Msgpacked encrypted and kdf data>
+82a9656e6372797074656482a464617461d......
+\end{verbatim}
+\end{exampleblock}
+パラメタがたくさんでコピペが無理なのでMsgpackでserializeして暗号化データを固めている。
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{exampleblock}{\small ECDH+HKDF+AES-CBC復号}
+\scriptsize
+\begin{verbatim}
+// msgpackしたデータを秘密鍵にする。
+$ yarn execute ecdh-aes-decrypt '82a9656e6372797074656482a46461......'
+ -p '3059301306072a8648ce3d0201060......' // 送り元の公開鍵
+ -s '308193020100301306072a8648ce3......' // 送り先の秘密鍵
+
+<Shared Bits> // ECDHの共有ビット列
+51a1a502d01917e6ae0c7cd69cc7078d4a07d0172d271555d001485621551eef
+
+<Derived AES Key> // 共有ビット列とmsgpackの中のパラメタから導出した鍵
+f52372329867b83ee4e2cada7452a909e85b1ffc2401c5e3b7e7aa7bf9363f7b
+
+<Decrypted Data> // 復号データ
+hello world
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+
+\begin{frame}[fragile]
 ECDH, HKDF, AESを組み合わせた暗号化のコードはこんな感じ。
+\begin{block}{\small 暗号化: src/commands-node.js}
+\scriptsize
+\begin{verbatim}
+// Shared bits
+const sharedBits = await ecdh(publicKeyA, privateKeyB);
+
+// HKDF key derivation
+const aesKey = await deriveKeyFromMasterSecret(sharedBits, 32);
+
+// AES-CBC encryption
+const encrypted = await encryptAES(data, aesKey.key);
+
+// packing for ease
+const packed = msgpack.encode({encrypted, kdfParams: aesKey.kdfParams});
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{block}{\small 復号: src/commands-node.js}
+\scriptsize
+\begin{verbatim}
+const depack = msgpack.decode(uint8ArrayData);
+
+// Shared bits
+const sharedBits = await ecdh(publicKeyB, privateKeyA);
+
+// HKDF key derivation
+const aesKey = await deriveKeyFromMasterSecret(
+  sharedBits, 32, depack.kdfParams.salt, depack.kdfParams.hash
+);
+
+// AES-CBC decryption
+const decrypted = await decryptAES(
+  depack.encrypted.data, aesKey.key, depack.encrypted.iv
+);
+\end{verbatim}
+\end{block}
 \end{frame}
 
 
@@ -809,18 +1080,6 @@ AES暗号化データ自体は誰宛でも共通なので、CDNに載せて公�
 \end{frame}
 
 \begin{frame}
-RSA-OAEPとAESを使って「複数人宛のデータ暗号化」を試してみよう。 
-\end{frame}
-
-\begin{frame}
-RSA-OAEP+AESのコードの中身はこんな感じ。
-\end{frame}
-
-\begin{frame}
- 
-\end{frame}
-
-\begin{frame}
 \frametitle{Perfect Forward Secrecy}
 より安全な暗号化のために。
 
@@ -834,6 +1093,13 @@ $\Downarrow$\\[1ex]
 公開鍵・秘密鍵を1回限りで使い捨てる\alert{Ephemeral Scheme}の利用
 \end{center}
 
+\end{frame}
+
+\begin{frame}
+\begin{block}{\small なんでこんなめんどくさい概念が？}
+「米国政府機関、SSL/TLSとかの暗号化通信データをそのままガンガン保存してる。保存しておいて、いつか復号できるような機会を待ってる。」とか暴露したことで注目を浴びている。
+\end{block}
+$\Rightarrow$ 保存データの一箇所でもクラックできたら、一気に他のデータもクラックできるのはよくない。\alert{被害は最小限にしよう}。
 \end{frame}
 
 \begin{frame}
@@ -854,7 +1120,7 @@ ECDHを使った暗号化では、Ephemeral Schemeを使うのが推奨される
  \item 送信先の相手を問わず、毎回違う共有ビット列が生成される。
 
 $\Rightarrow$ 「今使った」共有ビット列や秘密鍵が盗まれても過去のデータは解読不能。i.e., \alert{Forward secrecy}。
- \item 毎度毎度、まずEphemeralな公開鍵を送らなければならず、\alert{通信コストは高い}。
+ \item 毎度毎度、まずEphemeralな公開鍵を送らなければならず、\structure{通信コストは高い}。
  \item \structure{「送られてきたEphemeralな公開鍵は、本当に自分がやりとりしたい相手の公開鍵か?」を確認する手間}もかかる。
 \end{itemize}
 \end{block}
@@ -928,37 +1194,37 @@ $\Rightarrow$ 「今使った」共有ビット列や秘密鍵が盗まれても
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\backupbegin
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \backupbegin
 
-\begin{frame}
- 以下バックアップ
-\end{frame}
-\begin{frame}
-直接Concat KDFを暗号化の鍵にするか、
-あるいはConcat KDFの結果をAESKWの鍵としてContent Encryption Keyを暗号化するのに使う。
+% \begin{frame}
+%  以下バックアップ
+% \end{frame}
+% \begin{frame}
+% 直接Concat KDFを暗号化の鍵にするか、
+% あるいはConcat KDFの結果をAESKWの鍵としてContent Encryption Keyを暗号化するのに使う。
 
-\end{frame}
+% \end{frame}
 
-\begin{frame}
-\frametitle{ECDH Ephemeral (ECDHE)}
-\begin{center}
-\includegraphics[width=\linewidth]{Figs/ecdh01.pdf}
-\end{center}
-\end{frame}
+% \begin{frame}
+% \frametitle{ECDH Ephemeral (ECDHE)}
+% \begin{center}
+% \includegraphics[width=\linewidth]{Figs/ecdh01.pdf}
+% \end{center}
+% \end{frame}
 
-\begin{frame}
-\begin{center}
-\includegraphics[width=\linewidth]{Figs/ecdh02.pdf}
-\end{center}
-\end{frame}
+% \begin{frame}
+% \begin{center}
+% \includegraphics[width=\linewidth]{Figs/ecdh02.pdf}
+% \end{center}
+% \end{frame}
 
 
-\begin{frame}
-\begin{center}
-\includegraphics[width=\linewidth]{Figs/aeskw.pdf}
-\end{center}
-\end{frame}
+% \begin{frame}
+% \begin{center}
+% \includegraphics[width=\linewidth]{Figs/aeskw.pdf}
+% \end{center}
+% \end{frame}
 
 
 
@@ -973,7 +1239,7 @@ $\Rightarrow$ 「今使った」共有ビット列や秘密鍵が盗まれても
 % \frametitle{Appendix}
 % This page is not counted.
 % \end{frame}
-\backupend
+% \backupend
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

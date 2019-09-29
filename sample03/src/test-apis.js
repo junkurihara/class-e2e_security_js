@@ -1,6 +1,5 @@
 import jseu from 'js-encoding-utils';
 
-import {encryptAES, decryptAES} from './encryptAES';
 import {getJscu, getJscec} from './util/env';
 
 
