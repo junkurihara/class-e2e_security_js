@@ -135,6 +135,7 @@
 % \DeclareFontSubstitution{U}{txmia}{m}{it}
 % \DeclareMathSymbol{v}{\mathalpha}{lettersA}{"33} %"
 
+\usepackage{multirow}
 
 %上線 widebar, Widebar
 \usepackage{accents}
@@ -238,7 +239,7 @@
 \subtitle{第4回 データの真正性・本人確認のためのテクニック 編}
 \author[Jun Kurihara]{栗原 淳}
 \institute[]{}
-\date[Oct. 3x, 2019]{2019年10月3x日}
+\date[Oct. 24, 2019]{2019年10月24日}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -264,25 +265,48 @@
 第1,2,3回では
 \begin{itemize}
  \item End-to-End (E2E) セキュリティの原則と必要性
- \item JavaScriptでAESを正しく・安全に暗号化する方法
- \item JavaScriptでRSA暗号・楕円曲線暗号を使ってを正しく・安全に暗号化する方法
+ \item JavaScriptでAESを使った暗号化のお作法
+ \item JavaScriptで公開鍵暗号(RSA/楕円曲線)を使った暗号化のお作法
 \end{itemize}
 を勉強した。
 
-
 \vspace{2ex}
 
-今回は、第3回で懸案事項だった「データのやり取りしてる相手って本当に正しい相手？」を保証する方法を学んでいく。
+今回は、第3回の最後に懸案事項だった「データのやり取りしてる相手って本当に正しい相手？」を保証する方法を学んでいく。
 \end{frame}
+
+
 \begin{frame}
- 
+\frametitle{第3回のおさらい: Ephemeral Scheme}
+\begin{block}{\small 公開鍵暗号化のEphemeral Schemeでの運用}
+公開鍵・秘密鍵ペアを都度生成、1回限りで使い捨てることで、\alert{Perfect Forward Secrecy}\footnote[frame]{\scriptsize 長期的に保存されているマスター秘密鍵の漏洩や、一部の暗号化データがクラックされたとしても、\alert{それ以外の過去に暗号化されたデータは復号されてしまうことはない}という概念。}を担保する運用方法。
+\end{block}
 \end{frame}
 
 \begin{frame}
+\small 
+\begin{center}
+\includegraphics[width=0.7\linewidth]{Figs/ephemeral-scheme-flow01.pdf}\\
+Ephemeral Schemeのイメージ
+\end{center}
+\vspace{-1ex}
+
+まずはじめに、\alert{「送られてきたEphemeralな公開鍵は、本当に自分がやりとりしたい相手の公開鍵か?」の確認}が必須。\footnote[frame]{\scriptsize 意図しない相手の公開鍵で暗号化して機密データを漏らさぬように、ということ。}
+\end{frame}
+
+\begin{frame}
+
+というわけで、「E2Eで安全にデータをやり取りする」ための基礎部分の最後のピースを今日は学ぶ。
 
 \begin{block}{\small この講義で最終的に学びたいこと}
 \begin{itemize}
-\item 
+\item 本人確認やデータの改ざん防止を担保する方法
+\begin{itemize}
+ \item データ毎に固有の指紋を生成する「\alert{ハッシュ}」
+ \item 「共通鍵」を使った改ざん防止方法「\alert{MAC}」\footnote[frame]{\scriptsize HMAC (RFC2104 \url{https://tools.ietf.org/html/rfc2104})}
+ \item 「公開鍵」を使った本人確認・改ざん防止方法「\alert{電子署名}」\footnote[frame]{\scriptsize RSA-PSS (PKCS\#1 RFC8017 \url{https://tools.ietf.org/html/rfc8017}), ECDSA (NIST FIPS PUB186-4 \url{https://csrc.nist.gov/publications/detail/fips/186/4/final})}
+\end{itemize}
+\item そしてその具体的なJavaScriptでの実装方法・お作法
 \end{itemize}
 \end{block}
 
@@ -322,11 +346,192 @@
 \end{enumerate}
 「こういうのを知りたい」というリクエストがあれば是非。
 
-マニアックすぎて最後のRFCの話題はやるかどうか不明…
+マニアックすぎて最後のRFCの話題はやるかどうか未定。
 
 \vspace{2ex}
 
 \underline{セカンドシーズンも検討中。}\footnote[frame]{場所等変えてもっと来やすい場所へ。。。}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{サンプルコードの準備}
+\begin{frame}
+\centering
+{\Large サンプルコードの準備}
+\end{frame}
+
+\begin{frame}
+\frametitle{準備}
+\small
+細かくHash/MAC/署名の説明を聞きつつ、手を動かすため、まず環境準備。
+
+\alert{今回は、JavaScript (Node.js) を使って手元でデータのHash/MAC/署名をいじってみる。}
+
+\begin{center}
+ \Large
+ \textcolor{blue}{デモの絵}
+\end{center}
+
+\alert{サンプルコードはブラウザでも動く}。src/commands-browser.htmlを開くとこれからNode.JSで試すデモが開発者コンソールで実行される。適宜試したり比較すると良い。
+\end{frame}
+
+\begin{frame}
+ 
+前回・前々回使った「リモートサーバに登録する」というところは、簡略化のため省略した。興味があれば、前回のコードを公開鍵暗号に拡張して、ネットワークを介してE2Eセキュリティしてみよう！
+\end{frame}
+
+\begin{frame}
+\frametitle{環境}
+以下の環境が前提:
+\begin{itemize}
+ \item Node.js ($>$ v10)がインストール済。yarnが使えること。 \footnote[frame]{インストールコマンド: \texttt{npm i -g yarn}}
+ \item ブラウザとして、Google Chrome (系ブラウザ)、もしくはFirefoxがインストール済み
+ \item Visual Studio Code や WebStorm などの統合開発環境がセットアップ済みだとなお良い。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{JavaScriptプロジェクトの準備}
+\begin{itemize}
+\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/zettant/e2e-security-04}}をClone\\
+\begin{exampleblock}{}
+\footnotesize
+\$ \texttt{git clone https://github.com/zettant/e2e-security-04}\\
+\$ \texttt{cd e2e-security-04/sample}
+\end{exampleblock}
+\item 依存パッケージのインストール
+\begin{exampleblock}{}
+\$ \texttt{yarn install}
+\end{exampleblock}
+\item ライブラリのビルド
+\begin{exampleblock}{}
+\$ \texttt{yarn build}
+\end{exampleblock}
+\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hash}
+\begin{frame}
+\centering
+{\Large データの指紋: Hash}
+\end{frame}
+
+\begin{frame}
+\frametitle{HashおよびHash関数とは}
+\begin{block}{\small HashおよびHash関数}
+あるデータに対し、そのデータを「代表するビット列」を計算する関数を「Hash関数」。導出したビット列を「Hash」\footnote[frame]{あるいはHash値、Message Digest}と呼ぶ。
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{HashおよびHash関数の役割}
+同じくデータ固有のビット列を導出するChecksumと似ているが、その用途はより強力で多岐にわたる。
+
+\begin{itemize}
+ \item Checksum
+\begin{itemize}
+ \item 通信路上などでの\structure{データの(偶発的な)エラー検知}
+\end{itemize}
+$\Rightarrow$ \structure{データから一意に導ける値}・高速な処理が可能なことが必須
+ \item Hash
+\begin{itemize}
+ \item \alert{データのエラー・改ざん検知} 
+ \item 多数のデータの索引作成\footnote[frame]{Hash Table} 
+ \item データの重複検出
+\end{itemize}
+$\Rightarrow$ \alert{別のデータ同士で同じHashを得ることが困難}なことが必須
+\end{itemize}
+
+目的としては、Checksum $\subseteq$ Hash と言える。
+\end{frame}
+
+\begin{frame}
+\frametitle{Hashの種類}
+MD5/SHA1/SHA256からSHA3へ
+\end{frame}
+
+\begin{frame}
+\frametitle{JavaScriptでデータのHashを生成してみる。}
+\end{frame}
+
+\begin{frame}
+Hash生成のコードはこんな感じ。
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{本人確認の技術}
+\begin{frame}
+\centering
+{\Large 本人確認の技術}
+\end{frame}
+
+\begin{frame}
+\frametitle{MACと署名とは？}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{MAC}
+\begin{frame}
+\centering
+
+{\Large 共通鍵を使った改ざん検知・本人確認: MAC}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Message Authentication Code (MAC) 事始め}
+\end{frame}
+
+\begin{frame}
+\frametitle{Hash-based MAC (HMAC)}
+「鍵付きのハッシュ (Keyed Hash)」だと思えば良い。
+\end{frame}
+
+\begin{frame}
+\frametitle{JavaScriptでHMACを実行してみる}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{署名}
+\begin{frame}
+\centering
+{\Large 公開鍵を使った改ざん検知・本人確認: 署名}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{署名 事始め}
+\end{frame}
+
+\begin{frame}
+\frametitle{署名とは？}
+
+データそのものに署名を施すのは厳しいので、「データの指紋」に対してハッシュを施そう。
+\end{frame}
+
+
+\begin{frame}
+\frametitle{RSA}
+\begin{itemize}
+ \item RSASSA PKCS1-v1.5
+ \item RSASSA-PSS
+\end{itemize}
+
+RSAなら可能ならPSSを使おう！
+\end{frame}
+
+\begin{frame}
+\frametitle{JavaScriptでRSASSA-PSSを実行してみる}
+\end{frame}
+
+\begin{frame}
+\frametitle{ECDSA}
+\end{frame}
+
+\begin{frame}
+\frametitle{JavaScriptでECDSAを実行してみる}
 \end{frame}
 
 
