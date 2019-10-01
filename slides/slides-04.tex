@@ -272,7 +272,9 @@
 
 \vspace{2ex}
 
-今回は、第3回の最後に懸案事項だった「データのやり取りしてる相手って本当に正しい相手？」を保証する方法を学んでいく。
+今回は、第3回の最後に懸案事項だった\\
+「データのやり取りしてる相手って本当に正しい相手？」\\
+を保証する方法を学んでいく。
 \end{frame}
 
 
@@ -363,21 +365,19 @@ Ephemeral Schemeのイメージ
 \begin{frame}
 \frametitle{準備}
 \small
-細かくHash/MAC/署名の説明を聞きつつ、手を動かすため、まず環境準備。
-
+説明を聞きつつ手を動かすため、まず環境準備。
 \alert{今回は、JavaScript (Node.js) を使って手元でデータのHash/MAC/署名をいじってみる。}
+そしてその効果を実感する。
 
 \begin{center}
- \Large
- \textcolor{blue}{デモの絵}
+\includegraphics[width=0.7\linewidth]{Figs/md-flow.pdf}
 \end{center}
 
 \alert{サンプルコードはブラウザでも動く}。src/commands-browser.htmlを開くとこれからNode.JSで試すデモが開発者コンソールで実行される。適宜試したり比較すると良い。
 \end{frame}
 
 \begin{frame}
- 
-前回・前々回使った「リモートサーバに登録する」というところは、簡略化のため省略した。興味があれば、前回のコードを公開鍵暗号に拡張して、ネットワークを介してE2Eセキュリティしてみよう！
+前回のコードの公開鍵に署名をつけたりして本人確認とかして、E2Eセキュリティをしてみましょう！
 \end{frame}
 
 \begin{frame}
@@ -426,16 +426,17 @@ Ephemeral Schemeのイメージ
 \end{frame}
 
 \begin{frame}
+\small
 \frametitle{HashおよびHash関数の役割}
 同じくデータ固有のビット列を導出するChecksumと似ているが、その用途はより強力で多岐にわたる。
 
 \begin{itemize}
- \item Checksum
+ \item \textbf{Checksum}
 \begin{itemize}
  \item 通信路上などでの\structure{データの(偶発的な)エラー検知}
 \end{itemize}
 $\Rightarrow$ \structure{データから一意に導ける値}・高速な処理が可能なことが必須
- \item Hash
+ \item \textbf{Hash}
 \begin{itemize}
  \item \alert{データのエラー・改ざん検知} 
  \item 多数のデータの索引作成\footnote[frame]{Hash Table} 
@@ -444,12 +445,16 @@ $\Rightarrow$ \structure{データから一意に導ける値}・高速な処理
 $\Rightarrow$ \alert{別のデータ同士で同じHashを得ることが困難}なことが必須
 \end{itemize}
 
-目的としては、Checksum $\subseteq$ Hash と言える。
+\textbf{Checksum $\subseteq$ Hash} と言える。
 \end{frame}
 
 \begin{frame}
-\frametitle{Hashの種類}
-MD5/SHA1/SHA256からSHA3へ
+\frametitle{Hash関数の種類}
+ MD5, SHA-1, SHA-2 (SHA-256, 384, 512), SHA-3というHash関数がよく知られている。
+ \begin{center}
+  \includegraphics[width=\linewidth]{Figs/hash-history.pdf}
+ \end{center}
+ MD5、SHA-1は、「\alert{同じHash(指紋)を生成するデータが割と簡単に見つけられる}\footnote[frame]{「衝突」と呼ぶ。MD5の場合は、$2^{20}$程度の計算量でクラック可能。}」という致命的な欠陥が発見されている。
 \end{frame}
 
 \begin{frame}
