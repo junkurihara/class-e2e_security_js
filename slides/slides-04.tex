@@ -239,7 +239,7 @@
 \subtitle{第4回 データの真正性・本人確認のためのテクニック 編}
 \author[Jun Kurihara]{栗原 淳}
 \institute[]{}
-\date[Oct. 24, 2019]{2019年10月24日}
+\date[Oct. 31, 2019]{2019年10月31日}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -283,6 +283,8 @@
 \begin{block}{\small 公開鍵暗号化のEphemeral Schemeでの運用}
 公開鍵・秘密鍵ペアを都度生成、1回限りで使い捨てることで、\alert{Perfect Forward Secrecy}\footnote[frame]{\scriptsize 長期的に保存されているマスター秘密鍵の漏洩や、一部の暗号化データがクラックされたとしても、\alert{それ以外の過去に暗号化されたデータは復号されてしまうことはない}という概念。}を担保する運用方法。
 \end{block}
+
+Perfect Forward Secrecyを守り、End-to-End暗号化の強固な運用を。
 \end{frame}
 
 \begin{frame}
@@ -306,7 +308,7 @@ Ephemeral Schemeのイメージ
 \begin{itemize}
  \item データ毎に固有の指紋を生成する「\alert{ハッシュ}」
  \item 「共通鍵」を使った改ざん防止方法「\alert{MAC}」\footnote[frame]{\scriptsize HMAC (RFC2104 \url{https://tools.ietf.org/html/rfc2104})}
- \item 「公開鍵」を使った本人確認・改ざん防止方法「\alert{電子署名}」\footnote[frame]{\scriptsize RSA-PSS (PKCS\#1 RFC8017 \url{https://tools.ietf.org/html/rfc8017}), ECDSA (NIST FIPS PUB186-4 \url{https://csrc.nist.gov/publications/detail/fips/186/4/final})}
+ \item 「公開鍵」を使った本人確認・改ざん防止方法「\alert{電子署名}」\footnote[frame]{\scriptsize RSASSA PKCS\#1-v1.5/PSS (PKCS\#1 RFC8017 \url{https://tools.ietf.org/html/rfc8017}), ECDSA (FIPS PUB186-4 \url{https://csrc.nist.gov/publications/detail/fips/186/4/final})}
 \end{itemize}
 \item そしてその具体的なJavaScriptでの実装方法・お作法
 \end{itemize}
@@ -373,11 +375,15 @@ Ephemeral Schemeのイメージ
 \includegraphics[width=0.7\linewidth]{Figs/md-flow.pdf}
 \end{center}
 
-\alert{サンプルコードはブラウザでも動く}。src/commands-browser.htmlを開くとこれからNode.JSで試すデモが開発者コンソールで実行される。適宜試したり比較すると良い。
 \end{frame}
 
 \begin{frame}
-前回のコードの公開鍵に署名をつけたりして本人確認とかして、E2Eセキュリティをしてみましょう！
+
+※\alert{サンプルコードはブラウザでも動く}。src/commands-browser.htmlを開くとこれからNode.JSで試すデモが開発者コンソールで実行される。適宜試したり比較すると良い。
+
+\vspace{2ex}
+
+※前回のコードの公開鍵に署名をつけたりしてEphemeral Schemeを作ってみると良い。
 \end{frame}
 
 \begin{frame}
@@ -392,7 +398,7 @@ Ephemeral Schemeのイメージ
 
 \begin{frame}
 \frametitle{JavaScriptプロジェクトの準備}
-\begin{itemize}
+\begin{enumerate}
 \item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/zettant/e2e-security-04}}をClone\\
 \begin{exampleblock}{}
 \footnotesize
@@ -407,7 +413,7 @@ Ephemeral Schemeのイメージ
 \begin{exampleblock}{}
 \$ \texttt{yarn build}
 \end{exampleblock}
-\end{itemize}
+\end{enumerate}
 \end{frame}
 
 
@@ -421,8 +427,18 @@ Ephemeral Schemeのイメージ
 \begin{frame}
 \frametitle{HashおよびHash関数とは}
 \begin{block}{\small HashおよびHash関数}
-あるデータに対し、そのデータを「代表するビット列」を計算する関数を「Hash関数」。導出したビット列を「Hash」\footnote[frame]{あるいはHash値、Message Digest}と呼ぶ。
+あるデータに対し、そのデータを「代表するビット列」を計算する不可逆の関数を「Hash関数」。導出したビット列を「Hash」\footnote[frame]{あるいはHash値、Message Digest}と呼ぶ。
 \end{block}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/hash-flow01.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+ 1ビットでもデータが異なれば、全く違うHashが導出される。
+\begin{center}
+ \includegraphics[width=0.8\linewidth]{Figs/hash-flow02.pdf}
+\end{center}
 \end{frame}
 
 \begin{frame}
@@ -438,7 +454,8 @@ Ephemeral Schemeのイメージ
 $\Rightarrow$ \structure{データから一意に導ける値}・高速な処理が可能なことが必須
  \item \textbf{Hash}
 \begin{itemize}
- \item \alert{データのエラー・改ざん検知} 
+ \item \alert{データのエラー・改ざん検知}
+ \item \alert{Hashをデータ実態の代替として署名を生成}
  \item 多数のデータの索引作成\footnote[frame]{Hash Table} 
  \item データの重複検出
 \end{itemize}
@@ -458,6 +475,24 @@ $\Rightarrow$ \alert{別のデータ同士で同じHashを得ることが困難}
 \end{frame}
 
 \begin{frame}
+\begin{block}{\small Hash関数の選択について}
+\begin{itemize}
+ \item 理由がなければSHA-2シリーズ以降のものを選択する。
+\begin{itemize}
+ \item bit長は長いほど、衝突するデータが見つけづらい(=強固)
+ \item ただし、bit長が長いほど、計算が重くなる
+\end{itemize}
+ \item SHA-1/MD5は、基本的に互換性の担保のためだけに利用する。但し、Checksumとして使う分には問題ない。\alert{何が何でも使うな、というわけではない。}
+\end{itemize}
+\end{block}
+
+\begin{exampleblock}{\small IE/Edge こぼれ話}
+\small
+X.509の公開鍵証明書などはまだSHA-1が利用されている場合が多々ある。しかし、\alert{IE/Edgeでは互換性の担保を全て無視してSHA-1のネイティブサポートを全打ち切り}しているので、X.509公開鍵証明書などをJavaScriptからネイティブAPIを通して扱えない。
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
 \frametitle{JavaScriptでデータのHashを生成してみる。}
 \end{frame}
 
@@ -472,7 +507,115 @@ Hash生成のコードはこんな感じ。
 \end{frame}
 
 \begin{frame}
-\frametitle{MACと署名とは？}
+\frametitle{「正しい相手から正しく送信されてきたデータか」？}
+いわゆる「データの真正性と送信元の確認方法」には、大まかに2つの方法がある。
+\begin{itemize}
+ \item Message Authentication Code (MAC)
+ \item 署名 (電子署名)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+両者とも、送信するデータからMAC/署名という検証用データを生成、元データに付与する形で送信。
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{Figs/mac-sig-flow01.pdf}
+\end{center}
+受信したデータと、MAC/署名とを突合して、「送信元は意図している相手か？」「データは改ざんされてないか？」を検証。
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{Figs/mac-sig-flow02.pdf}
+\end{center}
+ MAC・署名の中身に突っ込む前に、それぞれのざっくりとした定義とpros/consを説明する。
+\end{frame}
+
+\begin{frame}
+\frametitle{Message Authentication Code (MAC)}
+\begin{block}{\small MACによるデータ真正性と送信者の確認}
+\begin{itemize}
+\item 送信側・受信側で共有する鍵を使って\alert{データ・鍵固有のバイナリ(MAC)}を生成する方法。
+\item 受信側で、\alert{送信側と同一のMACが作れるかどうか}をチェック。
+\end{itemize}
+\end{block}
+\begin{center}
+ \includegraphics[width=0.7\linewidth]{Figs/mac-flow01.pdf}
+\end{center}
+\end{frame}
+\begin{frame}
+MACの特徴:
+\begin{itemize}
+ \item 同じ鍵でも、データが異なれば出力されるMACも異なる。
+ \item 同じデータでも、鍵が異なれば出力されるMACも異なる。
+\end{itemize}
+\begin{center}
+ $\Downarrow$
+\end{center}
+すなわち、受信側で同一のMACが作れることを確認できれば、\\
+\begin{itemize}
+ \item \alert{鍵を共有する相手}から
+ \item \alert{途中の改ざんなしで送られたデータ}であること
+\end{itemize}
+が保証。
+\end{frame}
+
+\begin{frame}
+\frametitle{署名 (電子署名)}
+公開鍵・秘密鍵ペアをベースとした技術\footnote[frame]{\scriptsize ここでいう公開鍵・秘密鍵ペアは、暗号化に使うものと全く一緒の概念。}：
+\begin{block}{署名によるデータ真正性と送信者の確認}
+\begin{itemize}
+ \item 送信側は公開鍵・秘密鍵ペアを保有。
+ \item 送信側は、データと自分の秘密鍵から署名を生成。
+ \item 受信側は、受信データ、署名と公開鍵の間の一貫性をチェック。
+\end{itemize}
+\end{block}
+\begin{center}
+ \includegraphics[width=0.7\linewidth]{Figs/sig-flow01.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+署名の特徴:
+\begin{itemize}
+ \item データが改ざんされていたら、検証が失敗。
+ \item 意図する相手の秘密鍵\footnote[frame]{\scriptsize 自分が入手している公開鍵の対となる秘密鍵}で署名が作られていなければ、検証が失敗。
+ \item 検証に使う公開鍵は公開情報(当たり前)
+ \item \alert{MACと違って、秘密の情報(=鍵)を事前共有しなくて良い}
+\end{itemize}
+
+\begin{center}
+ $\Downarrow$
+\end{center}
+すなわち、署名技術は、\\
+\begin{itemize}
+ \item 意図する送信者から
+ \item 途中の改ざんなしで送られたデータなことを
+ \item \alert{事前の秘密情報の共有なし}で
+\end{itemize}
+保証する。
+\end{frame}
+
+\begin{frame}
+\frametitle{MACと署名のpros/cons}
+じゃあ署名だけでMACは不要では？…そういうわけにはいかない。
+\begin{table}
+\centering
+\begin{tabular}{|p{0.09\linewidth}||p{0.39\linewidth}|p{0.43\linewidth}|}
+\hline
+ & \textbf{Pros} & \textbf{Cons}\\
+\hline
+\hline
+\textbf{MAC}
+& ・一般的に\alert{高速}\footnote[frame]{\scriptsize AES (CMAC) とかHash (HMAC) とかを構成要素としているため。} & ・鍵の\structure{事前共有が必要} \\
+& ・生成するMACサイズは{小さい}\footnote[frame]{\scriptsize 通常128--512bits程度。} & \\
+\hline
+\textbf{署名}
+& ・鍵の\alert{事前共有が不要} & ・一般的に\structure{非常に遅い・重い}\\
+& & ・生成する署名サイズは一般的に\structure{大きい}\footnote[frame]{\scriptsize ECDSAは小さく、256--512bits程度。RSA系は非常に大きく2048bits以上が必要。} \\
+\hline
+\end{tabular}
+\end{table}
+
+$\Rightarrow$ AES/公開鍵暗号の関係と全く一緒で、使い所を考えて組み合わせて使う、もしくは場合に応じて使い分ける。
+
 \end{frame}
 
 
@@ -491,7 +634,14 @@ Hash生成のコードはこんな感じ。
 
 \begin{frame}
 \frametitle{Hash-based MAC (HMAC)}
-「鍵付きのハッシュ (Keyed Hash)」だと思えば良い。
+\begin{block}{HMAC}
+\begin{itemize}
+ \item 「鍵付きHash (Keyed Hash)」とも呼ばれる、Hash関数を利用したMAC生成方法。
+ \item RFC2104\footnote[frame]{\url{https://tools.ietf.org/html/rfc2104}}に規定。
+ \item HDKFなどのRFC標準技術や、AWS-Signature-v4等、各所で利用されている。
+\end{itemize}
+\end{block}
+\structure{「鍵」と「データ」を連結してHash関数に入れる}、と考えると特徴をイメージしやすい。
 \end{frame}
 
 \begin{frame}
@@ -539,6 +689,48 @@ RSAなら可能ならPSSを使おう！
 \frametitle{JavaScriptでECDSAを実行してみる}
 \end{frame}
 
+
+
+\begin{frame}
+ {\Large 運用Tips}
+\end{frame}
+
+\begin{frame}
+\frametitle{署名検証のブートストラップの問題}
+
+\alert{署名の検証用の公開鍵が正しいことはどうやって保証するの？}
+
+\vspace{2ex}
+
+$\Rightarrow$ Appに固定インストールか、Verisignあたりに署名してもらう必要…
+
+\vspace{2ex}
+
+$\Rightarrow$ PKIに頼って検証用の公開鍵の信頼性を担保するしか、現状は方法がない。
+
+\end{frame}
+
+\begin{frame}
+\frametitle{署名・MACの使い分け}
+処理の重さで使い分けると幸せになれる。
+
+\begin{itemize}
+ \item \alert{署名は手続きのイニシエーション}に使う
+ \item \structure{MACは、なんども繰り返すような本人確認}に使う
+\end{itemize}
+
+\vspace{2ex}
+
+例えば。。。
+
+\begin{enumerate}
+\item 署名を付与して、ECDH-ephemeralの公開鍵を交換。
+\item ECDH-ephemeral + AESでMACの鍵を共有。
+\item 以降の大規模データのやり取りはMACで本人確認を実施。
+\end{enumerate}
+
+など。
+\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
