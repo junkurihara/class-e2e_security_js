@@ -346,11 +346,9 @@ Ephemeral Schemeのイメージ
  \item \textcolor{gray}{AESを正しく・安全に暗号化するには？}
  \item \textcolor{gray}{公開鍵暗号はどうやって使う？その使い方のコツは？}
  \item \alert{ハッシュ・MAC・署名、それぞれの使い所と使い方は？} ← 今日はココ
- \item \textcolor{gray}{RFCにまつわるあれこれ（証明書・鍵フォーマット・etc...)}
+ \item \textcolor{gray}{RFCにまつわるあれこれ（証明書・鍵フォーマット・etc...未定。)}
 \end{enumerate}
 「こういうのを知りたい」というリクエストがあれば是非。
-
-マニアックすぎて最後のRFCの話題はやるかどうか未定。
 
 \vspace{2ex}
 
@@ -482,7 +480,7 @@ $\Rightarrow$ \alert{別のデータ同士で同じHashを得ることが困難}
  \item bit長は長いほど、衝突するデータが見つけづらい(=強固)
  \item ただし、bit長が長いほど、計算が重くなる
 \end{itemize}
- \item SHA-1/MD5は、基本的に互換性の担保のためだけに利用する。但し、Checksumとして使う分には問題ない。\alert{何が何でも使うな、というわけではない。}
+ \item SHA-1/MD5は、基本的に互換性の担保のためだけに利用する。但し、Checksumとして使う分には概ね問題ない。\alert{何が何でも使うな、というわけではない。}
 \end{itemize}
 \end{block}
 
@@ -525,7 +523,10 @@ Hash生成のコードはこんな感じ。
 \begin{center}
  \includegraphics[width=0.75\linewidth]{Figs/mac-sig-flow02.pdf}
 \end{center}
- MAC・署名の中身に突っ込む前に、それぞれのざっくりとした定義とpros/consを説明する。
+\end{frame}
+
+\begin{frame}
+MAC・署名の中身に突っ込む前に、それぞれのざっくりとした定義とpros/consを説明する。
 \end{frame}
 
 \begin{frame}
@@ -554,12 +555,12 @@ MACの特徴:
  \item \alert{鍵を共有する相手}から
  \item \alert{途中の改ざんなしで送られたデータ}であること
 \end{itemize}
-が保証。
+が保証される。
 \end{frame}
 
 \begin{frame}
 \frametitle{署名 (電子署名)}
-公開鍵・秘密鍵ペアをベースとした技術\footnote[frame]{\scriptsize ここでいう公開鍵・秘密鍵ペアは、暗号化に使うものと全く一緒の概念。}：
+公開鍵・秘密鍵ペアをベースとした技術\footnote[frame]{\scriptsize ここでいう公開鍵・秘密鍵ペアは、公開鍵暗号化に使うものと全く一緒の概念。}：
 \begin{block}{署名によるデータ真正性と送信者の確認}
 \begin{itemize}
  \item 送信側は公開鍵・秘密鍵ペアを保有。
@@ -568,16 +569,15 @@ MACの特徴:
 \end{itemize}
 \end{block}
 \begin{center}
- \includegraphics[width=0.7\linewidth]{Figs/sig-flow01.pdf}
+ \includegraphics[width=0.63\linewidth]{Figs/sig-flow01.pdf}
 \end{center}
 \end{frame}
 
 \begin{frame}
 署名の特徴:
 \begin{itemize}
- \item データが改ざんされていたら、検証が失敗。
+ \item データが改ざんされていたら、検証が失敗(falseが出力)。
  \item 意図する相手の秘密鍵\footnote[frame]{\scriptsize 自分が入手している公開鍵の対となる秘密鍵}で署名が作られていなければ、検証が失敗。
- \item 検証に使う公開鍵は公開情報(当たり前)
  \item \alert{MACと違って、秘密の情報(=鍵)を事前共有しなくて良い}
 \end{itemize}
 
@@ -590,7 +590,7 @@ MACの特徴:
  \item 途中の改ざんなしで送られたデータなことを
  \item \alert{事前の秘密情報の共有なし}で
 \end{itemize}
-保証する。
+保証する。\footnote[frame]{\scriptsize 検証用の公開鍵は、信頼できる手段で入手済み、あるいはプリインストールされていると仮定}
 \end{frame}
 
 \begin{frame}
@@ -598,7 +598,7 @@ MACの特徴:
 じゃあ署名だけでMACは不要では？…そういうわけにはいかない。
 \begin{table}
 \centering
-\begin{tabular}{|p{0.09\linewidth}||p{0.39\linewidth}|p{0.43\linewidth}|}
+\begin{tabular}{|p{0.07\linewidth}||p{0.39\linewidth}|p{0.43\linewidth}|}
 \hline
  & \textbf{Pros} & \textbf{Cons}\\
 \hline
@@ -609,7 +609,7 @@ MACの特徴:
 \hline
 \textbf{署名}
 & ・鍵の\alert{事前共有が不要} & ・一般的に\structure{非常に遅い・重い}\\
-& & ・生成する署名サイズは一般的に\structure{大きい}\footnote[frame]{\scriptsize ECDSAは小さく、256--512bits程度。RSA系は非常に大きく2048bits以上が必要。} \\
+& & ・生成する署名サイズは一般的に\structure{大きい}\footnote[frame]{\scriptsize ECDSAは小さく、256--512bits程度。RSA系は非常に大きく通常2048bits以上。} \\
 \hline
 \end{tabular}
 \end{table}
@@ -634,18 +634,50 @@ $\Rightarrow$ AES/公開鍵暗号の関係と全く一緒で、使い所を考�
 
 \begin{frame}
 \frametitle{Hash-based MAC (HMAC)}
-\begin{block}{HMAC}
+\begin{block}{\small HMAC (RFC2104)\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc2104}}}
 \begin{itemize}
- \item 「鍵付きHash (Keyed Hash)」とも呼ばれる、Hash関数を利用したMAC生成方法。
- \item RFC2104\footnote[frame]{\url{https://tools.ietf.org/html/rfc2104}}に規定。
- \item HDKFなどのRFC標準技術や、AWS-Signature-v4等、各所で利用されている。
+ \item 鍵付きHash\footnote[frame]{\scriptsize Keyed Hash}と呼ばれる、Hash関数ベースのMAC生成方法。
+ \item HDKF (RFC5869)などの標準技術や、AWS Signature v4\footnote[frame]{\scriptsize AWS S3にクライアントからREST API経由でアップロードする時に一時的に生成するMAC}等、各所で利用されている。
 \end{itemize}
 \end{block}
-\structure{「鍵」と「データ」を連結してHash関数に入れる}、と考えると特徴をイメージしやすい。
+\underline{「鍵」と「データ」をまとめてHash関数に入れる}、と考えると、
+\begin{itemize}
+ \item 鍵・データ両者が正しくないと、正しいHashも生成不能(=MAC検証失敗)。
+ \item MACから鍵・データの情報を逆算することはできない。
+\end{itemize}
+という特徴をイメージしやすい。
 \end{frame}
 
 \begin{frame}
 \frametitle{JavaScriptでHMACを実行してみる}
+\end{frame}
+
+\begin{frame}
+コードの中身はこんな感じ。
+\end{frame}
+
+\begin{frame}
+\frametitle{その他のMAC (JSじゃビミョー…)}
+\begin{block}{\small Cipher-based MAC (CMAC, NIST SP800-38B\footnote[frame]{\scriptsize https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38b.pdf})}
+\alert{共通鍵暗号(e.g., AES)のCBCモードをHash関数がわりに使用}してMACを計算する。
+「前のブロックの暗号文を使って次のブロックを暗号化する」という特徴を応用。
+\end{block}
+
+\begin{block}{\small GMAC (Galois MAC, NIST SP800-38D\footnote[frame]{\scriptsize https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf})}
+共通鍵暗号(e.g., AES)の Galois Counter Mode (GCM) で暗号化と同時に生成されるMAC。
+\alert{高速に計算できる代数演算\footnote[frame]{\scriptsize $\mathbb{F}[x]/(x^{128}\!+\!x^7\!+\!x^2\!+\!x\!+\!1) = \mathbb{F}_{2^{128}}$上の乗算}をHash関数がわりに使用}してMACを計算する。
+GMAC単独で利用可。
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+
+と、「標準技術」で「広く利用されている」MACアルゴリズムはあるが、\structure{JSのネイティブAPI\footnote[frame]{\scriptsize WebCrypto API, Node.js Crypto}でサポートされているMACは、現状HMACのみ…}
+
+\vspace{2ex}
+
+CMAC, GMACが使いたかったら自力実装 or npmjs.comで見つけて利用する。
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
