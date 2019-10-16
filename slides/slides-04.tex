@@ -630,10 +630,34 @@ $\Rightarrow$ AES/公開鍵暗号の関係と全く一緒で、使い所を考�
 
 \begin{frame}
 \frametitle{Message Authentication Code (MAC) 事始め}
+\begin{block}{\small MACを使った改ざん検知\&本人確認手続き}
+\small
+送信側、受信側で秘密の鍵(バイナリ列)を共有。
+\begin{enumerate}
+\item 送信側はデータと一緒に、データと鍵から生成したMACを送信。
+\item 受信側は、鍵と受信したデータから、受け取ったMACと同じものが作れるかどうかをチェック。
+\end{enumerate}
+\end{block}
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{Figs/mac-flow02.pdf}
+\end{center}
 \end{frame}
 
 \begin{frame}
-\frametitle{Hash-based MAC (HMAC)}
+MACを作る標準手法のバリエーション。 
+\begin{itemize} 
+ \item \alert{HMAC; Hash-based Message Authentication Code}
+ \item CMAC; Cipher-based Message Authentication Code
+ \item GMAC; Galois Message Authentication Code
+ \item etc.
+\end{itemize}
+今回は、JSで一番使いやすいと思われるHMACを取り上げる。
+\end{frame}
+
+
+\begin{frame}
+\frametitle{HMAC; Hash-based MAC}
 \begin{block}{\small HMAC (RFC2104)\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc2104}}}
 \begin{itemize}
  \item 鍵付きHash\footnote[frame]{\scriptsize Keyed Hash}と呼ばれる、Hash関数ベースのMAC生成方法。
@@ -658,12 +682,12 @@ $\Rightarrow$ AES/公開鍵暗号の関係と全く一緒で、使い所を考�
 
 \begin{frame}
 \frametitle{その他のMAC (JSじゃビミョー…)}
-\begin{block}{\small Cipher-based MAC (CMAC, NIST SP800-38B\footnote[frame]{\scriptsize https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38b.pdf})}
+\begin{block}{\small CMAC; Cipher-based MAC (NIST SP800-38B\footnote[frame]{\scriptsize https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38b.pdf})}
 \alert{共通鍵暗号(e.g., AES)のCBCモードをHash関数がわりに使用}してMACを計算する。
 「前のブロックの暗号文を使って次のブロックを暗号化する」という特徴を応用。
 \end{block}
 
-\begin{block}{\small GMAC (Galois MAC, NIST SP800-38D\footnote[frame]{\scriptsize https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf})}
+\begin{block}{\small GMAC; Galois MAC (NIST SP800-38D\footnote[frame]{\scriptsize https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf})}
 共通鍵暗号(e.g., AES)の Galois Counter Mode (GCM) で暗号化と同時に生成されるMAC。
 \alert{高速に計算できる代数演算\footnote[frame]{\scriptsize $\mathbb{F}[x]/(x^{128}\!+\!x^7\!+\!x^2\!+\!x\!+\!1) = \mathbb{F}_{2^{128}}$上の乗算}をHash関数がわりに使用}してMACを計算する。
 GMAC単独で利用可。
@@ -690,23 +714,95 @@ CMAC, GMACが使いたかったら自力実装 or npmjs.comで見つけて利用
 
 \begin{frame}
 \frametitle{署名 事始め}
-\end{frame}
 
-\begin{frame}
-\frametitle{署名とは？}
-
-データそのものに署名を施すのは厳しいので、「データの指紋」に対してハッシュを施そう。
-\end{frame}
-
-
-\begin{frame}
-\frametitle{RSA}
+\begin{block}{\small 署名 (電子署名) を使った改ざん検知\&本人確認手続き}
+受信側は、送信側の公開鍵を予めプリインストール。
 \begin{itemize}
- \item RSASSA PKCS1-v1.5
- \item RSASSA-PSS
+ \item 送信側の処理:
+\begin{enumerate}
+ \item データ$D$をHash関数で短縮\footnote[frame]{\scriptsize データ$D$そのものに直接署名を施すのは計算量的・データ量的に大変(e.g, 元データと同じかそれ以上の大きさの署名を作る羽目になる)なので、\alert{データの指紋(i.e., hash)に対して署名を施す}。}。
+$h = \mathit{Hash}(D)$
+ \item hash $h$に対して秘密鍵$\mathit{SK}$で署名を生成、データと合わせて受信側へ送付。$s = \mathit{Sign}(h, \mathit{SK})$
+\end{enumerate}
+ \item 受信側の処理:
+\begin{enumerate}
+ \item データ$D$をHash関数で短縮。
+$h = \mathit{Hash}(D)$
+ \item hash $h$と署名 $s$の一貫性を、公開鍵$\mathit{PK}$で検証。$\mathit{Verify}(h, s, \mathit{PK}) \in \{\mathsf{True}, \mathsf{False}\}$
+\end{enumerate}
 \end{itemize}
+\end{block}
+\end{frame}
 
-RSAなら可能ならPSSを使おう！
+\begin{frame}
+ざっくりフロー図。
+\begin{center}
+\includegraphics[width=0.9\linewidth]{Figs/sig-flow02.pdf}
+\end{center}
+このフローは、以下のように考えるとイメージがつきやすい\footnote[frame]{\scriptsize 但し、常に正しい表現ではないので注意。}
+\begin{enumerate}
+ \item 送信側は、hash $h$を\alert{秘密鍵で暗号化}して$s$を生成。
+ \item 受信側は、$s$を\structure{公開鍵で復号}して$h'$を入手。命題「$h' = \mathit{Hash}(D')$」が成立するか検証。
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+署名生成方式の標準方式のバリエーション。
+\begin{itemize}
+\item RSA暗号をベースとした手法:
+\begin{itemize}
+ \item RSASSA PSS
+ \item RSASSA PKCS\#1-v1.5
+\end{itemize}
+\item 楕円曲線暗号をベースとした手法:
+\begin{itemize}
+ \item ECDSA
+\end{itemize}
+\item etc.\footnote[frame]{\scriptsize Digital Signature Algorithm; DSA (FIPS PUB 186-4 \url{https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf})など}
+\end{itemize}
+JSで使いやすいRSASSA PSS \& PKSC\#1-v1.5とECDSAについて取り上げる。
+\end{frame}
+
+
+\begin{frame}
+\frametitle{RSASSA; RSA Signature Scheme with Appendix}
+\begin{block}{\scriptsize RSASSA PKCS\#1-v1.5と、RSASSA PSSの違い}
+暗号化と同様に、$h=\mathit{Hash}(D)$に対して署名を作る際、\underline{鍵長に合わせたパディングが必要}。そのパディングの方法が違う。
+\end{block}
+
+\alert{絵}
+
+\end{frame}
+
+\begin{frame}
+\alert{PKCS\#1 - v1.5の脆弱性について}
+
+  % Note: As noted in PKCS #1 v1.5, the EMSA-PKCS1-v1_5 encoding method
+  %  has the property that the encoded message, converted to an integer
+  %  message representative, is guaranteed to be large and at least
+  %  somewhat "random".  This prevents attacks of the kind proposed by
+  %  Desmedt and Odlyzko [CHOSEN] where multiplicative relationships
+  %  between message representatives are developed by factoring the
+  %  message representatives into a set of small values (e.g., a set of
+  %  small primes).  Coron, Naccache, and Stern [PADDING] showed that a
+  %  stronger form of this type of attack could be quite effective against
+  %  some instances of the ISO/IEC 9796-2 signature scheme.  They also
+  %  analyzed the complexity of this type of attack against the
+  %  EMSA-PKCS1-v1_5 encoding method and concluded that an attack would be
+  %  impractical, requiring more operations than a collision search on the
+  %  underlying hash function (i.e., more than 2^80 operations).
+  %  Coppersmith, Halevi, and Jutla [FORGERY] subsequently extended Coron
+  %  et al.'s attack to break the ISO/IEC 9796-1 signature scheme with
+  %  message recovery.  The various attacks illustrate the importance of
+  %  carefully constructing the input to the RSA signature primitive,
+  %  particularly in a signature scheme with message recovery.
+  %  Accordingly, the EMSA-PKCS-v1_5 encoding method explicitly includes a
+  %  hash operation and is not intended for signature schemes with message
+  %  recovery.  Moreover, while no attack is known against the
+  %  EMSA-PKCS-v1_5 encoding method, a gradual transition to EMSA-PSS is
+  %  recommended as a precaution against future developments.
+
+可能ならPSSを利用することが、RFCで推奨されている。\footnote[frame]{\scriptisize https://tools.ietf.org/html/rfc8017#section-8.2}
 \end{frame}
 
 \begin{frame}
