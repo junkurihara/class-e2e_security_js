@@ -664,6 +664,9 @@ MACを作る標準手法のバリエーション。
  \item HDKF (RFC5869)などの標準技術や、AWS Signature v4\footnote[frame]{\scriptsize AWS S3にクライアントからREST API経由でアップロードする時に一時的に生成するMAC}等、各所で利用されている。
 \end{itemize}
 \end{block}
+\end{frame}
+
+\begin{frame}
 \underline{「鍵」と「データ」をまとめてHash関数に入れる}、と考えると、
 \begin{itemize}
  \item 鍵・データ両者が正しくないと、正しいHashも生成不能(=MAC検証失敗)。
@@ -737,12 +740,14 @@ $h = \mathit{Hash}(D)$
 \begin{frame}
 ざっくりフロー図。
 \begin{center}
-\includegraphics[width=0.9\linewidth]{Figs/sig-flow02.pdf}
+\includegraphics[width=\linewidth]{Figs/sig-flow02.pdf}
 \end{center}
 このフローは、以下のように考えるとイメージがつきやすい\footnote[frame]{\scriptsize 但し、常に正しい表現ではないので注意。}
 \begin{enumerate}
  \item 送信側は、hash $h$を\alert{秘密鍵で暗号化}して$s$を生成。
- \item 受信側は、$s$を\structure{公開鍵で復号}して$h'$を入手。命題「$h' = \mathit{Hash}(D')$」が成立するか検証。
+ \item 受信側は、$s$を\structure{公開鍵で復号}して$h'$を入手。
+
+命題「$h' = \mathit{Hash}(D')$」が成立するか検証。
 \end{enumerate}
 \end{frame}
 
@@ -763,6 +768,25 @@ $h = \mathit{Hash}(D)$
 JSで使いやすいRSASSA PSS \& PKSC\#1-v1.5とECDSAについて取り上げる。
 \end{frame}
 
+\begin{frame}
+細かく説明する前に…
+
+
+\vspace{2ex}
+
+署名において一番やばいのは、「誰かが自分を騙って署名を作ることができる」などという状況。
+そのため、署名においても「公開鍵サイズの正しい選択」が重要。
+\begin{block}{\small 前回の復習}
+暗号化においてAES-128bitsと同程度の強度の公開鍵サイズは、
+\begin{itemize}
+\item RSA: $\geq$ 3072bits
+\item ECC: $\geq$ 256bits
+\end{itemize}
+程度。
+\end{block}
+\alert{署名についても暗号化に求めるものと同程度、あるいはそれ以上の鍵サイズを担保}して、公開鍵から秘密鍵を作られる(i.e., 自分を騙られる)ことを防ぐ。
+\end{frame}
+
 
 \begin{frame}
 \frametitle{RSASSA; RSA Signature Scheme with Appendix}
@@ -770,47 +794,105 @@ JSで使いやすいRSASSA PSS \& PKSC\#1-v1.5とECDSAについて取り上げ�
 暗号化と同様に、$h=\mathit{Hash}(D)$に対して署名を作る際、\underline{鍵長に合わせたパディングが必要}。そのパディングの方法が違う。
 \end{block}
 
-\alert{絵}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/sig-rsa-padding.pdf}
+\end{center}
 
 \end{frame}
 
 \begin{frame}
-\alert{PKCS\#1 - v1.5の脆弱性について}
-
-  % Note: As noted in PKCS #1 v1.5, the EMSA-PKCS1-v1_5 encoding method
-  %  has the property that the encoded message, converted to an integer
-  %  message representative, is guaranteed to be large and at least
-  %  somewhat "random".  This prevents attacks of the kind proposed by
-  %  Desmedt and Odlyzko [CHOSEN] where multiplicative relationships
-  %  between message representatives are developed by factoring the
-  %  message representatives into a set of small values (e.g., a set of
-  %  small primes).  Coron, Naccache, and Stern [PADDING] showed that a
-  %  stronger form of this type of attack could be quite effective against
-  %  some instances of the ISO/IEC 9796-2 signature scheme.  They also
-  %  analyzed the complexity of this type of attack against the
-  %  EMSA-PKCS1-v1_5 encoding method and concluded that an attack would be
-  %  impractical, requiring more operations than a collision search on the
-  %  underlying hash function (i.e., more than 2^80 operations).
-  %  Coppersmith, Halevi, and Jutla [FORGERY] subsequently extended Coron
-  %  et al.'s attack to break the ISO/IEC 9796-1 signature scheme with
-  %  message recovery.  The various attacks illustrate the importance of
-  %  carefully constructing the input to the RSA signature primitive,
-  %  particularly in a signature scheme with message recovery.
-  %  Accordingly, the EMSA-PKCS-v1_5 encoding method explicitly includes a
-  %  hash operation and is not intended for signature schemes with message
-  %  recovery.  Moreover, while no attack is known against the
-  %  EMSA-PKCS-v1_5 encoding method, a gradual transition to EMSA-PSS is
-  %  recommended as a precaution against future developments.
-
-可能ならPSSを利用することが、RFCで推奨されている。\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc8017}}
+ \begin{block}{\small RSASSA PKCS\#1-v1.5 (RFC8017\footnote[frame]{\scriptsize https://tools.ietf.org/html/rfc8017})}
+\begin{itemize}
+ \item \structure{RSAES PKCS\#1-v1.5の署名版。} PCKS\#1のv1.5で標準化。SSL/TLSを含め、現在でも広く使われている。
+ \item hash $h = \mathit{Hash}(D)$をDERエンコードしたデータ$T$に、公開鍵長まで以下のようなパディングを付与。
+\begin{align*}
+m = \mathtt{0x00 || 0x01 || RandomSequence || 0x00 ||} T
+\end{align*}
+ \item RSASSA PKCS\#1-v1.5は、\structure{hashではなく生の短いデータに対して署名を生成すると、署名からその元データを戻せちゃうという脆弱性}\footnote[frame]{\scriptsize Y. Desmedt et al., ``A Chosen Text Attack on the  RSA Cryptosystem and Some Discrete Logarithm Schemes,'' in \textit{Proc. CRYPTO 1985}, pp.516--522, 1985.、他。J. Coron (CRYPTO 1999)等。}が知られている。本人確認の意味なし。
+ \item PCKS\#1 v2.2 (RFC8017)では、「仕様通りにhash使っていればとりあえず問題ないが、今後何があるか分からないので\alert{RSASSA-PSSを使うほうが無難}」と記載。
+\end{itemize}
+\end{block}
 \end{frame}
+
+\begin{frame}
+\begin{block}{\small RSASSA-PSS (Probabilistic Signature Scheme, RFC8017\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc8017}})}
+\begin{itemize}
+ \item \structure{RSAES OAEPの署名版。} RFC3447/PKCS\#1 v2.1 (2003年) で標準化策定。
+ \item 署名対象となるデータ$D$のhash $h$を求める際、乱数成分(Salt)を加え、Padded data $m$を作っている。
+\begin{align*}
+h &= Hash(Hash(D), \texttt{RandomSalt}),\\
+m &= \texttt{MaskedDataBlock} || h || \texttt{0xBC},
+\end{align*}
+MaskedDataBlockはヘッダ。
+ \item RSASSA PKCS\#1-v1.5からの乗り換えが進みつつあるものの\alert{OAEP同様に未対応の暗号ライブラリも多い}。ただし、RFC標準的には、可能ならPSSを利用することを推奨。
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{PSSのイメージ図}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{Figs/pss.pdf}
+\end{center}
+元データ$D$に加え、padded data $m$があればSaltなどを逆計算可能。
+\end{frame}
+
 
 \begin{frame}
 \frametitle{JavaScriptでRSASSA-PSSを実行してみる}
+というわけで、RFC推奨となっているPSSを試してみよう。
 \end{frame}
 
 \begin{frame}
-\frametitle{ECDSA}
+コードの中身はこんな感じ。
+\end{frame}
+
+\begin{frame}
+RSASSA-PSSは、Node.js Crypto/WebCrypto共にネイティブサポートされている。（WebCryptoはブラウザ次第）
+
+しかし他の環境だと、\structure{OAEP同様、PSSに未対応なライブラリも多く注意が必要}。(最近までOpenSSLも未対応だった)
+\end{frame}
+
+\begin{frame}
+\frametitle{ECDSA; Elliptic Curve Digital Signature Algorithm}
+\begin{block}{\small ECDSA (NIST FIPS 186-4\footnote[frame]{\scriptsize \url{https://csrc.nist.gov/publications/detail/fips/186/4/final}})}
+\begin{itemize}
+ \item ECDHの署名版\footnote[frame]{\scriptsize 正しい表現ではないが、イメージでそう捉えて欲しい。}。NIST FIPS 186-3 (2009年) で標準化。\structure{Bitcoin blockchainにも使われていて、また注目度が上がった}。
+ \item RSASSAとは異なり、事前のpaddingに気を使う必要がない。アルゴリズム内部でhash $h$を生成・利用している。すなわち、
+\begin{align*}
+ \mathtt{Signature} &= \mathit{SignECDSA}(D, \mathit{SK}),\\
+ \{\mathtt{True}, \mathtt{False}\} & \ni \mathit{VerifyECDSA}(\mathtt{Signature}, D, \mathit{PK}),
+\end{align*}
+という直接のAPIがアルゴリズムレベルで提供される。\footnote[frame]{\scriptsize RSASSAも、普通のライブラリでは直接Sign/Verify可能なAPIが提供されるが、その実態はRSAのナイーブな署名生成・検証アルゴリズムのラッパー。}
+ \item OpenSSLをはじめ\alert{ほとんどの現代的な暗号ライブラリが実装をサポート}している。
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+RSASSAとECDSAの比較。(一般論。実装にもよる。)
+
+\begin{table}
+\centering
+\begin{tabular}{|p{0.13\linewidth}||p{0.35\linewidth}|p{0.35\linewidth}|}
+\hline
+ & \textbf{Pros} & \textbf{Cons}\\
+\hline
+\hline
+\textbf{RSASSA}
+& ・\alert{署名検証が高速}。ECDSAと比較してもかなり速い。
+& ・\structure{署名サイズが大きい}。公開鍵長に等しい(e.g., 3072bits)。\\
+& & ・\structure{署名生成がかなり低速}。\\
+\hline
+\textbf{ECDSA}
+& ・\alert{署名サイズが小さい}。 公開鍵長の倍(e.g., 512bits (256bits key))。
+& ・署名生成・検証共に同じくらい低速。\\
+\hline
+\end{tabular}
+\end{table}
+どっち使えばいいかは利用環境に応じて選択したほうがいい。常にECDSAを使えばいいとかそういうわけではない。
+
 \end{frame}
 
 \begin{frame}
@@ -820,44 +902,66 @@ JSで使いやすいRSASSA PSS \& PKSC\#1-v1.5とECDSAについて取り上げ�
 
 
 \begin{frame}
- {\Large 運用Tips}
+\centering
+{\Large MAC/署名の運用について}
 \end{frame}
 
 \begin{frame}
 \frametitle{署名検証のブートストラップの問題}
 
-\alert{署名の検証用の公開鍵が正しいことはどうやって保証するの？}
+Q: \alert{署名の検証用の公開鍵が正しいことはどうやって保証するの？}
 
 \vspace{2ex}
 
-$\Rightarrow$ Appに固定インストールか、Verisignあたりに署名してもらう必要…
+$\Rightarrow$ 現状ではこの問題に対して\structure{仮定なしでOKな万能の解は未知}。どこかに仮定、\underline{信頼するという起点}を置いた暫定解がある感じ。
 
-\vspace{2ex}
 
-$\Rightarrow$ PKIに頼って検証用の公開鍵の信頼性を担保するしか、現状は方法がない。
+\end{frame}
+
+\begin{frame}
+\begin{block}{暫定解1: Trust Anchor}
+Endごとに、\alert{検証用の公開鍵をアプリケーション・端末に固定で事前に埋め込んでおく}。そこだけは起点として無条件に信頼して使う。
+\end{block}
+
+※ SSHとかGitHubで行う「ホスト・サービスへの公開鍵の登録」、というのはこのTrust Anchorの登録になる。
+\end{frame}
+
+\begin{frame}
+ 
+\begin{block}{暫定解2: PKIに頼る}
+さらに\alert{Verisignとかに検証用の公開鍵に署名してもらって、公開鍵証明書を作る}。
+公開鍵証明書自身はオンラインで取得するが、その\structure{Verisignの署名の検証はTrust Anchor…}(Verisignを信頼の起点にする)。
+\end{block}
+
+解2は、Verisignの鍵1つをTrust Anchorにすればいいので鍵を埋め込むような手間がかからないが、\structure{お金がかかる}\footnote[frame]{\scriptsize 賛否あるだろうが、Let's encrypt (\url{https://letsencrypt.org/}) を使えば無償でいける。\structure{ただしLet's encryptは厳密な本人確認とかせずに署名つけてくれるので…}}。
+
 
 \end{frame}
 
 \begin{frame}
 \frametitle{署名・MACの使い分け}
-処理の重さで使い分けると幸せになれる。
+処理の重さで使い分けるのが鉄則。
 
 \begin{itemize}
- \item \alert{署名は手続きのイニシエーション}に使う
- \item \structure{MACは、なんども繰り返すような本人確認}に使う
+ \item 暗号化されたデータのやり取りの手続きで、\alert{署名はエンド間でのイニシエーション}に使う
+ \item \structure{MACはエンド間でなんども繰り返すような本人確認・データ整合性確認}に使う
 \end{itemize}
 
 \vspace{2ex}
 
-例えば。。。
-
+例えば:
 \begin{enumerate}
 \item 署名を付与して、ECDH-ephemeralの公開鍵を交換。
-\item ECDH-ephemeral + AESでMACの鍵を共有。
-\item 以降の大規模データのやり取りはMACで本人確認を実施。
+\item ECDH-ephemeral + AESでHMAC/AES暗号化の鍵を共有。
+\item 以降の大規模データのやり取りはAES復号と同時にHMACで本人確認を実施。
 \end{enumerate}
 
-など。
+\end{frame}
+\begin{frame}
+図にすると:
+\begin{center}
+\includegraphics[width=\linewidth]{Figs/key-exchange-flow01.pdf}
+\end{center}
 \end{frame}
 
 
@@ -873,25 +977,44 @@ $\Rightarrow$ PKIに頼って検証用の公開鍵の信頼性を担保するし
 お疲れ様でした。
 
 \begin{itemize}
-\item 
+\item データの真正性・本人確認のためのテクニックついて学んだ。
+\begin{itemize}
+ \item Hash: データの「指紋」。SHA-2以降のものを使おう。
+ \item MAC:
+\begin{itemize}
+ \item 共通鍵ベースの本人確認手法。動作が軽い。
+ \item JSだととりあえずHMACを使う。
+\end{itemize}
+ \item 署名:
+\begin{itemize}
+\item 公開鍵ベースの本人確認手法。MACと比べると動作がかなり重い。
+\item RSASSA: \alert{RSASSA-PSSがおすすめ}。
+\item ECDSA: 大体どの環境でも使える。
+\end{itemize}
+\end{itemize}
+\item 上記について、JavaScriptのコードを実行/中身を覗いてみた。
+\item 署名はエンド間のやり取りイニシエーション、MACはその後のデータのやり取りに使うと良い。
 \end{itemize}
 \end{frame}
 
 
 \begin{frame}
-\frametitle{次回は}
-% \begin{itemize}
-%  \item 内容: 
-% \begin{itemize}
-%  \item 暗号化に加えて、MAC・署名を使ってみよう（数学的なことはやらない）
-%  \item まずはハッシュ: SHA2, SHA3
-%  \item 共通鍵ベース: HMAC/CMAC
-%  \item 公開鍵ベース: RSA Signature/ECDSA
-% \end{itemize}
-%  \item 日時: 2019年10月31(?)日(木曜日) 19:00- (2週間後)
-%  \item 場所: ブロックチェーンハブ (ここ)
-%  \item 発表者: (また) 栗原
-% \end{itemize}
+\frametitle{今後の予定}
+色々と未説明な事柄について、付録資料を作ろうと思います。
+\begin{itemize}
+ \item RFCとは？NIST FIPS PUBって何。どこで何が決まってるの？
+ \item データフォーマット(鍵とか署名とか)はどうなっているの？PEM？DER？JWK？Webで使うにはどれがいい？
+ \item ECDH/ECDSAの楕円曲線の選択ってどうすればいいの？
+\end{itemize}
+とか。
+
+他に説明して欲しいこと等、リクエストを募集してます。
+
+
+\vspace{2ex}
+
+このセミナー自体はセカンドシーズンを行います(connpass登録予定)。途中聞き逃した回があれば是非どうぞ。
+
 \end{frame}
 
 
