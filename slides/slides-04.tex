@@ -490,12 +490,57 @@ X.509の公開鍵証明書などはまだSHA-1が利用されている場合が�
 \end{exampleblock}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{JavaScriptでデータのHashを生成してみる。}
+\begin{exampleblock}{}
+\scriptsize
+\begin{verbatim}
+% yarn execute gen-hash 'hello hash world!' // デフォルトのhash関数は'SHA-256'
+<Computed Hash>
+70c6b0c909b7a3b4932e6e6d27c6e3c8106b7b9487a4ab9fb27d698b0bee601d // 'SHA-256'で計算したhash
+=======
+
+% yarn execute gen-hash 'hello hash world!!' // 1文字増やす
+<Computed Hash>
+c1a548f16bc6cd013fb76f59c982c6dbc57d390d9a470e09b35d716c7716ab47 // 全く違うhash
+=======
+
+% yarn execute gen-hash 'hello hash world!' -h 'SHA3-256' // -hでhash関数指定
+<Computed Hash>
+cb352b3d82d5911b99774fcf534bfd024fc58ef58fb67db14f504931da9a333d
+=======
+\end{verbatim}
+\end{exampleblock}
+
+ちなみにbashだと、以下でSHA-256のhashをチェック可能。
+
+\begin{exampleblock}{}
+\scriptsize
+\begin{verbatim}
+% echo -n 'hello hash world!' | shasum -a 256   
+70c6b0c909b7a3b4932e6e6d27c6e3c8106b7b9487a4ab9fb27d698b0bee601d  -
+\end{verbatim}
+\end{exampleblock}
+
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 Hash生成のコードはこんな感じ。
+
+今回も手前味噌で恐縮だが\texttt{jscu}\footnote[frame]{https://github.com/junkurihara/jscu}を利用している。
+
+\begin{block}{\small hash生成(src/test-apis.js)}
+\scriptsize
+\begin{verbatim}
+// hashName = 'SHA-256', 'SHA-384', 'SHA-512', 'SHA-1', 'SHA3-256', etc...
+
+const jscu = getJscu(); // jscuオブジェクト取得
+const binary = jseu.encoder.stringToArrayBuffer(data); // stringをuint8arrayに
+
+return jscu.hash.compute(binary, hashName); // hash値のpromiseを返す
+\end{verbatim}
+\end{block}
+Node.js, ブラウザ共に全く同じコードで動作。SHA3もサポート。
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{本人確認の技術}

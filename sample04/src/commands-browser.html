@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>E2E Encryption Test</title>
+  <script src="../node_modules/@babel/polyfill/browser.js"></script>
+  <script src="../node_modules/js-crypto-utils/dist/jscu.bundle.min.js"></script>
+  <script src="../dist/e2eTest.bundle.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  const toBeHashed = 'hello hash world';
+  const hashName = 'SHA-256';
+  const genHash = async () => {
+    console.log(`Compute hash value\n=======\n`);
+    console.log(`<Input Data>\n${toBeHashed}`);
+
+    // generate Hash
+    const hashed = await e2eTest.genHash(toBeHashed, hashName);
+    console.log(`<Computed Hash (HEX)>\n${e2eTest.util.arrayBufferToHexString(hashed)}\n=======\n`);
+  };
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  genHash()
+    .then( (r) => r);
+</script>
+</body>
+</html>
