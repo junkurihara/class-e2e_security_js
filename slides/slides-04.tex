@@ -696,6 +696,7 @@ MACを作る標準手法のバリエーション。
 GMAC単独で利用可。
 \end{block}
 
+※CMAC/GMAC共々暗号化と同時に計算されることが多く、単独で利用するケースはあまり見かけない。
 \end{frame}
 
 \begin{frame}
@@ -723,14 +724,15 @@ CMAC, GMACが使いたかったら自力実装 or npmjs.comで見つけて利用
 \begin{itemize}
  \item 送信側の処理:
 \begin{enumerate}
- \item データ$D$をHash関数で短縮\footnote[frame]{\scriptsize データ$D$そのものに直接署名を施すのは計算量的・データ量的に大変(e.g, 元データと同じかそれ以上の大きさの署名を作る羽目になる)なので、\alert{データの指紋(i.e., hash)に対して署名を施す}。}。
-$h = \mathit{Hash}(D)$
- \item hash $h$に対して秘密鍵$\mathit{SK}$で署名を生成、データと合わせて受信側へ送付。$s = \mathit{Sign}(h, \mathit{SK})$
+ \item データ$D$をHash関数で短縮\footnote[frame]{\scriptsize データ$D$そのものに直接署名を施すのは計算量的・データ量的に大変(e.g, 元データと同じかそれ以上の大きさの署名を作る羽目になる)なので、\alert{データの指紋(i.e., hash)に対して署名を施す}。}、hash
+$h = \mathit{Hash}(D)$を導出。
+ \item hash $h$に対して秘密鍵$\mathit{SK}$で署名$s = \mathit{Sign}(h, \mathit{SK})$を生成。
+
+データ$D$と署名$s$とを一緒に受信側へ送付。
 \end{enumerate}
  \item 受信側の処理:
 \begin{enumerate}
- \item データ$D$をHash関数で短縮。
-$h = \mathit{Hash}(D)$
+ \item データ$D$のhash $h = \mathit{Hash}(D)$を導出。
  \item hash $h$と署名 $s$の一貫性を、公開鍵$\mathit{PK}$で検証。$\mathit{Verify}(h, s, \mathit{PK}) \in \{\mathsf{True}, \mathsf{False}\}$
 \end{enumerate}
 \end{itemize}
@@ -818,7 +820,7 @@ m = \mathtt{0x00 || 0x01 || RandomSequence || 0x00 ||} T
 \begin{block}{\small RSASSA-PSS (Probabilistic Signature Scheme, RFC8017\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc8017}})}
 \begin{itemize}
  \item \structure{RSAES OAEPの署名版。} RFC3447/PKCS\#1 v2.1 (2003年) で標準化策定。
- \item 署名対象となるデータ$D$のhash $h$を求める際、乱数成分(Salt)を加え、Padded data $m$を作っている。
+ \item 署名対象データ$D$に対して、乱数成分(RandomSalt)を加えつつHash関数を2重掛けし、Padded data $m$を作っている。
 \begin{align*}
 h &= Hash(Hash(D), \texttt{RandomSalt}),\\
 m &= \texttt{MaskedDataBlock} || h || \texttt{0xBC},
