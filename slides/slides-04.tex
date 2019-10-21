@@ -720,12 +720,97 @@ MACを作る標準手法のバリエーション。
 という特徴をイメージしやすい。
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{JavaScriptでHMACを実行してみる}
+\begin{exampleblock}{}
+\scriptsize
+\begin{verbatim}
+// HMAC用のHex鍵を生成。鍵長は使うhashのサイズと等しい。
+% yarn execute gen-hex-key 32 
+
+<Generated Hex Key>
+6c9a34e979fc7701330ec75a1bc6acb589ebaf831c7941e042c9ded0b2741d8f
+=======
+
+// HMACを生成。デフォルトはSHA-256で実行。-hで変更可。
+% yarn execute gen-hmac 'hello hmac world!'\
+-k '6c9a34e979fc7701330ec75a1bc6acb589ebaf831c7941e042c9ded0b2741d8f' // Hex鍵
+
+<Computed HMAC with SHA-256>
+862e28454f635541ce194d3e4919327c9823830cb7174286aaced5fc61e96a46
+=======
+
+// HMACを検証
+% yarn execute verify-hmac 'hello hmac world!'\
+-k '6c9a34e979fc7701330ec75a1bc6acb589ebaf831c7941e042c9ded0b2741d8f'\ // Hex鍵
+-m '862e28454f635541ce194d3e4919327c9823830cb7174286aaced5fc61e96a46' // Hex HMAC
+
+<Verification result of given HMAC>
+true
+=======
+\end{verbatim}
+\end{exampleblock}
 \end{frame}
 
-\begin{frame}
+
+\begin{frame}[fragile]
+\begin{exampleblock}{}
+\scriptsize
+\begin{verbatim}
+// データが書き換わると検証が失敗
+% yarn execute verify-hmac 'hello hmac world!?'\ // ?を追加
+-k '6c9a34e979fc7701330ec75a1bc6acb589ebaf831c7941e042c9ded0b2741d8f'\
+-m '862e28454f635541ce194d3e4919327c9823830cb7174286aaced5fc61e96a46'
+
+<Verification result of given HMAC>
+false
+=======
+
+// HMACが書き換わっても検証が失敗。
+% yarn execute verify-hmac 'hello hmac world!'\
+-k '6c9a34e979fc7701330ec75a1bc6acb589ebaf831c7941e042c9ded0b2741d8f'\
+-m '862e28454f635541ce194d3e4919327c9823830cb7174286aaced5fc61e96a47' //最後を書換
+
+<Verification result of given HMAC>
+false
+=======
+\end{verbatim}
+\end{exampleblock}
+もちろん鍵が書き換わっても検証が失敗する。
+\end{frame}
+
+\begin{frame}[fragile]
 コードの中身はこんな感じ。
+\begin{block}{\small HMAC生成 (src/test-apis.js)}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu();
+
+// hex stringやstringをuint8arrayに。
+const binaryData = jseu.encoder.stringToArrayBuffer(data);
+const binaryKey = jseu.encoder.hexStringToArrayBuffer(key);
+
+// Promsieを返す。hash = 'SHA-256', etc...
+return jscu.hmac.compute(binaryKey, binaryData, hash);
+\end{verbatim}
+\end{block}
+
+\begin{block}{\small HMAC検証 (src/test-apis.js)}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu();
+
+// hex stringやstringをuint8arrayに。
+const binaryData = jseu.encoder.stringToArrayBuffer(data);
+const binaryKey = jseu.encoder.hexStringToArrayBuffer(key);
+const binaryMac = jseu.encoder.hexStringToArrayBuffer(mac);
+
+// Promiseを返す。hash = 'SHA-256', etc...
+return jscu.hmac.verify(binaryKey, binaryData, binaryMac, hash);
+\end{verbatim}
+\end{block}
+
+検証は、「受信側でもMACを生成→チェック」でもOK。
 \end{frame}
 
 \begin{frame}
@@ -886,13 +971,90 @@ MaskedDataBlockはヘッダ。
 \end{frame}
 
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{JavaScriptでRSASSA-PSSを実行してみる}
-というわけで、RFC推奨となっているPSSを試してみよう。
+では、RFC推奨となっているPSSを試す。(コピペ頑張って)
+\begin{exampleblock}{}
+\scriptsize
+\begin{verbatim}
+% yarn execute gen-rsa-key // RSA鍵ペアの生成。-bでビット数指定。
+<Generated RSA Public Key>
+30820122300d06092a864886f70d01010105000... // 公開鍵
+<Generated RSA Private Key>
+308204be020100300d06092a864886f70d01010... // 秘密鍵
+=======
+
+% yarn execute sign-rsa-pss 'hello rsa-pss world!'\ // RSASSA-PSS署名生成
+-s '308204be020100300d06092a864886f70d0...' // 秘密鍵
+<Generated RSASSA-PSS Signature>
+6e7c4632f62e354f0ac40f65c92cd3e5bec5f6f... // 生成された署名
+=======
+
+% yarn execute verify-rsa-pss 'hello rsa-pss world!'\ // RSASSA-PSS署名検証
+-p '30820122300d06092a864886f70d0101010...'\ // 公開鍵
+-t '6e7c4632f62e354f0ac40f65c92cd3e5bec...' // 受け取った署名
+<Verification Result of RSASSA-PSS Signature>
+true // 署名検証結果
+=======
+\end{verbatim}
+\end{exampleblock}
+使うhash関数は-hオプションで切り替えられる。
+
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 コードの中身はこんな感じ。
+
+鍵生成は前回と一緒なので省略。
+
+
+\begin{block}{\small 署名生成(src/test-apis.js)}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu();
+
+// uint8arrayへ変換
+const binaryData = jseu.encoder.stringToArrayBuffer(data);
+const privateKeyDer = jseu.encoder.hexStringToArrayBuffer(privateKeyHex);
+
+const privateKey = new jscu.Key('der', privateKeyDer); // DERを読込
+
+// hash = 'SHA-256', saltLength = 32
+return jscu.pkc.sign(
+  binaryData,
+  privateKey,
+  hash, // データを縮めるためのhash関数名
+  {name: 'RSA-PSS', saltLength}
+);
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+
+\begin{block}{\small 署名検証(src/test-apis.js)}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu();
+
+// uint8arrayへ変換
+const binaryData = jseu.encoder.stringToArrayBuffer(data);
+const publicKeyDer = jseu.encoder.hexStringToArrayBuffer(publicKeyHex);
+const signature = jseu.encoder.hexStringToArrayBuffer(signatureHex);
+
+const publicKey = new jscu.Key('der', publicKeyDer);　// DER鍵を読込
+
+// hash = 'SHA-256', saltLength = 32
+jscu.pkc.verify(
+  binaryData,
+  signature,
+  publicKey,
+  hash, // データを縮めるためのhash関数名
+  {name: 'RSA-PSS', saltLength}
+); 
+\end{verbatim}
+\end{block}
+
 \end{frame}
 
 \begin{frame}
@@ -942,11 +1104,19 @@ RSASSAとECDSAの比較。(一般論。実装にもよる。)
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{JavaScriptでECDSAを実行してみる}
 \end{frame}
 
+\begin{frame}[fragile]
+コードの中身はこんな感じ。
 
+鍵生成は前回と一緒なので省略。
+\end{frame}
+
+\begin{frame}
+ECDSAは、Node.js Crypto/WebCrypto共に（大体）ネイティブサポートされている。パラメータによっては実装されていない可能性があるので注意。\footnote[frame]{\scriptsize JavaScriptでは曲線'P-256K'がネイティブではサポートされていないので、Bitcoin blockchainのECDSAは動作しない。jscuではpure jsで補っている。}
+\end{frame}
 
 \begin{frame}
 \centering

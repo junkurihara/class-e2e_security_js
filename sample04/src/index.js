@@ -1,8 +1,8 @@
 /**
  * index.js
  */
-import {genHash} from './test-apis';
+import {genHash, genHmac, verifyHmac, genRsaKey} from './test-apis';
 import * as util from './util/format';
 
-export {util, genHash};
-export default {util, genHash};
+export {util, genHash, genHmac, verifyHmac, genRsaKey};
+export default {util, genHash, genHmac, verifyHmac, genRsaKey};

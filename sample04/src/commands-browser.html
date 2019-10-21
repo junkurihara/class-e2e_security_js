@@ -22,7 +22,25 @@
   };
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  const toBeHMACed = 'hello hmac world';
+  const hashNameHMAC = 'SHA-256';
+  const checkHMAC = async () => {
+    console.log(`Compute HMAC value\n=======\n`);
+    console.log(`<Input Data>\n${toBeHMACed}`);
+    const key = e2eTest.util.arrayBufferToHexString(jscu.random.getRandomBytes(32));
+    console.log(`<Generated Hex Key>\n${key}`);
+
+    const hmac = e2eTest.util.arrayBufferToHexString(await e2eTest.genHmac(toBeHMACed, key, hashNameHMAC));
+    console.log(`<Generated HMAC>\n${hmac}`);
+
+    const verify = await e2eTest.verifyHmac(toBeHMACed, key, hmac, hashNameHMAC);
+    console.log(`<HMAC Verification Result>\n${verify}\n=======\n`);
+  };
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   genHash()
+    .then( () => {
+      return checkHMAC();
+    })
     .then( (r) => r);
 </script>
 </body>
