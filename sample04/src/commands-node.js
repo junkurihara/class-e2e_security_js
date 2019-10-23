@@ -1,6 +1,16 @@
 #!/usr/bin/env node
 
-import {genHash, genHmac, genRsaKey, verifyHmac, signRsaPss, verifyRsaPss} from './test-apis';
+import {
+  genHash,
+  genHmac,
+  verifyHmac,
+  genRsaKey,
+  signRsaPss,
+  verifyRsaPss,
+  genEccKey,
+  signEcdsa,
+  verifyEcdsa
+} from './test-apis';
 import pgm from 'commander';
 import jseu from 'js-encoding-utils';
 import {getJscu} from './util/env';
@@ -83,6 +93,37 @@ pgm
     console.log(`<Verification Result of RSASSA-PSS Signature>\n${result}\n=======\n`);
   });
 
+pgm
+  .command('gen-ecc-key', '')
+  .description('Generate ECC key pair')
+  .option('-c, --curve <curve>', 'Curve name like \'P-256\'', 'P-256')
+  .action( async (options) => {
+    // verify
+    const result = await genEccKey(options.curve);
+    console.log(`<Generated ECC Public Key>\n${result.publicKey}\n`);
+    console.log(`<Generated ECC Private Key>\n${result.privateKey}\n=======\n`);
+  });
+
+pgm
+  .command('sign-ecdsa <data>', '')
+  .description('Sign with ECDSA')
+  .option('-h, --hash <hash>', 'Name of hash function like \'SHA-256\'', 'SHA-256')
+  .option('-s, --privateKey <privateKey>', 'Private key in Hex')
+  .action( async (data, options) => {
+    const sig = await signEcdsa(data, options.privateKey, options.hash);
+    console.log(`<Generated ECDSA Signature>\n${jseu.encoder.arrayBufferToHexString(sig)}\n=======\n`);
+  });
+
+pgm
+  .command('verify-ecdsa <data>', '')
+  .description('Verify with ECDSA')
+  .option('-h, --hash <hash>', 'Name of hash function like \'SHA-256\'', 'SHA-256')
+  .option('-t, --signature <signature>', 'Signature in Hex')
+  .option('-p, --publicKey <publicKey>', 'Public key in Hex')
+  .action( async (data, options) => {
+    const result = await verifyEcdsa(data, options.signature, options.publicKey, options.hash);
+    console.log(`<Verification Result of ECDSA Signature>\n${result}\n=======\n`);
+  });
 
 
 pgm.parse(process.argv);

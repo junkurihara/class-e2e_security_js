@@ -985,14 +985,14 @@ MaskedDataBlockはヘッダ。
 =======
 
 % yarn execute sign-rsa-pss 'hello rsa-pss world!'\ // RSASSA-PSS署名生成
--s '308204be020100300d06092a864886f70d0...' // 秘密鍵
+  -s '308204be020100300d06092a864886f70d0...' // 秘密鍵
 <Generated RSASSA-PSS Signature>
 6e7c4632f62e354f0ac40f65c92cd3e5bec5f6f... // 生成された署名
 =======
 
 % yarn execute verify-rsa-pss 'hello rsa-pss world!'\ // RSASSA-PSS署名検証
--p '30820122300d06092a864886f70d0101010...'\ // 公開鍵
--t '6e7c4632f62e354f0ac40f65c92cd3e5bec...' // 受け取った署名
+  -p '30820122300d06092a864886f70d0101010...'\ // 公開鍵
+  -t '6e7c4632f62e354f0ac40f65c92cd3e5bec...' // 受け取った署名
 <Verification Result of RSASSA-PSS Signature>
 true // 署名検証結果
 =======
@@ -1106,16 +1106,91 @@ RSASSAとECDSAの比較。(一般論。実装にもよる。)
 
 \begin{frame}[fragile]
 \frametitle{JavaScriptでECDSAを実行してみる}
+\begin{exampleblock}{}
+\scriptsize
+\begin{verbatim}
+% yarn execute gen-ecc-key // ECC鍵ペアの生成。-cで楕円曲線パラメタ設定。
+<Generated ECC Public Key>
+3059301306072a8648ce3d020106082a8648ce3d03010703... // 公開鍵
+
+<Generated ECC Private Key>
+308193020100301306072a8648ce3d020106082a8648ce3d... // 秘密鍵
+=======
+
+% yarn execute sign-ecdsa 'hello ecdsa world!'\ // ECDSA署名生成
+  -s '308193020100301306072a8648ce3d020106082a8648c...' // 秘密鍵
+
+<Generated ECDSA Signature>
+58e5d15be4e71f7e6fbd4662cdb31eca463ed855114ef8357bed9.... // 生成された署名
+=======
+
+% yarn execute verify-ecdsa 'hello ecdsa world!'\
+  -p '3059301306072a8648ce3d020106082a8648ce3d03010...'\ // 公開鍵
+  -t '58e5d15be4e71f7e6fbd4662cdb31eca463ed855114ef...' // 受け取った署名
+<Verification Result of ECDSA Signature>
+true // 署名検証結果
+=======
+\end{verbatim}
+\end{exampleblock}
+使うhash関数は-hオプションで切り替えられる。
 \end{frame}
 
 \begin{frame}[fragile]
 コードの中身はこんな感じ。
 
 鍵生成は前回と一緒なので省略。
+
+\begin{block}{\small 署名生成(src/test-apis.js)}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu();
+
+// uint8arrayへ変換
+const binaryData = jseu.encoder.stringToArrayBuffer(data);
+const privateKeyDer = jseu.encoder.hexStringToArrayBuffer(privateKeyHex);
+
+const privateKey = new jscu.Key('der', privateKeyDer); // DERを読込
+
+// hash = 'SHA-256'
+return jscu.pkc.sign(
+  binaryData,
+  privateKey,
+  hash, // データを縮めるためのhash関数名
+);
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+
+\begin{block}{\small 署名検証(src/test-apis.js)}
+\scriptsize
+\begin{verbatim}
+const jscu = getJscu();
+
+// uint8arrayへ変換
+const binaryData = jseu.encoder.stringToArrayBuffer(data);
+const publicKeyDer = jseu.encoder.hexStringToArrayBuffer(publicKeyHex);
+const signature = jseu.encoder.hexStringToArrayBuffer(signatureHex);
+
+const publicKey = new jscu.Key('der', publicKeyDer);　// DER鍵を読込
+
+// hash = 'SHA-256'
+jscu.pkc.verify(
+  binaryData,
+  signature,
+  publicKey,
+  hash // データを縮めるためのhash関数名
+); 
+\end{verbatim}
+\end{block}
+RSASSA-PSSと異なり、Saltが不要になり、\alert{APIがよりシンプル！}
 \end{frame}
 
 \begin{frame}
-ECDSAは、Node.js Crypto/WebCrypto共に（大体）ネイティブサポートされている。パラメータによっては実装されていない可能性があるので注意。\footnote[frame]{\scriptsize JavaScriptでは曲線'P-256K'がネイティブではサポートされていないので、Bitcoin blockchainのECDSAは動作しない。jscuではpure jsで補っている。}
+ECDSAは、Node.js Crypto/WebCrypto共に（大体）ネイティブサポートされている。
+
+\alert{ただし、パラメータによっては実装されていない可能性がある}ので注意。ブラウザ差異だけではなく、仕様にない可能性も。\footnote[frame]{\scriptsize JavaScriptでは曲線'P-256K'がネイティブではサポートされていないので、Bitcoin blockchainのECDSAは動作しない。jscuではpure jsで補っている。}
 \end{frame}
 
 \begin{frame}
