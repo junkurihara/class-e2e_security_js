@@ -236,7 +236,7 @@
 %%% 著者など
 %%%
 \title[E2E Security with JS Appendix]{JavaScriptによるEnd-to-Endセキュリティ}
-\subtitle{付録 RFCとか鍵フォーマットとか}
+\subtitle{付録: RFCとか鍵フォーマットとか}
 \author[Jun Kurihara]{栗原 淳}
 \institute[]{}
 \date[Oct. 31, 2019]{2019年10月31日}
@@ -261,11 +261,44 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{PKCS (Public Key Cryptography Specification)とは}
+\frametitle{はじめに}
+この資料は、「JavaScriptによるEnd-to-Endセキュリティ」の補足資料である。
+
+標準規格や鍵フォーマットなどについて解説を与えている。
+
+また、鍵フォーマットなどは、JavaScriptでハンドリングするためのサンプルコードも記述している。
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{標準規格}
+\begin{frame}
+\centering
+ {\Large 暗号周りの標準規格}
+\end{frame}
+
+\begin{frame}
+\frametitle{PKCS (Public Key Cryptography Standards)}
+\end{frame}
+
+\begin{frame}
+\frametitle{NIST FIPS PUB}
 \end{frame}
 
 \begin{frame}
 \frametitle{RFC (Request for Comments)とは}
+\end{frame}
+
+\begin{frame}
+\frametitle{その他}
+\begin{block}{\small CRYPTOREC, NESSIE, ISO...}
+基本的には、「アルゴリズム」「プロトコル」のどれを標準として採用します、という\alert{「推奨技術リスト」}。
+\end{block}
+
+「ここで採用されたアルゴリズム・プロトコルを使ってるから安全です」と言える以上の意味はない。
+
+\alert{仕様の詳細はPKCS, RFC, NIST FIPS PUBを参考にする。}
+
+
 \end{frame}
 
 \begin{frame}
