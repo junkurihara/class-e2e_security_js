@@ -340,19 +340,14 @@ Ephemeral Schemeのイメージ
 \end{frame}
 
 \begin{frame}
-今後の予定(暫定)
+今回の位置付け:
 \begin{enumerate}
  \item \textcolor{gray}{導入\&JSの暗号化コードを触ってみる}
  \item \textcolor{gray}{AESを正しく・安全に暗号化するには？}
  \item \textcolor{gray}{公開鍵暗号はどうやって使う？その使い方のコツは？}
  \item \alert{ハッシュ・MAC・署名、それぞれの使い所と使い方は？} ← 今日はココ
- \item \textcolor{gray}{RFCにまつわるあれこれ（証明書・鍵フォーマット・etc...未定。)}
 \end{enumerate}
-「こういうのを知りたい」というリクエストがあれば是非。
 
-\vspace{2ex}
-
-\underline{セカンドシーズンも検討中。}\footnote[frame]{場所等変えてもっと来やすい場所へ。。。}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1279,8 +1274,8 @@ Endごとに、\alert{検証用の公開鍵をアプリケーション・端末�
 \end{itemize}
  \item 署名:
 \begin{itemize}
-\item 公開鍵ベースの本人確認手法。MACと比べると動作がかなり重い。
-\item RSASSA: \alert{RSASSA-PSSがおすすめ}。
+\item 公開鍵ベースの本人確認手法。MACと比べると動作が重い。
+\item RSASSA: 使うなら\alert{RSASSA-PSSがおすすめ}。
 \item ECDSA: 大体どの環境でも使える。
 \end{itemize}
 \end{itemize}
@@ -1292,20 +1287,18 @@ Endごとに、\alert{検証用の公開鍵をアプリケーション・端末�
 
 \begin{frame}
 \frametitle{今後の予定}
-色々と未説明な事柄について、付録資料を作ろうと思います。
+\small
+特に第3回、4回の内容について色々と未説明な事柄があるため、付録資料を作成中。\footnote[frame]{公開 or 送付予定。}
 \begin{itemize}
- \item RFCとは？NIST FIPS PUBって何。どこで何が決まってるの？
+ \item RFCとは。NIST FIPS PUBって何。どこで何が決まってるの？
  \item データフォーマット(鍵とか署名とか)はどうなっているの？PEM？DER？JWK？Webで使うにはどれがいい？
  \item ECDH/ECDSAの楕円曲線の選択ってどうすればいいの？
 \end{itemize}
 とか。
 
-他に説明して欲しいこと等、リクエストを募集してます。
-
-
 \vspace{2ex}
 
-このセミナー自体はセカンドシーズンを行います(connpass登録予定)。途中聞き逃した回があれば是非どうぞ。
+\alert{この勉強会はセカンドシーズンを実施(connpass登録済)}。途中聞き逃した回があれば是非どうぞ。
 
 \end{frame}
 
@@ -1321,38 +1314,6 @@ Endごとに、\alert{検証用の公開鍵をアプリケーション・端末�
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % \backupbegin
-
-% \begin{frame}
-%  以下バックアップ
-% \end{frame}
-% \begin{frame}
-% 直接Concat KDFを暗号化の鍵にするか、
-% あるいはConcat KDFの結果をAESKWの鍵としてContent Encryption Keyを暗号化するのに使う。
-
-% \end{frame}
-
-% \begin{frame}
-% \frametitle{ECDH Ephemeral (ECDHE)}
-% \begin{center}
-% \includegraphics[width=\linewidth]{Figs/ecdh01.pdf}
-% \end{center}
-% \end{frame}
-
-% \begin{frame}
-% \begin{center}
-% \includegraphics[width=\linewidth]{Figs/ecdh02.pdf}
-% \end{center}
-% \end{frame}
-
-
-% \begin{frame}
-% \begin{center}
-% \includegraphics[width=\linewidth]{Figs/aeskw.pdf}
-% \end{center}
-% \end{frame}
-
-
-
 
 % \section{Backup}
 
