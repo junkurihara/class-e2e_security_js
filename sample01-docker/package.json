@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/zettant/e2e-security-class-docker#readme",
   "dependencies": {
-    "json-server": "^0.15.0"
+    "json-server": "0.15.1"
   }
 }
