@@ -43,7 +43,6 @@
   %\usetheme{Singapore}
   %\usetheme{Szeged}
   %\usetheme{Warsaw}
-
 % 省略可
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% COLOR THEME
   %\usecolortheme{albatross}
@@ -238,7 +237,7 @@
 \subtitle{第3回 公開鍵暗号はどうやって使えばいいのか？ 編}
 \author[Jun Kurihara]{栗原 淳}
 \institute[]{}
-\date[Oct. 17, 2019]{2019年10月17日}
+\date[]{}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -320,7 +319,6 @@ $\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。現
 「イメージ」と「コードの流れ＆その流れの必要性」をつかめるようにする。
 \end{frame}
 
-\input{./frame-kurihara.tex}
 
 \begin{frame}
 \frametitle{この講義の対象と事前準備}
@@ -347,13 +345,9 @@ $\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。現
  \item \textcolor{gray}{AESを正しく・安全に暗号化するには？}
  \item \alert{公開鍵暗号はどうやって使う？その使い方のコツは？} ← 今日はココ
  \item ハッシュ・MAC・署名、それぞれの使い所と使い方は？
- \item \textcolor{gray}{RFCにまつわるあれこれ（証明書・鍵フォーマット・etc...)}
 \end{enumerate}
 「こういうのを知りたい」というリクエストがあれば是非。
 
-\vspace{2ex}
-
-\underline{セカンドシーズンも検討中。}\footnote[frame]{場所等変えてもっと来やすい場所へ。。。}
 \end{frame}
 
 
@@ -1170,31 +1164,15 @@ $\Rightarrow$ 「今使った」共有ビット列や秘密鍵が盗まれても
 
 \begin{frame}
 \frametitle{次回は}
-\begin{itemize}
- \item 内容: 
+内容: 
 \begin{itemize}
  \item 暗号化に加えて、MAC・署名を使ってみよう（数学的なことはやらない）
  \item まずはハッシュ: SHA2, SHA3
  \item 共通鍵ベース: HMAC/CMAC
  \item 公開鍵ベース: RSA Signature/ECDSA
 \end{itemize}
- \item 日時: 2019年10月31(?)日(木曜日) 19:00- (2週間後)
- \item 場所: ブロックチェーンハブ (ここ)
- \item 発表者: (また) 栗原
-\end{itemize}
+
 \end{frame}
-
-\begin{frame}
-次回の申し込みはこちら
-
-\begin{center}
- \includegraphics[width=0.6\linewidth]{FigsSample03/QR_Code1571235785.png}\\[-2ex]
-\url{https://zettant.connpass.com/event/151622/}
-\end{center}
-
-\alert{Paypal前払いを試験導入中}。現地払い希望の場合はご連絡を。
-\end{frame}
-
 
 
 \input{./frame-itransfy.tex}

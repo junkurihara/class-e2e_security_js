@@ -238,7 +238,7 @@
 \subtitle{第2回 AESはどうやって使えばいいのか？ 編}
 \author[Jun Kurihara]{栗原 淳}
 \institute[]{}
-\date[Oct. 3, 2019]{2019年10月3日}
+\date[]{}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,7 +304,6 @@ AESを使ってみることもできた。
 \alert{お作法を守る・守らないで安全性は大違い}なので、注意しなければならない。\footnote[frame]{世の中のソフトウェア、全くお作法を守ってないのが散見されてとても危険。最近だとphpの\texttt{hash\_hkdf()}がお作法守ってなかった (2018年)。}
 \end{frame}
 
-\input{./frame-kurihara.tex}
 
 \begin{frame}
 \frametitle{この講義の対象と事前準備}
@@ -332,13 +331,9 @@ AESを使ってみることもできた。
  \item \alert{AESを正しく・安全に暗号化するには？} ← 今日はココ
  \item 公開鍵暗号はどうやって使う？その使い方のコツは？
  \item ハッシュ・MAC・署名、それぞれの使い所と使い方は？
- \item \textcolor{gray}{RFCにまつわるあれこれ（証明書・鍵フォーマット・etc...)}
 \end{enumerate}
 「こういうのを知りたい」というリクエストがあれば是非。
 
-\vspace{2ex}
-
-\underline{セカンドシーズンも検討中。}\footnote[frame]{場所等変えてもっと来やすい場所へ。。。}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -978,28 +973,12 @@ const decrypted = await jscu.aes.decrypt( // AES復号
 
 \begin{frame}
 \frametitle{次回は}
-\begin{itemize}
- \item 内容: 
+内容: 
 \begin{itemize}
  \item 公開鍵暗号を使うコツ（数学的なことはやらない）
  \item RSA-OAEP
  \item EDCH-Ephemeral + AES
 \end{itemize}
- \item 日時: 2019年10月17日(木曜日) 19:00- (2週間後)
- \item 場所: ブロックチェーンハブ (ここ)
- \item 発表者: (また) 栗原
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-次回の申し込みはこちら
-
-\begin{center}
- \includegraphics[width=0.6\linewidth]{FigsSample02/QR_Code1570031022.png}\\[-2ex]
-\url{https://zettant.connpass.com/event/149136/}
-\end{center}
-
-\alert{Paypal前払いを試験導入中}。現地払い希望の場合はご連絡を。
 \end{frame}
 
 
