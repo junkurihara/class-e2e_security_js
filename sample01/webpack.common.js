@@ -39,6 +39,9 @@ const webpackConfig = {
   },
   node: {
     fs: 'empty'
+  },
+  externals: {
+    'js-crypto-utils': true
   }
 };
 
