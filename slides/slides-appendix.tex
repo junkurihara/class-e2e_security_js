@@ -273,7 +273,7 @@
 \section{標準規格}
 \begin{frame}
 \centering
- {\Large 暗号周りの標準規格}
+ {\Large セキュリティ関連の標準規格}
 \end{frame}
 
 \begin{frame}
@@ -285,18 +285,32 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{RFC (Request for Comments)とは}
+\frametitle{RFC (Request for Comments)}
 \end{frame}
 
 \begin{frame}
-\frametitle{その他}
-\begin{block}{\small CRYPTOREC, NESSIE, ISO...}
-基本的には、「アルゴリズム」「プロトコル」のどれを標準として採用します、という\alert{「推奨技術リスト」}。
+\frametitle{その他; 各国の推奨技術リストとしての標準規格}
+\small
+\begin{itemize}
+ \item CRYPTOREC\footnote[frame]{\scriptsize Cryptography Research and Evaluation Committee} \\
+電子政府推奨暗号リストを作り、その実装や運用方法も含めて安全性を調査・評価・監視・検討するプロジェクト (2000年〜)
+ \item NESSIE\footnote[frame]{\scriptsize New European Schemes for Signature, Integrity, and Encryption}\\
+EUの制定した暗号標準リストを策定するプロジェクト (2000年〜)
+\end{itemize}
+基本的には、「評価検討した結果、\underline{既存}の暗号アルゴリズム・プロトコルのどれそれを標準として採用する」という\alert{「推奨技術リスト」の策定プロジェクト}だと思って差し支えない。
+\end{frame}
+
+\begin{frame}
+\small
+ 
+\begin{block}{\small 「各国独自」という意味}
+推奨技術リストへ採用されたアルゴリズム・プロトコルは、「その国において正しく評価された比較的安全なもの」というお墨付きを得る。
+セキュリティ技術は国防上重要な意味を持つため、このお墨付きは、その技術を自国で利用して良いものかどうかを判定するもの、と言える。
 \end{block}
 
-「ここで採用されたアルゴリズム・プロトコルを使ってるから安全です」と言える以上の意味はない。
+例外はもちろん存在するが、仕様の詳細はPKCS, NIST公募 (NIST FIPS PUB), あるいはIETF (RFC)など国際的に比較的オープンな場でまず採用・策定される。
 
-\alert{仕様の詳細はPKCS, RFC, NIST FIPS PUBを参考にする。}
+そしてそれを各国が独自に調査検討して推奨技術リストとして採用する、というケースが多い。
 
 
 \end{frame}
