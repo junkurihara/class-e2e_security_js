@@ -350,7 +350,7 @@ $\Rightarrow$ AESなどにはない、非常に強力な暗号化の概念。現
 
 \end{frame}
 
-
+\input{frame-kurihara.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{公開鍵暗号の使い方 事始め}
 \begin{frame}
@@ -401,7 +401,7 @@ JavaScriptに限らず、各種環境で利用可能な代表的な公開鍵暗�
 \item Diffie-Hellman(DH)\footnote[frame]{\scriptsize RFC2631 \url{https://tools.ietf.org/html/rfc2631}}を楕円曲線上で実行するのがECDH、DSA\footnote[frame]{\scriptsize NIST FIPS 186-4 \url{https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf}}を楕円曲線上で実行するのがECDSA。
 \item RFC8442、CRYPTREC、IEEE P1363等で標準化。TLSやBitcoinなど多方面で利用。
 \item 公開鍵長は256--521bits (Compact form) が標準的に使われている。
-\item ECDHは「ECDH-Ephemeral」という方法で実行することで、普通に使うより\alert{安全性が大きく向上}する。\footnote[frame]{\scriptsize Forward Secrecy(第1回のスライド参照)を担保する。}
+\item ECDHは「ECDH-Ephemeral」という方法で実行することで、普通に使うより\alert{安全性が大きく向上}する。\footnote[frame]{\scriptsize Forward Secrecy(後述)を担保する。}
 \end{itemize}
 \end{block}
 \end{frame}
