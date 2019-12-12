@@ -281,10 +281,10 @@
 \begin{frame}
 \frametitle{第3回のおさらい: Ephemeral Scheme}
 \begin{block}{\small 公開鍵暗号化のEphemeral Schemeでの運用}
-公開鍵・秘密鍵ペアを都度生成、1回限りで使い捨てることで、\alert{Perfect Forward Secrecy}\footnote[frame]{\scriptsize 長期的に保存されているマスター秘密鍵の漏洩や、一部の暗号化データがクラックされたとしても、\alert{それ以外の過去に暗号化されたデータは復号されてしまうことはない}という概念。}を担保する運用方法。
+公開鍵・秘密鍵ペアを都度生成、1回限りの暗号化・復号で使い捨てることで、\alert{Perfect Forward Secrecy}\footnote[frame]{\scriptsize 長期的に保存されているマスター秘密鍵の漏洩や、一部の暗号化データがクラックされたとしても、\alert{それ以外の過去に暗号化されたデータは復号されてしまうことはない}という概念。}を担保する運用方法。
 \end{block}
 
-Perfect Forward Secrecyを守り、End-to-End暗号化の強固な運用を。
+Perfect Forward Secrecyを守ることで、End-to-End暗号化の強固な運用が可能に。
 \end{frame}
 
 \begin{frame}
@@ -901,7 +901,7 @@ JSで使いやすいRSASSA PSS \& PKSC\#1-v1.5とECDSAについて取り上げ�
 \vspace{2ex}
 
 署名において一番やばいのは、「誰かが自分を騙って署名を作ることができる」などという状況。
-そのため、署名においても「公開鍵サイズの正しい選択」が重要。
+それを防ぐためには、署名においても「公開鍵サイズの正しい選択」が重要。
 \begin{block}{\small 前回の復習}
 暗号化においてAES-128bitsと同程度の強度の公開鍵サイズは、
 \begin{itemize}
@@ -957,7 +957,7 @@ MaskedDataBlockはヘッダ。
 \end{frame}
 
 \begin{frame}
-\frametitle{PSSのイメージ図}
+\frametitle{参考: PSSのイメージ図}
 \begin{center}
 \includegraphics[width=0.8\linewidth]{Figs/pss.pdf}
 \end{center}
@@ -1022,6 +1022,7 @@ return jscu.pkc.sign(
 );
 \end{verbatim}
 \end{block}
+RSASSAでも、\underline{Hash生成は署名生成API内部に含まれている}ことに注意。別途Hash生成しなくてよい。
 \end{frame}
 
 \begin{frame}[fragile]

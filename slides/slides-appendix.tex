@@ -278,6 +278,70 @@
 
 \begin{frame}
 \frametitle{PKCS (Public Key Cryptography Standards)}
+\begin{block}{PKCSとは？}
+RSA Security社\footnote[frame]{\scriptsize RSA暗号を作ったRivest-Shamir-Adlemanの会社。}の研究部門RSA Labsが策定・公開している、公開鍵暗号を中心とする一連のセキュリティ技術標準のこと。比較的古い、\underline{枯れた}標準になる。
+\end{block}
+\begin{itemize}
+ \item \#1,...\#15の15本が存在\footnote[frame]{\scriptsize 破棄・廃盤も含む。}。
+ \item 暗号化・署名生成の手続き・アルゴリズム、データフォーマットの規定など、いわゆる「ローレベル」の技術標準が中心。
+ \item RSA暗号標準を定める\#1を代表に、重要なものはメンテされ続けている。が、他の新標準規格で代替されるものなどは破棄・管理移譲されている。
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+PKCSは、その名目上「私企業」が策定した技術標準。
+
+しかし、採用された技術は、十分にセキュリティ評価されていると見做されるものが多く、また他の技術標準に採用・移植・継承されている。
+特に多くはIETF RFCの管理下へ継承されているようだ。
+\end{frame}
+
+\begin{frame}
+PKCS文書一覧(1/2)
+\begin{table}
+\scriptsize
+\begin{tabular}{|l|l|p{21ex}|p{40ex}|}
+\hline
+ & Ver. & 名称 & 内容 \\
+\hline\hline
+PKCS \#1 & v2.2 & RSA Cryptography Specifications\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc8017}} & RSA鍵ペアの構造、暗号化手法、署名手法を策定。\\
+\hline
+PKCS \#3 & v1.4 & Diffie–Hellman Key Agreement Standard & Diffie-Hellman鍵交換の仕様を策定。RFCではInternet Key Exchange (IKE)へ継承(?)。\\
+\hline
+PKCS \#5 & v2.1 & Password-Based Cryptography Specification\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc8018}} & パスワードからの鍵導出手法、暗号化手法 (PBKDF1/2, PBES1/2) の策定。\\
+\hline
+PKCS \#6 & 廃止 & Extended-Certificate Syntax Standard & X.509v1証明書の拡張。X.509v3へ統合されて廃止。\\
+\hline
+PKCS \#7 & 廃止(?) & Cryptographic Message Syntax Standard\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc2315}} & 暗号メッセージ構文を策定。S/MIMEに利用。より新しい仕様 (RFC5652) により廃止(?)。\\
+\hline
+PKCS \#8 & 廃止(?) & Private-Key Information Syntax Specification\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc5208}} & 秘密鍵フォーマットを策定。より新しい仕様 (RFC5968) によりv1.2で廃止(?)。\\
+\hline
+PKCS \#9 & v2.0 & Selected Object Classes and Attribute Types\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc2985}} & 各種フォーマットにおける「属性」タイプを策定。\\
+\hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}
+PKCS文書一覧(2/2)
+\begin{table}
+\scriptsize
+\begin{tabular}{|l|l|p{21ex}|p{40ex}|}
+\hline
+ & Ver. & 名称 & 内容 \\
+\hline\hline
+PKCS \#10 & v1.7 & Certification Request Syntax Specification\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc2986} + \url{https://tools.ietf.org/html/rfc5967}} & 証明書リクエスト構文を策定。元はPKCSのみで策定されていたが、利用されるメディアタイプをRFC5967で拡張。\\
+\hline
+PKCS \#11 & v2.40 & Cryptographic Token Interface & Cryptokiとしても知られる、暗号トークン(H/Wセキュリティモジュール)インターフェースの仕様を策定。OASIS PKCS 11 Technical Committeeへ継承。\\
+\hline
+PKCS \#12 & v1.1 & Personal Information Exchange Syntax Standard\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc7292}} & パスワード暗号化された秘密鍵、公開鍵証明書の構文を策定。IETF IESG管理下へ継承。\\
+\hline
+PKCS \#15 & v1.1 & Cryptographic Token Information Format Standard & 暗号トークン向け、ユーザ特定標準仕様の策定。ICカード部分はISO/IEC 7816-15へ移譲。\\
+\hline
+\end{tabular}
+\end{table}
+策定中のまま立ち消えたものなどは削除。
+
+IETF RFCなどへRepublication、あるいは継承されて新しい標準になっている。
 \end{frame}
 
 \begin{frame}
@@ -285,7 +349,7 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{RFC (Request for Comments)}
+\frametitle{IETF RFC (Request for Comments)}
 \end{frame}
 
 \begin{frame}
@@ -305,12 +369,16 @@ EUの制定した暗号標準リストを策定するプロジェクト (2000年
  
 \begin{block}{\small 「各国独自」という意味}
 推奨技術リストへ採用されたアルゴリズム・プロトコルは、「その国において正しく評価された比較的安全なもの」というお墨付きを得る。
-セキュリティ技術は国防上重要な意味を持つため、このお墨付きは、その技術を自国で利用して良いものかどうかを判定するもの、と言える。
+
+
+\underline{セキュリティ技術は国防上重要な意味を持つ}ため、このお墨付きは、その技術を自国で利用して良いものかどうかを判定するもの、と言える。
 \end{block}
 
-例外はもちろん存在するが、仕様の詳細はPKCS, NIST公募 (NIST FIPS PUB), あるいはIETF (RFC)など国際的に比較的オープンな場でまず採用・策定される。
+仕様の詳細はNIST公募 (NIST FIPS PUB), あるいはIETF (RFC)など国際的に比較的オープンな場でまず評価・採用・策定される\footnote[frame]{\scriptsize 例外は存在する。元々PKCSはRSA Labs.の独自標準を公開したものだったが、IETFの公開の場でInternet Draftの形で標準化場されてきている。}。
 
-そしてそれを各国が独自に調査検討して推奨技術リストとして採用する、というケースが多い。
+\vspace{1ex}
+
+その後、各国が独自に調査検討して推奨技術リストとして採用する、というケースが多い。
 
 
 \end{frame}
