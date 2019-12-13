@@ -279,7 +279,7 @@
 \begin{frame}
 \frametitle{PKCS (Public Key Cryptography Standards)}
 \begin{block}{PKCSとは？}
-RSA Security社\footnote[frame]{\scriptsize RSA暗号を作ったRivest-Shamir-Adlemanの会社。}の研究部門RSA Labsが策定・公開している、公開鍵暗号を中心とする一連のセキュリティ技術標準のこと。比較的古い、\underline{枯れた}標準になる。
+RSA Security社\footnote[frame]{\scriptsize RSA暗号を作ったRivest-Shamir-Adlemanの会社。}の研究部門RSA Labsが策定・公開している、公開鍵暗号を中心とする一連のセキュリティ技術標準のこと。比較的古い、\underline{枯れた標準}になる。
 \end{block}
 \begin{itemize}
  \item \#1,...\#15の15本が存在\footnote[frame]{\scriptsize 破棄・廃盤も含む。}。
@@ -345,7 +345,23 @@ IETF RFCなどへRepublication、あるいは継承されて新しい標準に�
 \end{frame}
 
 \begin{frame}
-\frametitle{NIST FIPS PUB}
+\frametitle{NIST FIPS および SP800\footnote[frame]{参考: https://www.ipa.go.jp/security/publications/nist/}}
+\begin{block}{NIST FIPS/SP800とは？}
+米国国立標準技術研究所 (NIST; National Institute of Standards and Technology) の発行する文書のこと。
+\begin{itemize}
+ \item \alert{FIPS; Federal Information Processing Standards}: 米国商務長官の承認の下、NISTが公布した情報セキュリティ関連の米国の標準規格文書。詳細な基準や要求事項、ガイドラインが記載されている。
+ \item SP800; Special Publication: 米国政府がセキュリティ対策を実施する際に参考とすることを前提とした、コンピュータセキュリティ関係のレポート。
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+すなわちNIST FIPSは、米国ローカルの標準規格と言える。
+
+\begin{itemize}
+\item 多くは、他の国別標準規格同様にANSI/ISO/IEEE等で広く使われていた既存規格を引き継ぐ。
+\item 一部はNIST FIPS独自に公募・評価・策定した独自規格。代表的なものは、公募されてきた`Rijndael'という新暗号アルゴリズムを採用したFIPS 197; Advanced Encryption Standard (AES)。
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -374,7 +390,7 @@ EUの制定した暗号標準リストを策定するプロジェクト (2000年
 \underline{セキュリティ技術は国防上重要な意味を持つ}ため、このお墨付きは、その技術を自国で利用して良いものかどうかを判定するもの、と言える。
 \end{block}
 
-仕様の詳細はNIST公募 (NIST FIPS PUB), あるいはIETF (RFC)など国際的に比較的オープンな場でまず評価・採用・策定される\footnote[frame]{\scriptsize 例外は存在する。元々PKCSはRSA Labs.の独自標準を公開したものだったが、IETFの公開の場でInternet Draftの形で標準化場されてきている。}。
+仕様の詳細はIETF (RFC), ISO, NIST公募など国際的に比較的オープンな場でまず評価・採用・策定される\footnote[frame]{\scriptsize 例外は存在する。元々PKCSはRSA Labs.の独自標準を公開したものだったが、IETFの公開の場でInternet Draftの形で標準化されてきている。}。
 
 \vspace{1ex}
 
