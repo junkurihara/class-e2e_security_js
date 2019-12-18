@@ -270,11 +270,43 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{標準規格}
+\section{セキュリティエンジニアリングと標準規格}
 \begin{frame}
 \centering
  {\Large セキュリティ関連の標準規格}
 \end{frame}
+
+\begin{frame}
+\frametitle{はじめに： セキュリティエンジニアリングと標準規格}
+\begin{block}{セキュリティエンジニアリング\footnote[frame]{\scriptsize \url{https://www.ipa.go.jp/security/awareness/vendor/software.html}} }
+ソフトウェア・アプリケーション開発において、セキュリティを考慮したエンジニアリング、あるいはセキュリティエンジニアリングを行うためには、要件定義・設計・実装・テストの段階ごとに種々のセキュリティ関連事項を検討する必要がある。
+\end{block}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{FigsAppendix/security-eng-2.png}
+\end{center}
+\end{frame}
+
+\begin{frame}
+一方で、標準規格は:
+\begin{block}{標準規格となるアルゴリズム・プロトコル}
+国家や団体の標準文書に載せるために、\alert{安全性・相互接続性・効率性を分析し、安全性や将来性などがある程度確保}されたもの、と言える。
+\end{block}
+
+\begin{center}
+ $\Downarrow$
+\end{center}
+
+すなわち、\underline{標準規格を要件に応じて適切に選択}し、設計・実装を行うことで脆弱性低減、使いやすさとの両立や相互運用可能性の担保が容易になると言える。
+
+\vspace{1ex}
+
+つまり、最新の標準規格とその推奨される利用方法\footnote[frame]{\scriptsize なぜそのように利用するのか・載っているのか、も正しく知っておく必要がある。悪い例は、脆弱性はあるが互換性のために残っているRFC8017のRSAES-PKCS1-v1\_5。}を把握しておくことで、\alert{効率的なセキュリティエンジニアリングが行える}。
+\end{frame}
+
+\begin{frame}
+ 次ページからは、実際のセキュリティ関連標準について紹介する。
+\end{frame}
+
 
 \begin{frame}
 \frametitle{PKCS (Public Key Cryptography Standards)}
@@ -396,8 +428,8 @@ EUの制定した暗号標準リストを策定するプロジェクト (2000年
 
 その後、各国が独自に調査検討して推奨技術リストとして採用する、というケースが多い。
 
-
 \end{frame}
+
 
 \begin{frame}
 \frametitle{公開鍵・秘密鍵のフォーマット・エンコーディング}
