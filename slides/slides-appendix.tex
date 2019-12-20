@@ -398,6 +398,7 @@ IETF RFCなどへRepublication、あるいは継承されて新しい標準に�
 
 \begin{frame}
 \frametitle{IETF RFC (Request for Comments)}
+JWT, JWKはOpenID Foundation
 \end{frame}
 
 \begin{frame}
@@ -405,16 +406,40 @@ IETF RFCなどへRepublication、あるいは継承されて新しい標準に�
 \end{frame}
 
 \begin{frame}
-\frametitle{ITU-T Study Group 17}
+\frametitle{W3C (World Wide Web Consortium)}
+\begin{block}{W3Cとは？}
+\end{block}
+
 \end{frame}
 
 \begin{frame}
-\frametitle{W3C (World Wide Web Consortium)}
-
-JWT, JWKなど
-
-FIDO2 Webauthnの手続きもここに。CTAPはFIDO Allianceの方か。
+W3Cのセキュリティ関連WG (Working Group) で有名な活動として、以下のような国際標準化策定が上げられる。
+\begin{itemize}
+ \item \structure{WebCrypto WG}\footnote[frame]{\scriptsize \url{https://www.w3.org/2012/webcrypto/} 現状はClose。}: WebCrypto APIを策定、勧告として国際標準化。
+ \item \structure{WebAuthn WG}\footnote[frame]{\scriptsize \url{https://www.w3.org/blog/webauthn/}}: FIDOアライアンスの技術仕様を勧告として国際標準化 \footnote[frame]{\scriptsize 対象はブラウザ・端末・認証サーバの連携プロトコルであるFIDO2 WebAuthn \url{https://www.w3.org/2019/03/pressrelease-webauthn-rec.html.ja}。デバイス連携プロトコルであるFIDO2 CTAPはITU-Tで国際標準化。}
+\end{itemize} 
 \end{frame}
+
+\begin{frame}
+\frametitle{ITU-T SG17}
+\begin{block}{\footnotesize ITU-T (International Telecommunication Union Telecommunication Standardization Sector) SG17 (Study Group 17) とは？\footnote[frame]{\scriptsize \url{https://www.ituaj.jp/wp-content/uploads/2016/07/2016_08-06-spotITU-T.pdf}}}
+\begin{itemize}
+ \item ITU-T: ITU (International Telecom. Union; 国際電気通信連合) における通信分野の標準技術を策定する「電気通信標準化部門」。策定された標準は「勧告」として発行される。
+ \item Study Group 17: ITU-Tにおいてセキュリティ関連勧告作成の中心となるグループ。
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+ITU-T SG17で取り扱う技術は、SDN・IoT・ITS・クラウドのセキュリティ技術、SPAM対策、ID管理技術、認証技術、テレバイオメトリクスなど、ソフトウェア実装のためのアルゴリズムというより\alert{「通信事業者」や「通信端末」を対象とした分野の技術}。
+
+\vspace{1ex}
+
+昨今だと、「FIDOアライアンスの技術仕様を勧告として国際標準化\footnote[frame]{\scriptsize 対象はデバイス連携プロトコルであるFIDO UAF 1.1およびCTAP \url{https://fidoalliance.org/fido-alliance-specifications-now-adopted-as-itu-international-standards/}。Web関連プロトコルであるFIDO2 WebAuthnはW3Cで国際標準化。}」している。
+
+\end{frame}
+
 
 \begin{frame}
 \frametitle{その他; 各国の推奨技術リストとしての標準規格}
@@ -425,15 +450,7 @@ FIDO2 Webauthnの手続きもここに。CTAPはFIDO Allianceの方か。
  \item NESSIE\footnote[frame]{\scriptsize New European Schemes for Signature, Integrity, and Encryption}\\
 EUの制定した暗号標準リストを策定するプロジェクト (2000年〜)
 \end{itemize}
-基本的には、「評価検討した結果、\underline{既存}の暗号アルゴリズム・プロトコルのどれそれを標準として採用する」という\alert{「推奨技術リスト」の策定プロジェクト}だと思って差し支えない。
-\end{frame}
-
-\begin{frame}
-\frametitle{その他; 諸々}
-\begin{itemize}
- \item FIDO Alliance (?)
- \item IEEE Standards Association
-\end{itemize}
+基本的には、「評価検討した結果、\underline{既存}のアルゴリズム・プロトコルのどれそれを標準として採用する」という\alert{「推奨技術リスト」の策定プロジェクト}だと思って差し支えない。
 \end{frame}
 
 \begin{frame}
@@ -453,6 +470,15 @@ EUの制定した暗号標準リストを策定するプロジェクト (2000年
 その後、各国が独自に調査検討して推奨技術リストとして採用する、というケースが多い。
 
 \end{frame}
+
+\begin{frame}
+\frametitle{その他; 諸々}
+\begin{itemize}
+ \item FIDO Alliance: フォーラム標準。国際標準ではない。
+ \item IEEE Standards Association
+\end{itemize}
+\end{frame}
+
 
 
 \begin{frame}
