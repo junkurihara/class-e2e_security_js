@@ -397,8 +397,35 @@ IETF RFCなどへRepublication、あるいは継承されて新しい標準に�
 \end{frame}
 
 \begin{frame}
-\frametitle{IETF RFC (Request for Comments)}
-JWT, JWKはOpenID Foundation
+\frametitle{IETF RFC}
+\begin{block}{RFC (Request for Comments) とは？}
+「インターネット技術」全般の国際標準を議論策定するグループ IETF (Internet Engineering Task Force) で議論策定された、「インターネット技術標準」および「その他」\footnote[frame]{\scriptsize \url{https://www.nic.ad.jp/ja/rfc-jp/RFC-Category.html}}の広範な内容を扱う文書(群)のこと。
+\end{block}
+
+詳細仕様を策定するITU-TやISOと異なり、「まずは動作させる」ことを目的として実験的な「Rough」な仕様をまず策定することが特徴。
+\end{frame}
+
+\begin{frame}
+RFCは5つのカテゴリに分類される:
+\begin{itemize}
+ \item \structure{Standards Track}: Proposed Standard $\rightarrow$ Internet Standard という策定過程を経る「インターネット標準技術仕様」の文書。
+ \item \structure{Informational}: すでにデファクト標準であったり、インターネット標準の議論・策定において有益として公開されたもの。例えば、RSAセキュリティ社のPKCS\#1 v2.1 = RFC8017。
+ \item \structure{Experimental}: デファクト標準を狙うような、研究等の目的で公開される技術仕様文書。
+ \item \structure{Historical}: 過去の記録として残す情報としての文書。
+ \item \structure{Best Current Practice}: 現状のベストプラクティスをまとめた仕様文書。
+\end{itemize}
+
+特にStandard Track, Informational, Experimentalに関して、PKCS等の他標準を引き継いだり、新たな技術標準を定めた文書が策定される。
+\end{frame}
+
+\begin{frame}
+セキュリティ関係のRFC化の事例：
+\begin{itemize}
+ \item 事例1: OpenID Connectによって利用される鍵や署名、暗号化の仕様: JWS\footnote[frame]{\scriptsize JSON Web Signature \url{https://tools.ietf.org/html/rfc7515}}, JWE\footnote[frame]{\scriptsize JSON Web Encryption \url{https://tools.ietf.org/html/rfc7516}}, JWK\footnote[frame]{\scriptsize JSON Web Key \url{https://tools.ietf.org/html/rfc7517}}, JWT\footnote[frame]{\scriptsize JSON Web Token \url{https://tools.ietf.org/html/rfc7519}}について、OpenID Foundationのメンバにより、RFC Standards Trackとして国際標準化。
+ \item 事例2: PKCS\#1, \#5, \#9等のRSAセキュリティ社の独自標準は、InformationalとしてRFC化。
+ \item 事例3: HTTPSを支えるTLS v1.3\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc8446}}は、Standards TrackとしてRFC化。
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}
@@ -474,15 +501,15 @@ EUの制定した暗号標準リストを策定するプロジェクト (2000年
 \begin{frame}
 \frametitle{その他; 諸々}
 \begin{itemize}
- \item FIDO Alliance: フォーラム標準。国際標準ではない。
- \item IEEE Standards Association
+ \item FIDO Alliance: フォーラム標準を定める業界団体。国際標準ではない。
+ \item OpenID Foundation
 \end{itemize}
 \end{frame}
 
 
 
 \begin{frame}
-\frametitle{公開鍵・秘密鍵のフォーマット・エンコーディング}
+\frametitle{公開鍵・秘密鍵・証明書のフォーマット・エンコード}
 \begin{itemize}
  \item PEM
  \item DER
