@@ -429,12 +429,32 @@ RFCは5つのカテゴリに分類される:
 \end{frame}
 
 \begin{frame}
-\frametitle{ISO (International Organization for Standardization)}
+\frametitle{ISO/IEC JTC 1}
+\begin{block}{ISO\footnote[frame]{\scriptsize 国際標準化機構; International Organization for Standardization}/IEC\footnote[frame]{\scriptsize 国際電気標準会議; International Electrotechnical Commission} JTC (Joint Technical Committee) 1 とは}
+情報技術の分野で国際標準化を行うための、ISOとIECの第一合同技術委員会のこと。セキュリティ技術は、第27 subcommittee (SC27)。
+\end{block}
+
+ISO/IEC JTC 1は各国が提案を持ち寄り議論が進められる国際標準化団体。他の標準規格からの引継ぎだけではなく、国際会議等で発表された新しいメカニズムやアルゴリズムも標準規格として提案される。
 \end{frame}
+
+\begin{frame}
+ISO/IEC JTC1 SC27は5つのWorking Groupで構成される\footnote[frame]{\scriptsize \url{https://www.itscj.ipsj.or.jp/hyojunka/h_sn_member/h_sn_katsudo/h_sn_katsudo2013/sc27_2013.html}}。特にWG2で扱われるものが、セキュリティ「技術」や「メカニズム」の標準規格となる。
+
+\begin{itemize}
+ \item WG 1 情報セキュリティマネジメントシステム (いわゆるISMS)
+ \item \alert{WG 2 暗号とセキュリティメカニズム}: 暗号アルゴリズム・プロトコルの標準規格。他の標準規格からの引継ぎだけでなく、各国から新たに提案されたものを議論し、標準規格を決定している。
+ \item WG3 セキュリティの評価・試験・仕様
+ \item WG4 セキュリティコントロールとサービス
+ \item WG5 アイデンティティ管理とプライバシー技術
+\end{itemize}
+
+\end{frame}
+
 
 \begin{frame}
 \frametitle{W3C (World Wide Web Consortium)}
 \begin{block}{W3Cとは？}
+WWWで用いられるWeb技術の標準化、相互運用性の確保を目的とする団体。ブラウザのAPIやHTML, XML, DOM等の標準規格を「勧告 (Recommendation)」として策定する。
 \end{block}
 
 \end{frame}
@@ -503,10 +523,15 @@ EUの制定した暗号標準リストを策定するプロジェクト (2000年
 \begin{itemize}
  \item FIDO Alliance: フォーラム標準を定める業界団体。国際標準ではない。
  \item OpenID Foundation
+ \item Ecma International: JavaScriptのメイン機能の標準規格 (ECMAScript) を策定する業界団体。JS以外にも多種の規格策定、およびEcma規格の国際標準化を行っている。\footnote[frame]{\scriptsize 例えば: Ecma規格ECMA-334 ``C\#'' は、国際規格ISO/IEC 23270として標準化。}
 \end{itemize}
 \end{frame}
 
 
+\begin{frame}
+\centering
+{\Large 鍵フォーマット・エンコードの規格について}
+\end{frame}
 
 \begin{frame}
 \frametitle{公開鍵・秘密鍵・証明書のフォーマット・エンコード}
@@ -520,6 +545,12 @@ JSの基本はJWK。OpenSSLやSSHなどで馴染みがあるのはPEM。
 \end{frame}
 
 \begin{frame}
+\centering
+{\Large 楕円曲線暗号のパラメタについて}
+\end{frame}
+
+
+\begin{frame}
 \frametitle{ECDH, ECDSAの鍵選択(曲線の選択)}
 どの曲線を使えばいいのか？
 \begin{itemize}
@@ -528,7 +559,11 @@ JSの基本はJWK。OpenSSLやSSHなどで馴染みがあるのはPEM。
  \item P-384,
  \item P-521
 \end{itemize}
-あたりが無難なところ。
+公開APIの中で選択できるものの中で、無難。
+
+現実的な攻撃かどうかはさておいて、現状学術的な攻撃が発見されたりしているものは、Falseがついている。
+
+Safe Curves: \url{https://safecurves.cr.yp.to/}
 \end{frame}
 
 
