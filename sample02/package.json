@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@babel/runtime": "~7.7.2",
-    "commander": "4.0.1",
+    "commander": "4.1.0",
     "js-crypto-utils": "0.18.2",
     "js-encoding-utils": "0.5.6",
     "json-server": "~0.15.1",
