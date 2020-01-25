@@ -265,8 +265,6 @@
 この資料は、「JavaScriptによるEnd-to-Endセキュリティ」の補足資料である。
 
 「標準規格」そのもの、および一連の勉強会にて話題に上げた鍵フォーマットや標準アルゴリズムについてを解説を与える。
-
-また、鍵フォーマットなどは、JavaScriptでハンドリングするためのサンプルコードも記述している。
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -522,48 +520,139 @@ EUの制定した暗号標準リストを策定するプロジェクト (2000年
 \frametitle{その他; 諸々}
 \begin{itemize}
  \item FIDO Alliance: フォーラム標準を定める業界団体。国際標準ではない。
- \item OpenID Foundation
+ \item OpenID Foundation: 上記同様。
  \item Ecma International: JavaScriptのメイン機能の標準規格 (ECMAScript) を策定する業界団体。JS以外にも多種の規格策定、およびEcma規格の国際標準化を行っている。\footnote[frame]{\scriptsize 例えば: Ecma規格ECMA-334 ``C\#'' は、国際規格ISO/IEC 23270として標準化。}
 \end{itemize}
 \end{frame}
 
 
+\section{公開鍵・秘密鍵等の表現形式}
 \begin{frame}
 \centering
-{\Large 鍵フォーマット・エンコードの規格について}
+{\Large 公開鍵・秘密鍵等の表現形式}
 \end{frame}
 
 \begin{frame}
-\frametitle{公開鍵・秘密鍵・証明書のフォーマット・エンコード}
+\frametitle{公開鍵・秘密鍵・証明書等の形式}
+公開鍵・秘密鍵・証明書などを表すための代表的な表現形式:
 \begin{itemize}
- \item PEM
- \item DER
- \item JWK
- \item {[ECC鍵のみ]}  RAW (Octet form)
+ \item DER (Distinguished Encoding Rules) 形式: ANS.1で記述されるエンコード方法。RSA暗号の公開鍵・秘密鍵、楕円曲線暗号の公開鍵・秘密鍵など、それぞれエンコード方法を規定。
+ \item \structure{PEM (Privacy Enhanced Mail\footnote[frame]{\scriptsize 元々メールを暗号化したデータのエンコード方法だったので。})}: DERのBase64テキスト。
+ \item \structure{SECG SEC1形式}: (楕円曲線暗号の鍵のみ) 業界団体SECGで定められた公開鍵・秘密鍵のバイナリ表現方法。\footnote[frame]{\scriptsize \url{http://www.secg.org/sec1-v2.pdf}}
+ \item JWK/JWE/JWS (JSON Web Key/Encryption/Signature) 形式: JSON形式での表現方法。\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc7517}, \url{https://tools.ietf.org/html/rfc7516}, \url{https://tools.ietf.org/html/rfc7515}}
 \end{itemize}
-JSの基本はJWK。OpenSSLやSSHなどで馴染みがあるのはPEM。
+基本、JavaScriptでは鍵をJWKとして使うことが多いだろうが、OpenSSL等で最も良く利用されるのはDER・PEM形式の鍵。
 \end{frame}
 
+\begin{frame}
+\begin{center}
+\begin{table}
+\scriptsize
+\caption{各データの表現形式の規定文書一覧}
+\begin{tabular}{|c|c|c|c|}
+\hline
+& DER/PEM & SECG SEC1 & JWK/E/S \\
+\hline
+\hline
+RSA公開鍵 & 1) PKCS\#1 & N/A & RFC7517 \\
+ & 2)RFC5280\footnote[frame]{\scriptsize 証明書の中にあるSubjectPublicKeyInfoフィールド} & & \\
+\hline
+RSA秘密鍵 & RFC5958\footnote[frame]{\scriptsize 秘密鍵の暗号化サポート。RFC5958はPKCS\#8の拡張。}, PKCS\#1\footnote[frame]{\scriptsize RSA秘密鍵自体の構造を定義} & N/A & RFC7517 \\
+\hline
+ECC公開鍵 & RFC5480\footnote[frame]{\scriptsize 証明書の中にあるSubjectPublicKeyInfoフィールド} & SECG SEC1 v2 & RFC7517 \\
+\hline
+ECC秘密鍵 & RFC5958\footnote[frame]{\scriptsize 秘密鍵の暗号化をサポートするフォーマット}, RFC5915\footnote[frame]{\scriptsize ECC秘密鍵自体の構造を定義} & SECG SEC1 v2 & RFC7517 \\
+\hline
+(AES)共通鍵 & N/A & N/A & RFC7517 \\
+\hline
+公開鍵証明書 & RFC5280 (他) & N/A & N/A \footnote[frame]{\scriptsize X.509証明書へのURI等は記述可能 \url{https://tools.ietf.org/html/rfc7517}} \\
+\hline
+RSA暗号文 & N/A & N/A & RFC7516\\
+\hline
+ECDH+AES暗号文 & N/A & N/A & RFC7516\\
+\hline
+AES暗号文 & N/A & N/A & RFC7516 \\
+\hline
+HMAC & N/A & N/A & RFC7515\\
+\hline
+RSA署名 & N/A & N/A & RFC7515\\
+\hline
+ECDSA署名 & RFC5759 & N/A & RFC7515\\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
+\begin{exampleblock}{\small WebCrypto API/Node.jsでサポートする公開鍵・秘密鍵フォーマット}
+\begin{itemize}
+ \item WebCrypto API: \\RFC5280形式 (公開鍵のみ)、RFC5958形式 (秘密鍵のみ)、JWK
+ \item Node.js Crypto: \\RFC5280形式 (公開鍵のみ)、RFC5958形式 (秘密鍵のみ)、PKCS\#1形式
+\end{itemize}
+\end{exampleblock}
+統一が取れていないため、環境に応じて適切な表現形式の変換が必要\footnote[frame]{\scriptsize jscuはこれらの鍵変換をサポート。\url{https://github.com/junkurihara/jscu/tree/develop/packages/js-crypto-key-utils}}
+\end{frame}
+
+
+\section{楕円曲線のパラメタについて}
 \begin{frame}
 \centering
 {\Large 楕円曲線暗号のパラメタについて}
 \end{frame}
 
-
 \begin{frame}
 \frametitle{ECDH, ECDSAの鍵選択(曲線の選択)}
-どの曲線を使えばいいのか？
+\begin{block}{\small RSA暗号と楕円曲線暗号(ECDH/ECDSA)のパラメタ}
 \begin{itemize}
- \item P-256,
- \item P-256K, (Bitcoinで利用)
- \item P-384,
- \item P-521
+ \item RSA: パラメタは「公開鍵ビット長」
+ \item 楕円曲線: パラメタは「曲線の種類」
 \end{itemize}
-公開APIの中で選択できるものの中で、無難。
+\end{block}
+曲線の種類は、公開鍵ビット長を定めれば一意に決まるわけではない\footnote[frame]{\scriptsize e.g., 公開鍵長 256bitでは、P-256やP-256Kなど複数の利用可能な曲線の種類が存在。}。
 
-現実的な攻撃かどうかはさておいて、現状学術的な攻撃が発見されたりしているものは、Falseがついている。
+\begin{alertblock}{}
+※ただし、RSA暗号・楕円曲線暗号共々、``一般的には''\structure{公開鍵ビット長が大きいほど、より安全になり、より処理が重く}なるというトレードオフがある。 
+\end{alertblock}
+\end{frame}
 
+\begin{frame}
+では、どういった曲線を選べば良いのか？
+
+\begin{block}{\small 代表的な楕円曲線パラメタの標準}
+\begin{itemize}
+ \item SEC2: 業界団体 SECG の標準\footnote[frame]{\scriptsize \url{http://www.secg.org/sec2-v2.pdf}}
+ \item ANSI X9.62: 米国標準 \footnote[frame]{\scriptsize American National Standards Institute, ``Public Key Cryptography for the Financial Services Industry: The Elliptic Curve Digital Signature Algorithm (ECDSA),'' ANSI X9.62, November 2005.}
+ \item NIST FIPS186-4: \footnote[frame]{\scriptsize \url{https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf}}
+\end{itemize}
+\end{block}
+それぞれで標準化されたパラメタは、大きくオーバーラップしている\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc8422\#appendix-A}}が、\alert{最も頻繁に更新されている標準パラメタリストはNIST FIPS 186}のものである。
+\end{frame}
+
+\begin{frame}
+\begin{block}{\small WebCrypto API/Node.js両方で選択できるNIST曲線パラメタ}
+\begin{itemize}
+ \item P-256: 公開鍵長 = 256bits, 安全性 $\simeq$ 128bit鍵AES
+ \item P-384: 公開鍵長 = 384bits, 安全性 $\simeq$ 192bit鍵AES
+ \item P-521: 公開鍵長 = 521bits, 安全性 $\simeq$ 256bit鍵AES
+\end{itemize}
+\end{block}
+Bitcoin Blockchainで使用されている曲線\footnote[frame]{\scriptsize SECGパラメタ secp256k1あるいはP-256Kと呼ばれる。}は、WebCrypto APIでネイティブには未実装。
+\end{frame}
+
+\begin{frame}
+
+曲線パラメタに対して、より学術的な脆弱性の有無の一覧：\\
 Safe Curves: \url{https://safecurves.cr.yp.to/}
+
+\begin{center}
+ $\Downarrow$
+\end{center}
+
+\underline{現実的な攻撃かどうかはさておき}、\structure{NIST曲線パラメタには有効な攻撃が知られている}\footnote{\scriptsize \texttt{Safe?=False}の場合、攻撃が存在。}。
+
+実装に不備がある場合に発生する脆弱性が多く、\alert{``正しく設計・実装されている既存ライブラリ''のAPI経由で利用する分には問題ない}と言ってもよいだろう。
 \end{frame}
 
 
