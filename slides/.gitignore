@@ -12,3 +12,4 @@ thumbs.db
 *.dvi
 *.aux
 *.vrb
+*-pdfa.pdf
