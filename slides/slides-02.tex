@@ -601,11 +601,11 @@ REST APIで暗号化データを登録してみる。
 \begin{frame}
 \frametitle{JavaScriptプロジェクトの準備}
 \begin{itemize}
-\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/zettant/e2e-security-02}}をClone\\
+\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/junkurihara/slides-e2e-security-js/}}をClone\\
 \begin{exampleblock}{}
 \footnotesize
-\$ \texttt{git clone https://github.com/zettant/e2e-security-02}\\
-\$ \texttt{cd e2e-security-02/sample}
+\$ \texttt{git clone https://github.com/junkurihara/slides-e2e-security-js.git}\\
+\$ \texttt{cd sample02}
 \end{exampleblock}
 \item 依存パッケージのインストール
 \begin{exampleblock}{}
@@ -620,7 +620,7 @@ REST APIで暗号化データを登録してみる。
 
 \begin{frame}
 \frametitle{REST APIモックサーバの準備}
-今回はSSL接続可能な共有サーバを準備済 (\url{https://e2e.zettant.com/})。
+今回はSSL接続可能な共有サーバを準備済 (\url{https://e2e.zettant.com/})\footnote[frame]{\alert{2020/1/25時点でサーバは停止している。モックサーバを利用のこと。}}。
 
 \vspace{2ex}
 
@@ -676,7 +676,7 @@ REST APIで暗号化データを登録してみる。
 登録データは\url{https://e2e.zettant.com/data}で一覧。
 
 \begin{center}
-\includegraphics[width=\linewidth]{FigsSample02/data_pbes.pdf}
+\includegraphics[width=\linewidth]{Figs/data_pbes.pdf}
 \end{center} 
 
 暗号化データ以外、復号側と共有する公開パラメタ：
@@ -743,7 +743,7 @@ REST APIで暗号化データを登録してみる。
 ブラウザで確認してみる。
 
 \begin{center}
-\includegraphics[width=\linewidth]{FigsSample02/data_hkdf.pdf}
+\includegraphics[width=\linewidth]{Figs/data_hkdf.pdf}
 \end{center} 
 
 暗号化データ以外、復号側と共有する公開パラメタ：

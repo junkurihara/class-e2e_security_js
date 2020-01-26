@@ -608,11 +608,11 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 \begin{frame}
 \frametitle{JavaScriptプロジェクトの準備}
 \begin{itemize}
-\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/zettant/e2e-security-01}}をClone\\
+\item プロジェクトのGitHubリポジトリ\footnote[frame]{\url{https://github.com/junkurihara/slides-e2e-security-js/}}をClone\\
 \begin{exampleblock}{}
 \footnotesize
-\$ \texttt{git clone https://github.com/zettant/e2e-security-01}\\
-\$ \texttt{cd e2e-security-01/sample}
+\$ \texttt{git clone https://github.com/junkurihara/slides-e2e-security-js.git}\\
+\$ \texttt{cd sample01}
 \end{exampleblock}
 \item 依存パッケージのインストール
 \begin{exampleblock}{}
@@ -627,7 +627,7 @@ Stanford大学暗号研究室で開発されたpure JSなライブラリ。
 
 \begin{frame}
 \frametitle{REST APIモックサーバの準備}
-今回はSSL接続可能な共有サーバを準備済 (\url{https://e2e.zettant.com/})。
+今回はSSL接続可能な共有サーバを準備済 (\url{https://e2e.zettant.com/})\footnote[frame]{\alert{2020/1/25時点でサーバは停止している。モックサーバを利用のこと。}}。
 
 \vspace{2ex}
 
@@ -719,7 +719,7 @@ Base64エンコードされているが、暗号化されており中身はま�
 \url{https://e2e.zettant.com/data} にアクセスすると、サーバでの登録状況が一覧できる。\footnote[frame]{ローカルホストに立てた場合は\url{http://localhost:3000/data}}
 
 \begin{center}
-\includegraphics[width=\linewidth]{FigsSample01/json_list.pdf}
+\includegraphics[width=\linewidth]{Figs/json_list.pdf}
 \end{center}
 \end{frame}
 
@@ -739,7 +739,7 @@ Base64エンコードされているが、暗号化されており中身はま�
 コマンドラインでやった「暗号化して登録→取得して復号」の一連の流れが初期設定のデータ・鍵を使って実行される。
 
 \begin{center}
-\includegraphics[width=\linewidth]{FigsSample01/browser-img1.pdf}
+\includegraphics[width=\linewidth]{Figs/browser-img1.pdf}
 \end{center}
 
 \end{frame}
@@ -756,7 +756,7 @@ Base64エンコードされているが、暗号化されており中身はま�
 \begin{frame}[fragile]
 Webコンソールから暗号化・登録してみる。
 \begin{center}
-\includegraphics[width=0.9\linewidth]{FigsSample01/browser-img2.pdf}
+\includegraphics[width=0.9\linewidth]{Figs/browser-img2.pdf}
 \end{center}
 
 \begin{exampleblock}{}\footnotesize
@@ -780,7 +780,7 @@ e2eTest.postMyData(
 \begin{frame}[fragile]
 今度はWebコンソールから取得・復号してみる。
 \begin{center}
-\includegraphics[width=0.9\linewidth]{FigsSample01/browser-img3.pdf}
+\includegraphics[width=0.9\linewidth]{Figs/browser-img3.pdf}
 \end{center}
 \begin{exampleblock}{}\footnotesize
 \begin{verbatim}
@@ -857,7 +857,7 @@ encrypted += cipher.final('base64'); // 暗号化完了
 \end{block}
 
 \begin{center}
-\includegraphics[width=0.8\linewidth]{FigsSample01/node_aes_e.pdf}
+\includegraphics[width=0.8\linewidth]{Figs/node_aes_e.pdf}
 \end{center}
 \end{frame}
 
@@ -874,7 +874,7 @@ decrypted += decipher.final(); // 復号完了
 \end{verbatim}
 \end{block}
 \begin{center}
-\includegraphics[width=0.8\linewidth]{FigsSample01/node_aes_d.pdf}
+\includegraphics[width=0.8\linewidth]{Figs/node_aes_d.pdf}
 \end{center}
 \end{frame}
 
