@@ -2,7 +2,7 @@
 
 ## What's this? このリポジトリは何?
 
-This repository contains slides and sample codes for the classes, 'Introduction toe End-to-End Security via JavaScript' held at Zettant, Inc. in 2019 (and will be held in 2020 too). Some of (expired) registration pages in connpass are given below:
+This repository contains slides and sample codes for the classes, 'Introduction to End-to-End Security via JavaScript' held at [Zettant, Inc.](https://www.zettant.com/) in 2019 (and will be held in 2020 too). Some of (expired) registration pages in connpass are given below:
 
 このリポジトリは、2019年に[株式会社ゼタント](https://www.zettant.com/)で行っていた「JavaScriptを使って学ぶEnd-to-Endセキュリティ」という勉強会 (2020年も開催予定) のサンプルコードとスライドのソースを保存しています。過去の勉強会の情報:
 
