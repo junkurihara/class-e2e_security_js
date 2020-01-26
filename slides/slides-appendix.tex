@@ -236,9 +236,9 @@
 %%% 著者など
 %%%
 \title[E2E Security with JS Appendix]{JavaScriptによるEnd-to-Endセキュリティ}
-\subtitle{標準規格とセキュリティエンジニアリング}
-\author[Jun Kurihara]{栗原 淳}
-\institute[]{}
+\subtitle{補足資料: 標準規格とセキュリティエンジニアリング}
+\author[Jun Kurihara]{栗原 淳$^{1),2)}$}
+\institute[Zettant Inc./U-Hyogo]{$^{1)}$株式会社ゼタント\\ $^{2)}$兵庫県立大学}
 \date[\today]{\today}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -548,7 +548,7 @@ EUの制定した暗号標準リストを策定するプロジェクト (2000年
 \begin{center}
 \begin{table}
 \scriptsize
-\caption{各データの表現形式の規定文書一覧}
+\caption{\footnotesize 各データの表現形式の規定文書一覧\footnote[frame]{\scriptsize \alert{調べ間違い等あったらご指摘を！}}}
 \begin{tabular}{|c|c|c|c|}
 \hline
 & DER/PEM & SECG SEC1 & JWK/E/S \\
@@ -624,7 +624,7 @@ ECDSA署名 & RFC5759 & N/A & RFC7515\\
 \begin{itemize}
  \item SEC2: 業界団体 SECG の標準\footnote[frame]{\scriptsize \url{http://www.secg.org/sec2-v2.pdf}}
  \item ANSI X9.62: 米国標準 \footnote[frame]{\scriptsize American National Standards Institute, ``Public Key Cryptography for the Financial Services Industry: The Elliptic Curve Digital Signature Algorithm (ECDSA),'' ANSI X9.62, November 2005.}
- \item NIST FIPS186-4: \footnote[frame]{\scriptsize \url{https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf}}
+ \item NIST FIPS186-4: 米国標準 \footnote[frame]{\scriptsize \url{https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf}}
 \end{itemize}
 \end{block}
 それぞれで標準化されたパラメタは、大きくオーバーラップしている\footnote[frame]{\scriptsize \url{https://tools.ietf.org/html/rfc8422\#appendix-A}}が、\alert{最も頻繁に更新されている標準パラメタリストはNIST FIPS 186}のものである。
