@@ -25,5 +25,5 @@ module.exports = (env, argv) => {
   if (argv.mode !== 'development') throw new Error('Not development mode!!');
   ////////////////////////////////////////////////////////////////////////
   // library build setting
-  return merge.smart(common.webpackConfig, webpackConfig);
+  return merge.merge(common.webpackConfig, webpackConfig);
 };
